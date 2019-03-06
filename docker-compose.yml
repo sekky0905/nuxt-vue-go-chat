@@ -1,8 +1,20 @@
 version: '3'
 
 services:
+  nvgdb:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "nuxt_vue_go_chat"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - "./mysql:/etc/mysql/conf.d"
+      - "./mysql/data:/var/lib/mysql"
+      - "./mysql/init:/docker-entrypoint-initdb.d"
+    container_name: gvdb
+    ports:
+      - "3306:3306"
   app:
-    build:
+    build: 
       context: ./
       dockerfile: docker/Dockerfile
     volumes:
@@ -10,4 +22,6 @@ services:
     command: bash -c 'cd /go/src/github.com/sekky0905/nuxt-vue-go-chat/server && go run *.go'
     ports:
       - "8080:8080"
+    depends_on:
+      - nvgdb
     container_name: app

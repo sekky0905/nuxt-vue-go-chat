@@ -12,7 +12,9 @@ func main() {
 	router.Router.Path("/").HandlerFunc(ServeStaticFile(entryPoint))
 	router.Router.PathPrefix("/_nuxt/").Handler(http.StripPrefix("/_nuxt/", http.FileServer(http.Dir("../client/nuxt-vue-go-chat/dist/_nuxt/"))))
 
-	http.ListenAndServe(":8080", router.Router)
+	if err := http.ListenAndServe(":8080", router.Router); err != nil {
+		panic(err.Error())
+	}
 }
 
 // ServeStaticFile is deliver static files.

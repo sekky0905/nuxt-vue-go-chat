@@ -14,7 +14,7 @@ services:
     ports:
       - "3306:3306"
   app:
-    build: # Dockerfileの指定
+    build: 
       context: ./
       dockerfile: docker/Dockerfile
     volumes:

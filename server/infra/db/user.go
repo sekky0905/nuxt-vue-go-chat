@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -128,6 +129,37 @@ func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, que
 	return list, nil
 }
 
-func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, error)  { return 0, nil }
+// InsertUser insert a record.
+func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, error) {
+	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	result, err := stmt.ExecContext(repo.ctx, user.Name, user.SessionID, user.Password, user.CreatedAt, user.UpdatedAt)
+	if err != nil {
+		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+
+	affect, err := result.RowsAffected()
+	if affect != 1 {
+		err = fmt.Errorf("total affected: %d ", affect)
+		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+
+	return uint32(id), nil
+}
 func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error { return nil }
 func (repo *userRepository) DeleteUser(m DBManager, id uint32) error                   { return nil }

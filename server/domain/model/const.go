@@ -1,5 +1,7 @@
 package model
 
+const InvalidID = 0
+
 // InvalidReasonForDeveloper is InvalidReason message for developer.
 type InvalidReasonForDeveloper string
 

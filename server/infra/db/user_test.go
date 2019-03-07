@@ -14,9 +14,11 @@ import (
 )
 
 const (
-	userNameForTest  = "testUserName"
-	sessionIDForTest = "testsessionID12345678"
-	passwordForTest  = "testPasswor"
+	userNameForTest             = "testUserName"
+	sessionIDForTest            = "testsessionID12345678"
+	passwordForTest             = "testPasswor"
+	userValidIDForTest   uint32 = 1
+	userInValidIDForTest uint32 = 2
 )
 
 func TestNewUserRepository(t *testing.T) {
@@ -115,9 +117,6 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 		id uint32
 	}
 
-	var validID uint32 = 1
-	var inValidID uint32 = 2
-
 	tests := []struct {
 		name    string
 		fields  fields
@@ -132,10 +131,10 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: validID,
+				id: userValidIDForTest,
 			},
 			want: &model.User{
-				ID:        validID,
+				ID:        userValidIDForTest,
 				Name:      userNameForTest,
 				SessionID: sessionIDForTest,
 				Password:  passwordForTest,
@@ -151,13 +150,13 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: inValidID,
+				id: userInValidIDForTest,
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
 				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
 				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               inValidID,
+				PropertyValue:               userInValidIDForTest,
 				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
 				DomainModelNameForUser:      model.DomainModelNameUserForUser,
 			},
@@ -283,6 +282,147 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userRepository.GetUserByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_userRepository_InsertUser(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer db.Close()
+
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m    repository.DBManager
+		user *model.User
+	}
+
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		rowAffected int64
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a user which has sID, Name, Session_id, Password, CreatedAt, UpdatedAt is given, returns nil",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				user: &model.User{
+					ID:        userValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 1,
+			wantErr:     nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      "test",
+					SessionID: "test12345678",
+					Password:  "test",
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 2,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "INSERT INTO users"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.rowAffected != 1 {
+				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnError(errors.New(tt.wantErr.Error()))
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+
+			_, err := repo.InsertUser(tt.args.m, tt.args.user)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("userRepository.InsertUser() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
 			}
 		})
 	}

@@ -191,4 +191,35 @@ func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User)
 
 	return nil
 }
-func (repo *userRepository) DeleteUser(m DBManager, id uint32) error { return nil }
+
+// DeleteUser delete a record.
+func (repo *userRepository) DeleteUser(m DBManager, id uint32) error {
+	query := "DELETE FROM users WHERE id=?"
+
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	result, err := stmt.ExecContext(repo.ctx, id)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+	}
+
+	affect, err := result.RowsAffected()
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+	}
+	if affect != 1 {
+		err = fmt.Errorf("total affected: %d ", affect)
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+	}
+
+	return nil
+}

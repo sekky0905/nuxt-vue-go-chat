@@ -569,3 +569,113 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		})
 	}
 }
+
+func Test_userRepository_DeleteUser(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m  repository.DBManager
+		id uint32
+	}
+
+	tests := []struct {
+		name        string
+		fields      fields
+		rowAffected int64
+		args        args
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a user specified by id exists, returns nil",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 1,
+			args: args{
+				m:  db,
+				id: userValidIDForTest,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 0,
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 2,
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 0,
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "DELETE FROM users WHERE id=\\?"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.rowAffected != 1 {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(errors.New(tt.wantErr.Error()))
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+
+			err := repo.DeleteUser(tt.args.m, tt.args.id)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("userRepository.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+		})
+	}
+}

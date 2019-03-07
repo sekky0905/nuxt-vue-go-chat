@@ -5,11 +5,11 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 )
 
-// CloseTransaction は、Transactionの後処理を行う。
+// CloseTransaction executes post process of tx.
 func CloseTransaction(tx repository.TxManager, err error) error {
-	if p := recover(); p != nil {
+	if p := recover(); p != nil { // rewrite panic
 		err = tx.Rollback()
-		panic(p) // panicをもう一回
+		panic(p)
 	} else if err != nil {
 		err = tx.Rollback()
 	} else {

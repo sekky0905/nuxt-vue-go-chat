@@ -12,6 +12,35 @@ import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
+func TestNewUserRepository(t *testing.T) {
+	type args struct {
+		ctx context.Context
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want repository.UserRepository
+	}{
+		{
+			name: "When given appropriate args, return UserRepository",
+			args: args{
+				ctx: context.Background(),
+			},
+			want: &userRepository{
+				context.Background(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewUserRepository(tt.args.ctx); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewUserRepository() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_userRepository_GetUserByID(t *testing.T) {
 	// set sqlmock
 	db, mock, err := sqlmock.New()

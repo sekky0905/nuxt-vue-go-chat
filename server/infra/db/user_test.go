@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
@@ -23,7 +24,7 @@ func TestNewUserRepository(t *testing.T) {
 		want repository.UserRepository
 	}{
 		{
-			name: "When given appropriate args, return UserRepository",
+			name: "When given appropriate args, returns UserRepository",
 			args: args{
 				ctx: context.Background(),
 			},
@@ -36,6 +37,53 @@ func TestNewUserRepository(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewUserRepository(tt.args.ctx); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewUserRepository() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_userRepository_ErrorMsg(t *testing.T) {
+	const errMsg = "test"
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		method model.RepositoryMethod
+		err    error
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr *model.RepositoryError
+	}{
+		{
+			name: "When given appropriate args, returns appropriate error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				method: model.RepositoryMethodInsert,
+				err:    errors.New(errMsg),
+			},
+			wantErr: &model.RepositoryError{
+				BaseErr:                     errors.New(errMsg),
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+			if err := repo.ErrorMsg(tt.args.method, tt.args.err); errors.Cause(err).Error() != tt.wantErr.Error() {
+				t.Errorf("userRepository.ErrorMsg() error = %#v, wantErr %#v", err, tt.wantErr)
 			}
 		})
 	}
@@ -72,7 +120,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 		wantErr *model.NoSuchDataError
 	}{
 		{
-			name: "When specified user exists, return a user",
+			name: "When specified user exists, returns a user",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -91,7 +139,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "When specified user does not exist, return NoSuchDataError",
+			name: "When specified user does not exist, returns NoSuchDataError",
 			fields: fields{
 				ctx: context.Background(),
 			},

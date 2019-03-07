@@ -2,7 +2,19 @@ package model
 
 import "fmt"
 
-// NoSuchDataError expresses not existing specified data.
+// RepositoryMethod is method of Repository.
+type RepositoryMethod string
+
+// methods of Repository.
+const (
+	RepositoryMethodREAD   = "READ"
+	RepositoryMethodInsert = "INSERT"
+	RepositoryMethodUPDATE = "UPDATE"
+	RepositoryMethodDELETE = "DELETE"
+	RepositoryMethodLIST   = "LIST"
+)
+
+// NoSuchDataError is not existing specified data.
 type NoSuchDataError struct {
 	BaseErr error
 	PropertyNameForDeveloper
@@ -12,9 +24,22 @@ type NoSuchDataError struct {
 	DomainModelNameForUser
 }
 
-// Error は、エラーメッセージを返す。
+// Error returns error message.
 func (e *NoSuchDataError) Error() string {
 	return fmt.Sprintf("no such data, %s: %v, %s", e.PropertyNameForDeveloper, e.PropertyValue, e.DomainModelNameForDeveloper)
+}
+
+// RepositoryError is Repository error.
+type RepositoryError struct {
+	BaseErr          error
+	RepositoryMethod RepositoryMethod
+	DomainModelNameForDeveloper
+	DomainModelNameForUser
+}
+
+// Error returns error message.
+func (e *RepositoryError) Error() string {
+	return fmt.Sprintf("failed Repository operation, %s, %s", e.RepositoryMethod, e.DomainModelNameForDeveloper)
 }
 
 // SQLError is SQL error.

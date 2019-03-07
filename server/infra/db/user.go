@@ -161,5 +161,34 @@ func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, e
 
 	return uint32(id), nil
 }
-func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error { return nil }
-func (repo *userRepository) DeleteUser(m DBManager, id uint32) error                   { return nil }
+
+// UpdateUser updates a record.
+func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error {
+	query := "UPDATE users SET session_id=?, password=?, updated_at=? WHERE id=?"
+
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+	}
+
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	result, err := stmt.ExecContext(repo.ctx, user.SessionID, user.Password, user.UpdatedAt, id)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+	}
+
+	affect, err := result.RowsAffected()
+	if affect != 1 {
+		err = fmt.Errorf("total affected: %d ", affect)
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+	}
+
+	return nil
+}
+func (repo *userRepository) DeleteUser(m DBManager, id uint32) error { return nil }

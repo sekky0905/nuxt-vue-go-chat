@@ -10,7 +10,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
-	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 const (
@@ -314,7 +314,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user which has sID, Name, Session_id, Password, CreatedAt, UpdatedAt is given, returns nil",
+			name: "When a user which has sID, Name, Session_id, Password, CreatedAt, UpdatedAt is given, returns ID",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -364,9 +364,9 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				m: db,
 				user: &model.User{
 					ID:        userInValidIDForTest,
-					Name:      "test",
-					SessionID: "test12345678",
-					Password:  "test",
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -421,6 +421,148 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userRepository.InsertUser() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_userRepository_UpdateUser(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m    repository.DBManager
+		id   uint32
+		user *model.User
+	}
+
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		rowAffected int64
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a user which has Name, Session_id, Password, UpdatedAt is given, returns nil",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:  db,
+				id: userValidIDForTest,
+				user: &model.User{
+					ID:        userValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 1,
+			wantErr:     nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 2,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+				user: &model.User{
+					ID:        userInValidIDForTest,
+					Name:      userNameForTest,
+					SessionID: sessionIDForTest,
+					Password:  passwordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "UPDATE users SET session_id=\\?, password=\\?, created_at=\\?, updated_at=\\? WHERE id=\\?"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.rowAffected != 1 {
+				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnError(errors.New(tt.wantErr.Error()))
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+			err := repo.UpdateUser(tt.args.m, tt.args.id, tt.args.user)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("userRepository.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
 			}

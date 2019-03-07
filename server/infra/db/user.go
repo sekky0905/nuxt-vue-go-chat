@@ -23,15 +23,20 @@ func NewUserRepository(ctx context.Context) UserRepository {
 }
 
 // ErrorMsg generates and returns error message.
-func (repo *userRepository) ErrorMsg(method RepositoryMethod, err error) error {
-	return nil
+func (repo *userRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
+	return &model.RepositoryError{
+		BaseErr:                     err,
+		RepositoryMethod:            method,
+		DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+		DomainModelNameForUser:      model.DomainModelNameUserForUser,
+	}
 }
 
-// GetUserByID gets and returns a record.
+// GetUserByID gets and returns a record specified by id.
 func (repo *userRepository) GetUserByID(m DBManager, id uint32) (*model.User, error) {
 	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE id=?"
 
-	list, err := repo.list(m, RepositoryMethodREAD, query, id)
+	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -46,14 +51,14 @@ func (repo *userRepository) GetUserByID(m DBManager, id uint32) (*model.User, er
 	}
 
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(RepositoryMethodREAD, errors.WithStack(err)))
+		return nil, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodREAD, errors.WithStack(err)))
 	}
 
 	return list[0], nil
 }
 
 // list gets and returns list of records.
-func (repo *userRepository) list(m DBManager, method RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
+func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, err)
@@ -98,7 +103,30 @@ func (repo *userRepository) list(m DBManager, method RepositoryMethod, query str
 
 	return list, nil
 }
-func (repo *userRepository) GetUserByName(m DBManager, name string) (*model.User, error) {}
-func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, error)    {}
-func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error   {}
-func (repo *userRepository) DeleteUser(m DBManager, id uint32) error                     {}
+
+// GetUserByName gets and returns a record specified by name.
+func (repo *userRepository) GetUserByName(m DBManager, name string) (*model.User, error) {
+	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
+	list, err := repo.list(m, model.RepositoryMethodREAD, query, name)
+
+	if len(list) == 0 {
+		err = &model.NoSuchDataError{
+			BaseErr:                     err,
+			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
+			PropertyNameForUser:         model.NamePropertyForUser,
+			PropertyValue:               name,
+			DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameUserForUser,
+		}
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodREAD, err))
+	}
+
+	return list[0], nil
+}
+func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, error)  { return 0, nil }
+func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error { return nil }
+func (repo *userRepository) DeleteUser(m DBManager, id uint32) error                   { return nil }

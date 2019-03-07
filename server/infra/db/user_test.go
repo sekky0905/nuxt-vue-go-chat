@@ -10,7 +10,13 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
+	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+)
+
+const (
+	userNameForTest  = "testUserName"
+	sessionIDForTest = "testsessionID12345678"
+	passwordForTest  = "testPasswor"
 )
 
 func TestNewUserRepository(t *testing.T) {
@@ -120,7 +126,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 		wantErr *model.NoSuchDataError
 	}{
 		{
-			name: "When specified user exists, returns a user",
+			name: "When a user specified by id exists, returns a user",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -130,16 +136,16 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			want: &model.User{
 				ID:        validID,
-				Name:      "test",
-				SessionID: "test12345678",
-				Password:  "test",
+				Name:      userNameForTest,
+				SessionID: sessionIDForTest,
+				Password:  passwordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
 			},
 			wantErr: nil,
 		},
 		{
-			name: "When specified user does not exist, returns NoSuchDataError",
+			name: "When a user specified by id does not exist, returns NoSuchDataError",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -184,6 +190,99 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userRepository.GetUserByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_userRepository_GetUserByName(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	defer db.Close()
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m    repository.DBManager
+		name string
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *model.User
+		wantErr *model.NoSuchDataError
+	}{
+		{
+			name: "When a user specified by name exists, returns a user",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:    db,
+				name: userNameForTest,
+			},
+			want: &model.User{
+				Name:      userNameForTest,
+				SessionID: sessionIDForTest,
+				Password:  passwordForTest,
+				CreatedAt: testutil.TimeNow(),
+				UpdatedAt: testutil.TimeNow(),
+			},
+			wantErr: nil,
+		},
+		{
+			name: "When a user specified by name does not exist, returns NoSuchDataError",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m:    db,
+				name: "test2",
+			},
+			want: nil,
+
+			wantErr: &model.NoSuchDataError{
+				PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
+				PropertyNameForUser:         model.NamePropertyForUser,
+				PropertyValue:               "test2",
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
+			prep := mock.ExpectPrepare(q)
+
+			if tt.wantErr != nil {
+				prep.ExpectQuery().WillReturnError(tt.wantErr)
+			} else {
+				rows := sqlmock.NewRows([]string{"id", "name", "session_id", "password", "created_at", "updated_at"}).
+					AddRow(tt.want.ID, tt.want.Name, tt.want.SessionID, tt.want.Password, tt.want.CreatedAt, tt.want.UpdatedAt)
+				prep.ExpectQuery().WithArgs(tt.want.Name).WillReturnRows(rows)
+			}
+
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+			got, err := repo.GetUserByName(tt.args.m, tt.args.name)
+			if tt.wantErr != nil {
+				if !reflect.DeepEqual(err, tt.wantErr) {
+					t.Errorf("userRepository.GetUserByName() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("userRepository.GetUserByName() = %v, want %v", got, tt.want)
 			}
 		})
 	}

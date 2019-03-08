@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	log "github.com/sirupsen/logrus"
@@ -33,12 +35,73 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 
 // GetSessionByID gets and returns a record specified by id.
 func (repo *sessionRepository) GetSessionByID(m repository.DBManager, id string) (*model.Session, error) {
-	return nil, nil
+	query := "SELECT id, user_id, created_at, updated_at FROM sessions WHERE id=?"
+
+	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
+
+	if len(list) == 0 {
+		err = &model.NoSuchDataError{
+			BaseErr:                     err,
+			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
+			PropertyNameForUser:         model.IDPropertyForUser,
+			PropertyValue:               id,
+			DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+		}
+		return nil, errors.WithStack(err)
+	}
+
+	if err != nil {
+		return nil, repo.ErrorMsg(model.RepositoryMethodREAD, errors.WithStack(err))
+	}
+
+	return list[0], nil
 }
 
 // list gets and returns list of records.
 func (repo *sessionRepository) list(m repository.DBManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
-	return nil, nil
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return nil, repo.ErrorMsg(method, errors.WithStack(err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	rows, err := stmt.QueryContext(repo.ctx, args...)
+	if err != nil {
+		err = repo.ErrorMsg(method, errors.WithStack(err))
+		return nil, err
+	}
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	list := make([]*model.Session, 0)
+	for rows.Next() {
+		session := &model.Session{}
+
+		err = rows.Scan(
+			&session.ID,
+			&session.UserID,
+			&session.CreatedAt,
+			&session.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, repo.ErrorMsg(method, errors.WithStack(err))
+		}
+
+		list = append(list, session)
+	}
+
+	return list, nil
 }
 
 // InsertSession insert a record.

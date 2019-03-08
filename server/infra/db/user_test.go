@@ -15,7 +15,6 @@ import (
 
 const (
 	userNameForTest             = "testUserName"
-	sessionIDForTest            = "testsessionID12345678"
 	passwordForTest             = "testPasswor"
 	userValidIDForTest   uint32 = 1
 	userInValidIDForTest uint32 = 2
@@ -51,8 +50,6 @@ func TestNewUserRepository(t *testing.T) {
 }
 
 func Test_userRepository_ErrorMsg(t *testing.T) {
-	const errMsg = "test"
-
 	type fields struct {
 		ctx context.Context
 	}
@@ -136,7 +133,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			want: &model.User{
 				ID:        userValidIDForTest,
 				Name:      userNameForTest,
-				SessionID: sessionIDForTest,
+				SessionID: sessionValidIDForTest,
 				Password:  passwordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
@@ -230,7 +227,7 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 			},
 			want: &model.User{
 				Name:      userNameForTest,
-				SessionID: sessionIDForTest,
+				SessionID: sessionValidIDForTest,
 				Password:  passwordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
@@ -323,7 +320,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				user: &model.User{
 					ID:        userValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -342,7 +339,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -365,7 +362,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -388,7 +385,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -463,7 +460,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 				user: &model.User{
 					ID:        userValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -483,7 +480,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -507,7 +504,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
@@ -531,7 +528,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 				user: &model.User{
 					ID:        userInValidIDForTest,
 					Name:      userNameForTest,
-					SessionID: sessionIDForTest,
+					SessionID: sessionValidIDForTest,
 					Password:  passwordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),

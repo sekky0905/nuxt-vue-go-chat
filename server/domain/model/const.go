@@ -20,7 +20,8 @@ func (p DomainModelNameForDeveloper) String() string {
 
 // Model name for developer.
 const (
-	DomainModelNameUserForDeveloper DomainModelNameForDeveloper = "User"
+	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
+	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
 )
 
 // DomainModelNameForUser is Model name for user.
@@ -33,7 +34,8 @@ func (p DomainModelNameForUser) String() string {
 
 // Model name for user.
 const (
-	DomainModelNameUserForUser DomainModelNameForUser = "ユーザー"
+	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
+	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
 )
 
 // PropertyNameForDeveloper is property name for developer.

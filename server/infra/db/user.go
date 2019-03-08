@@ -16,7 +16,7 @@ type userRepository struct {
 	ctx context.Context
 }
 
-// NewUserRepository は、userRepository生成する。
+// NewUserRepository generates and returns userRepository.
 func NewUserRepository(ctx context.Context) UserRepository {
 	return &userRepository{
 		ctx: ctx,

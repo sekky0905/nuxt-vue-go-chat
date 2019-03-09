@@ -287,6 +287,7 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
+				err: errors.New(errMsg),
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
@@ -302,7 +303,7 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 			prep := mock.ExpectPrepare(query)
 
 			if tt.args.err != nil {
-				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt, tt.args.session.UpdatedAt).WillReturnError(tt.wantErr)
+				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt, tt.args.session.UpdatedAt).WillReturnError(tt.args.err)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt, tt.args.session.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
@@ -315,6 +316,118 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("sessionRepository.InsertSession() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_sessionRepository_DeleteSession(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m   repository.DBManager
+		id  uint32
+		err error
+	}
+
+	tests := []struct {
+		name        string
+		fields      fields
+		rowAffected int64
+		args        args
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a user specified by id exists, returns nil",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 1,
+			args: args{
+				m:  db,
+				id: userValidIDForTest,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 0,
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 2,
+			args: args{
+				m:  db,
+				id: userInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			rowAffected: 0,
+			args: args{
+				m:   db,
+				id:  userInValidIDForTest,
+				err: errors.New(errMsg),
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "DELETE FROM users WHERE id=\\?"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.rowAffected != 1 {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.args.err)
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &userRepository{
+				ctx: tt.fields.ctx,
+			}
+
+			err := repo.DeleteUser(tt.args.m, tt.args.id)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("userRepository.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
 			}

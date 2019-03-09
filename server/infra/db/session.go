@@ -138,6 +138,32 @@ func (repo *sessionRepository) InsertSession(m repository.DBManager, session *mo
 
 // DeleteSession delete a record.
 func (repo *sessionRepository) DeleteSession(m repository.DBManager, id string) error {
+	query := "DELETE FROM sessions WHERE id=?"
+
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	result, err := stmt.ExecContext(repo.ctx, id)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+
+	affect, err := result.RowsAffected()
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+	if affect != 1 {
+		err = fmt.Errorf("total affected: %d ", affect)
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
 
 	return nil
 }

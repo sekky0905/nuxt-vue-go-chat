@@ -14,7 +14,34 @@ const (
 	RepositoryMethodLIST   RepositoryMethod = "LIST"
 )
 
-// NoSuchDataError is not existing specified data.
+// RequiredError is not existing necessary value error.
+type RequiredError struct {
+	BaseErr error
+	PropertyNameForDeveloper
+	PropertyNameForUser
+}
+
+// Error returns error message.
+func (e *RequiredError) Error() string {
+	return fmt.Sprintf("%s is required", e.PropertyNameForDeveloper)
+}
+
+// InvalidParamError is inappropriate parameter error。
+type InvalidParamError struct {
+	BaseErr error
+	PropertyNameForDeveloper
+	PropertyNameForUser
+	PropertyValue             interface{}
+	InvalidReasonForDeveloper string
+	InvalidReasonForUser      string
+}
+
+// Error returns error message.
+func (e *InvalidParamError) Error() string {
+	return fmt.Sprintf("%s, %v, is invalid, %s", e.PropertyNameForDeveloper, e.PropertyValue, e.InvalidReasonForDeveloper)
+}
+
+// NoSuchDataError is not existing specified data error.
 type NoSuchDataError struct {
 	BaseErr error
 	PropertyNameForDeveloper

@@ -38,5 +38,10 @@ func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, er
 
 // IsAlreadyExistName checks whether the data specified by name already exists or not.
 func (s *userService) IsAlreadyExistName(ctx context.Context, name string) (bool, error) {
-	panic("implement me")
+	searched, err := s.repo.GetUserByName(s.m, name)
+	if err != nil {
+		return false, errors.Wrap(err, "failed to get user by Name")
+	}
+
+	return searched != nil, nil
 }

@@ -13,13 +13,6 @@ import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
-const (
-	userNameForTest             = "testUserName"
-	passwordForTest             = "testPasswor"
-	userValidIDForTest   uint32 = 1
-	userInValidIDForTest uint32 = 2
-)
-
 func TestNewUserRepository(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -71,10 +64,10 @@ func Test_userRepository_ErrorMsg(t *testing.T) {
 			},
 			args: args{
 				method: model.RepositoryMethodInsert,
-				err:    errors.New(errMsg),
+				err:    errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				BaseErr:                     errors.New(errMsg),
+				BaseErr:                     errors.New(model.ErrorMessageForTest),
 				RepositoryMethod:            model.RepositoryMethodInsert,
 				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
 				DomainModelNameForUser:      model.DomainModelNameUserForUser,
@@ -128,13 +121,13 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userValidIDForTest,
+				id: model.UserValidIDForTest,
 			},
 			want: &model.User{
-				ID:        userValidIDForTest,
-				Name:      userNameForTest,
-				SessionID: sessionValidIDForTest,
-				Password:  passwordForTest,
+				ID:        model.UserValidIDForTest,
+				Name:      model.UserNameForTest,
+				SessionID: model.SessionValidIDForTest,
+				Password:  model.PasswordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
 			},
@@ -147,13 +140,13 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
 				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
 				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               userInValidIDForTest,
+				PropertyValue:               model.UserInValidIDForTest,
 				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
 				DomainModelNameForUser:      model.DomainModelNameUserForUser,
 			},
@@ -223,12 +216,12 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 			},
 			args: args{
 				m:    db,
-				name: userNameForTest,
+				name: model.UserNameForTest,
 			},
 			want: &model.User{
-				Name:      userNameForTest,
-				SessionID: sessionValidIDForTest,
-				Password:  passwordForTest,
+				Name:      model.UserNameForTest,
+				SessionID: model.SessionValidIDForTest,
+				Password:  model.PasswordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
 			},
@@ -319,10 +312,10 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			args: args{
 				m: db,
 				user: &model.User{
-					ID:        userValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -338,10 +331,10 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			args: args{
 				m: db,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -361,10 +354,10 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			args: args{
 				m: db,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -384,14 +377,14 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			args: args{
 				m: db,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
-				err: errors.New(errMsg),
+				err: errors.New(model.ErrorMessageForTest),
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
@@ -459,12 +452,12 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userValidIDForTest,
+				id: model.UserValidIDForTest,
 				user: &model.User{
-					ID:        userValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -479,12 +472,12 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -503,12 +496,12 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
@@ -527,16 +520,16 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 				user: &model.User{
-					ID:        userInValidIDForTest,
-					Name:      userNameForTest,
-					SessionID: sessionValidIDForTest,
-					Password:  passwordForTest,
+					ID:        model.UserInValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
-				err: errors.New(errMsg),
+				err: errors.New(model.ErrorMessageForTest),
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
@@ -603,7 +596,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			rowAffected: 1,
 			args: args{
 				m:  db,
-				id: userValidIDForTest,
+				id: model.UserValidIDForTest,
 			},
 			wantErr: nil,
 		},
@@ -615,7 +608,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			rowAffected: 0,
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -631,7 +624,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			rowAffected: 2,
 			args: args{
 				m:  db,
-				id: userInValidIDForTest,
+				id: model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -647,8 +640,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			rowAffected: 0,
 			args: args{
 				m:   db,
-				id:  userInValidIDForTest,
-				err: errors.New(errMsg),
+				id:  model.UserInValidIDForTest,
+				err: errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,

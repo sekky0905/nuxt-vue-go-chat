@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 )
 
@@ -28,7 +29,11 @@ func NewUserService(repo repository.UserRepository, m repository.SQLManager) Use
 
 // IsAlreadyExistID checks whether the data specified by id already exists or not.
 func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
-	panic("implement me")
+	searched, err := s.repo.GetUserByID(s.m, id)
+	if err != nil {
+		return false, errors.Wrap(err, "failed to get user by id")
+	}
+	return searched != nil, nil
 }
 
 // IsAlreadyExistName checks whether the data specified by name already exists or not.

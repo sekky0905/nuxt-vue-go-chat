@@ -29,7 +29,7 @@ func NewSQLManager() repository.SQLManager {
 }
 
 // Exec executes SQL.
-func (s *sqlManager) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (s sqlManager) Exec(query string, args ...interface{}) (sql.Result, error) {
 	return s.Conn.Exec(query, args...)
 }
 

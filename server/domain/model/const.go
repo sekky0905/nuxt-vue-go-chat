@@ -67,3 +67,23 @@ const (
 	NamePropertyForUser     PropertyNameForUser = "名前"
 	PassWordPropertyForUser PropertyNameForUser = "パスワード"
 )
+
+// == for test ==
+// User
+const (
+	UserNameForTest             = "testUserName"
+	PasswordForTest             = "testPasswor"
+	UserValidIDForTest   uint32 = 1
+	UserInValidIDForTest uint32 = 2
+)
+
+// Session
+const (
+	SessionValidIDForTest   = "testValidSessionID12345678"
+	SessionInValidIDForTest = "testInvalidSessionID12345678"
+)
+
+// error message for test
+const (
+	ErrorMessageForTest = "some error has occurred"
+)

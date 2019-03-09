@@ -7,11 +7,11 @@ type RepositoryMethod string
 
 // methods of Repository.
 const (
-	RepositoryMethodREAD   = "READ"
-	RepositoryMethodInsert = "INSERT"
-	RepositoryMethodUPDATE = "UPDATE"
-	RepositoryMethodDELETE = "DELETE"
-	RepositoryMethodLIST   = "LIST"
+	RepositoryMethodREAD   RepositoryMethod = "READ"
+	RepositoryMethodInsert RepositoryMethod = "INSERT"
+	RepositoryMethodUPDATE RepositoryMethod = "UPDATE"
+	RepositoryMethodDELETE RepositoryMethod = "DELETE"
+	RepositoryMethodLIST   RepositoryMethod = "LIST"
 )
 
 // NoSuchDataError is not existing specified data.

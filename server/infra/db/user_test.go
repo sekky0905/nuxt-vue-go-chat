@@ -301,6 +301,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 	type args struct {
 		m    repository.DBManager
 		user *model.User
+		err  error
 	}
 
 	tests := []struct {
@@ -311,7 +312,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user which has sID, Name, Session_id, Password, CreatedAt, UpdatedAt is given, returns ID",
+			name: "When a user which has ID, Name, Session_ID, Password, CreatedAt, UpdatedAt is given, returns ID",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -404,8 +405,8 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			query := "INSERT INTO users"
 			prep := mock.ExpectPrepare(query)
 
-			if tt.rowAffected != 1 {
-				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnError(errors.New(tt.wantErr.Error()))
+			if tt.args.err != nil {
+				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnError(tt.wantErr)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
@@ -450,7 +451,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user which has Name, Session_id, Password, UpdatedAt is given, returns nil",
+			name: "When a user which has Name, Session_ID, Password, UpdatedAt is given, returns nil",
 			fields: fields{
 				ctx: context.Background(),
 			},
@@ -548,7 +549,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			prep := mock.ExpectPrepare(query)
 
 			if tt.rowAffected != 1 {
-				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnError(errors.New(tt.wantErr.Error()))
+				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnError(tt.wantErr)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
@@ -657,7 +658,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			prep := mock.ExpectPrepare(query)
 
 			if tt.rowAffected != 1 {
-				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(errors.New(tt.wantErr.Error()))
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.wantErr)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}

@@ -6,12 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
+	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 const (
@@ -183,6 +182,141 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("sessionRepository.GetSessionByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_sessionRepository_InsertSession(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer db.Close()
+
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		ctx context.Context
+	}
+	type args struct {
+		m       repository.DBManager
+		session *model.Session
+		err     error
+	}
+
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		rowAffected int64
+		want        string
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a session which has ID, User_ID, CreatedAt, UpdatedAt is given, returns ID",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				session: &model.Session{
+					ID:        sessionValidIDForTest,
+					UserID:    userValidIDForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 1,
+			wantErr:     nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				session: &model.Session{
+					ID:        sessionInValidIDForTest,
+					UserID:    userValidIDForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				session: &model.Session{
+					ID:        sessionInValidIDForTest,
+					UserID:    userValidIDForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 2,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			fields: fields{
+				ctx: context.Background(),
+			},
+			args: args{
+				m: db,
+				session: &model.Session{
+					ID:        sessionInValidIDForTest,
+					UserID:    userValidIDForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "INSERT INTO sessions"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.args.err != nil {
+				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt, tt.args.session.UpdatedAt).WillReturnError(tt.wantErr)
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt, tt.args.session.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &sessionRepository{
+				ctx: tt.fields.ctx,
+			}
+
+			err := repo.InsertSession(tt.args.m, tt.args.session)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("sessionRepository.InsertSession() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
 			}
 		})
 	}

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -24,13 +25,15 @@ func NewSessionRepository(ctx context.Context) repository.SessionRepository {
 
 // ErrorMsg generates and returns error message.
 func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
-	log.Error(err.Error())
-	return &model.RepositoryError{
+	ex := &model.RepositoryError{
 		BaseErr:                     err,
 		RepositoryMethod:            method,
 		DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
 		DomainModelNameForUser:      model.DomainModelNameSessionForUser,
 	}
+
+	log.Errorf("EX--->%#v", ex)
+	return ex
 }
 
 // GetSessionByID gets and returns a record specified by id.
@@ -105,7 +108,31 @@ func (repo *sessionRepository) list(m repository.DBManager, method model.Reposit
 }
 
 // InsertSession insert a record.
-func (repo *sessionRepository) InsertSession(m repository.DBManager, session *model.Session) (err error) {
+func (repo *sessionRepository) InsertSession(m repository.DBManager, session *model.Session) error {
+	query := "INSERT INTO sessions (id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)"
+	stmt, err := m.PrepareContext(repo.ctx, query)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
+	result, err := stmt.ExecContext(repo.ctx, session.ID, session.UserID, session.CreatedAt, session.UpdatedAt)
+	if err != nil {
+		log.Errorf("[]==%s", err.Error())
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+
+	affect, err := result.RowsAffected()
+	if affect != 1 {
+		err = fmt.Errorf("total affected: %d ", affect)
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+
 	return nil
 }
 

@@ -391,6 +391,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
+				err: errors.New(errMsg),
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
@@ -406,7 +407,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			prep := mock.ExpectPrepare(query)
 
 			if tt.args.err != nil {
-				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnError(tt.wantErr)
+				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnError(tt.args.err)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
@@ -441,6 +442,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		m    repository.DBManager
 		id   uint32
 		user *model.User
+		err  error
 	}
 
 	tests := []struct {
@@ -534,6 +536,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
+				err: errors.New(errMsg),
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
@@ -548,8 +551,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			query := "UPDATE users SET session_id=\\?, password=\\?, created_at=\\?, updated_at=\\? WHERE id=\\?"
 			prep := mock.ExpectPrepare(query)
 
-			if tt.rowAffected != 1 {
-				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnError(tt.wantErr)
+			if tt.args.err != nil {
+				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnError(tt.args.err)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
@@ -580,8 +583,9 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m  repository.DBManager
-		id uint32
+		m   repository.DBManager
+		id  uint32
+		err error
 	}
 
 	tests := []struct {
@@ -642,8 +646,9 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			},
 			rowAffected: 0,
 			args: args{
-				m:  db,
-				id: userInValidIDForTest,
+				m:   db,
+				id:  userInValidIDForTest,
+				err: errors.New(errMsg),
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -657,8 +662,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			query := "DELETE FROM users WHERE id=\\?"
 			prep := mock.ExpectPrepare(query)
 
-			if tt.rowAffected != 1 {
-				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.wantErr)
+			if tt.args.err != nil {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.args.err)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}

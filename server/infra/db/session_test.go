@@ -414,7 +414,7 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 			query := "DELETE FROM users WHERE id=\\?"
 			prep := mock.ExpectPrepare(query)
 
-			if tt.rowAffected != 1 {
+			if tt.args.err != nil {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.args.err)
 			} else {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))

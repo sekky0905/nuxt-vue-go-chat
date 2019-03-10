@@ -21,7 +21,7 @@ type userService struct {
 	txCloser CloseTransaction
 }
 
-// NewUserService は、generates and returns UserService.
+// NewUserService generates and returns UserService.
 func NewUserService(m repository.SQLManager, f service.UserRepoFactory, txCloser CloseTransaction) UserService {
 	return &userService{
 		m:        m,

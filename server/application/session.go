@@ -7,7 +7,6 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/util"
 )
 
 // SessionService is the interface of SessionService.
@@ -31,9 +30,9 @@ func NewSessionService(m repository.SQLManager, f service.SessionRepoFactory, tx
 }
 
 // createSession creates the session.
-func createSession(ctx context.Context, userID uint32, db repository.DBManager, repo repository.SessionRepository, sService service.SessionService) (*model.Session, error) {
+func createSession(ctx context.Context, sessionID string, userID uint32, db repository.DBManager, repo repository.SessionRepository, sService service.SessionService) (*model.Session, error) {
 	session := model.NewSession(userID)
-	session.ID = util.UUID()
+	session.ID = sessionID
 
 	// ready for collision of UUID.
 	yes := true

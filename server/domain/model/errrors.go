@@ -94,3 +94,13 @@ type SQLError struct {
 func (e *SQLError) Error() string {
 	return e.InvalidReasonForDeveloper.String()
 }
+
+// AuthenticationErr is Authentication error.
+type AuthenticationErr struct {
+	BaseErr error
+}
+
+// Error returns error message.
+func (e *AuthenticationErr) Error() string {
+	return "invalid name or password"
+}

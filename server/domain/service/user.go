@@ -13,6 +13,9 @@ type UserService interface {
 	IsAlreadyExistName(ctx context.Context, name string) (bool, error)
 }
 
+// UserRepoFactory is factory of UserRepository.
+type UserRepoFactory func(ctx context.Context) repository.UserRepository
+
 // userService is domain service of user.
 type userService struct {
 	repo repository.UserRepository

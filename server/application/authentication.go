@@ -13,7 +13,7 @@ type AuthenticationService interface {
 	SignUp(ctx context.Context, name, password string) (*model.User, error)
 }
 
-// authenticationService is the service of authentication
+// authenticationService is the service of authentication.
 type authenticationService struct {
 	m        repository.SQLManager
 	uFactory service.UserRepoFactory

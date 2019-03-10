@@ -14,6 +14,21 @@ const (
 	RepositoryMethodLIST   RepositoryMethod = "LIST"
 )
 
+// AlreadyExistError expresses already specified data has existed.
+type AlreadyExistError struct {
+	BaseErr error
+	PropertyNameForDeveloper
+	PropertyNameForUser
+	PropertyValue interface{}
+	DomainModelNameForDeveloper
+	DomainModelNameForUser
+}
+
+// Error returns error message.
+func (e *AlreadyExistError) Error() string {
+	return fmt.Sprintf("%s, %s, is already exists", e.PropertyNameForDeveloper, e.DomainModelNameForDeveloper)
+}
+
 // RequiredError is not existing necessary value error.
 type RequiredError struct {
 	BaseErr error

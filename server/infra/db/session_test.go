@@ -103,7 +103,7 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m  repository.DBManager
+		m  repository.SQLManager
 		id string
 	}
 
@@ -197,7 +197,7 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m       repository.DBManager
+		m       repository.SQLManager
 		session *model.Session
 		err     error
 	}
@@ -330,7 +330,7 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m   repository.DBManager
+		m   repository.SQLManager
 		id  uint32
 		err error
 	}

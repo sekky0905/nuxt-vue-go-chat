@@ -24,7 +24,9 @@ func NewUser(name, password string) (*User, error) {
 	}
 
 	return &User{
-		Name:     name,
-		Password: hashed,
+		Name:      name,
+		Password:  hashed,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}, nil
 }

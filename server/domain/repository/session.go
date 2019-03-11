@@ -6,7 +6,7 @@ import (
 
 // SessionRepository is repository of session.
 type SessionRepository interface {
-	GetSessionByID(m DBManager, id string) (*model.Session, error)
-	InsertSession(m DBManager, user *model.Session) error
-	DeleteSession(m DBManager, id string) error
+	GetSessionByID(m SQLManager, id string) (*model.Session, error)
+	InsertSession(m SQLManager, user *model.Session) error
+	DeleteSession(m SQLManager, id string) error
 }

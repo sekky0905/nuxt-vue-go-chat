@@ -18,15 +18,15 @@ type UserRepoFactory func(ctx context.Context) repository.UserRepository
 
 // userService is domain service of user.
 type userService struct {
+	m    repository.DBManager
 	repo repository.UserRepository
-	m    repository.SQLManager
 }
 
 // NewUserService generates and returns UserService.
-func NewUserService(repo repository.UserRepository, m repository.SQLManager) UserService {
+func NewUserService(m repository.DBManager, repo repository.UserRepository) UserService {
 	return &userService{
-		repo: repo,
 		m:    m,
+		repo: repo,
 	}
 }
 

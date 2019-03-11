@@ -103,7 +103,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m  repository.DBManager
+		m  repository.SQLManager
 		id uint32
 	}
 
@@ -198,7 +198,7 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m    repository.DBManager
+		m    repository.SQLManager
 		name string
 	}
 
@@ -292,7 +292,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m    repository.DBManager
+		m    repository.SQLManager
 		user *model.User
 		err  error
 	}
@@ -432,7 +432,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m    repository.DBManager
+		m    repository.SQLManager
 		id   uint32
 		user *model.User
 		err  error
@@ -576,7 +576,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 		ctx context.Context
 	}
 	type args struct {
-		m   repository.DBManager
+		m   repository.SQLManager
 		id  uint32
 		err error
 	}

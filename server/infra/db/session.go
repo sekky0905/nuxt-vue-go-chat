@@ -37,7 +37,7 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 }
 
 // GetSessionByID gets and returns a record specified by id.
-func (repo *sessionRepository) GetSessionByID(m repository.DBManager, id string) (*model.Session, error) {
+func (repo *sessionRepository) GetSessionByID(m repository.SQLManager, id string) (*model.Session, error) {
 	query := "SELECT id, user_id, created_at, updated_at FROM sessions WHERE id=?"
 
 	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
@@ -62,7 +62,7 @@ func (repo *sessionRepository) GetSessionByID(m repository.DBManager, id string)
 }
 
 // list gets and returns list of records.
-func (repo *sessionRepository) list(m repository.DBManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
+func (repo *sessionRepository) list(m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, errors.WithStack(err))
@@ -108,7 +108,7 @@ func (repo *sessionRepository) list(m repository.DBManager, method model.Reposit
 }
 
 // InsertSession insert a record.
-func (repo *sessionRepository) InsertSession(m repository.DBManager, session *model.Session) error {
+func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *model.Session) error {
 	query := "INSERT INTO sessions (id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)"
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
@@ -137,7 +137,7 @@ func (repo *sessionRepository) InsertSession(m repository.DBManager, session *mo
 }
 
 // DeleteSession delete a record.
-func (repo *sessionRepository) DeleteSession(m repository.DBManager, id string) error {
+func (repo *sessionRepository) DeleteSession(m repository.SQLManager, id string) error {
 	query := "DELETE FROM sessions WHERE id=?"
 
 	stmt, err := m.PrepareContext(repo.ctx, query)

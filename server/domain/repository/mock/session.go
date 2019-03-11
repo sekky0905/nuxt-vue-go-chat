@@ -35,7 +35,7 @@ func (m *MockSessionRepository) EXPECT() *MockSessionRepositoryMockRecorder {
 }
 
 // GetSessionByID mocks base method
-func (m_2 *MockSessionRepository) GetSessionByID(m repository.DBManager, id string) (*model.Session, error) {
+func (m_2 *MockSessionRepository) GetSessionByID(m repository.SQLManager, id string) (*model.Session, error) {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "GetSessionByID", m, id)
 	ret0, _ := ret[0].(*model.Session)
@@ -50,7 +50,7 @@ func (mr *MockSessionRepositoryMockRecorder) GetSessionByID(m, id interface{}) *
 }
 
 // InsertSession mocks base method
-func (m_2 *MockSessionRepository) InsertSession(m repository.DBManager, user *model.Session) error {
+func (m_2 *MockSessionRepository) InsertSession(m repository.SQLManager, user *model.Session) error {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "InsertSession", m, user)
 	ret0, _ := ret[0].(error)
@@ -64,7 +64,7 @@ func (mr *MockSessionRepositoryMockRecorder) InsertSession(m, user interface{}) 
 }
 
 // DeleteSession mocks base method
-func (m_2 *MockSessionRepository) DeleteSession(m repository.DBManager, id string) error {
+func (m_2 *MockSessionRepository) DeleteSession(m repository.SQLManager, id string) error {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "DeleteSession", m, id)
 	ret0, _ := ret[0].(error)

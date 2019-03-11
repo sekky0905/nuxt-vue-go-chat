@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/router"
 )
 
@@ -29,4 +32,20 @@ func NewAuthenticationController(rm router.RequestManager, uAPP application.Auth
 // SignUp sign up an user.
 func (c *authenticationController) SignUp(w http.ResponseWriter, r *http.Request) {
 	return
+}
+
+//  ParseUserFromPayLoad parses user from payload.
+func ParseUserFromPayLoad(b []byte) (*model.User, error) {
+	u := &model.User{}
+	if err := json.Unmarshal(b, u); err != nil {
+		if err := json.Unmarshal(b, u); err != nil {
+			err = &model.InvalidDataError{
+				BaseErr:               err,
+				DataNameForDeveloper:  "request body",
+				DataValueForDeveloper: string(b),
+			}
+			return nil, errors.WithStack(err)
+		}
+	}
+	return u, nil
 }

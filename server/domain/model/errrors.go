@@ -14,6 +14,19 @@ const (
 	RepositoryMethodLIST   RepositoryMethod = "LIST"
 )
 
+// InvalidDataError expresses that given data is invalid.
+type InvalidDataError struct {
+	BaseErr                   error
+	DataNameForDeveloper      string
+	DataValueForDeveloper     interface{}
+	InvalidReasonForDeveloper string
+}
+
+// Error returns error message.
+func (e *InvalidDataError) Error() string {
+	return fmt.Sprintf("%s, %s", e.DataNameForDeveloper, e.InvalidReasonForDeveloper)
+}
+
 // AlreadyExistError expresses already specified data has existed.
 type AlreadyExistError struct {
 	BaseErr error

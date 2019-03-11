@@ -93,6 +93,16 @@ func handleError(err error) *handledError {
 			ErrorUserTitle: systemErrorForUser,
 			ErrorUserMsg:   fmt.Sprintf("[エラーコード: %s]システムエラーが発生しました。", InternalSQLFailure),
 		}
+	case *model.OtherServerError:
+		realErr := errors.Cause(err).(*model.OtherServerError)
+		return &handledError{
+			BaseError:      realErr.BaseErr,
+			Status:         http.StatusInternalServerError,
+			Code:           InternalFailure,
+			Message:        systemError,
+			ErrorUserTitle: systemErrorForUser,
+			ErrorUserMsg:   fmt.Sprintf("[エラーコード: %s]システムエラーが発生しました。", ServerError),
+		}
 	default:
 		return &handledError{
 			Status:         http.StatusInternalServerError,

@@ -8,6 +8,7 @@ const (
 	InternalFailure    ErrCode = "InternalFailure"
 	InternalDBFailure  ErrCode = "InternalDBFailure"
 	InternalSQLFailure ErrCode = "InternalSQLFailure"
+	ServerError        ErrCode = "ServerError"
 )
 
 // User error.

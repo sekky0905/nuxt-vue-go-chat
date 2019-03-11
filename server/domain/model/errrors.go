@@ -117,3 +117,14 @@ type AuthenticationErr struct {
 func (e *AuthenticationErr) Error() string {
 	return "invalid name or password"
 }
+
+// OtherServerError is other server error.
+type OtherServerError struct {
+	BaseErr                   error
+	InvalidReasonForDeveloper string
+}
+
+// Error returns error message.
+func (e *OtherServerError) Error() string {
+	return e.InvalidReasonForDeveloper
+}

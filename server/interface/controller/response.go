@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	"github.com/sekky0905/go-vue-chat/server/domain/model"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	log "github.com/sirupsen/logrus"
 )
 
 // Response returns response to client.
@@ -39,4 +40,24 @@ func ResponseWithCookie(w http.ResponseWriter, statusCode int, cookie *http.Cook
 	return Response(w, statusCode, body)
 }
 
-// TODO implement of error response.
+// ResponseError returns response error to client.
+func ResponseError(w http.ResponseWriter, err error) {
+	he := handleError(err)
+	if err := Response(w, he.Status, he); err != nil {
+		log.Errorf("failed to response:%s", err.Error())
+	}
+}
+
+// ResponseAndLogError returns response and log error.
+func ResponseAndLogError(w http.ResponseWriter, err error) {
+	he := handleError(err)
+	if he.BaseError != nil {
+		log.Errorf("error has occurred:%s, base err = %s", err.Error(), he.BaseError.Error())
+	} else {
+		log.Errorf("error has occurred:%s", err.Error())
+	}
+
+	if err := Response(w, he.Status, he); err != nil {
+		log.Errorf("failed to response:%s", err.Error())
+	}
+}

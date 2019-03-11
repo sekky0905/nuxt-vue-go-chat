@@ -16,7 +16,7 @@ type userRepository struct {
 	ctx context.Context
 }
 
-// NewUserRepository は、userRepository生成する。
+// NewUserRepository generates and returns userRepository.
 func NewUserRepository(ctx context.Context) UserRepository {
 	return &userRepository{
 		ctx: ctx,
@@ -34,7 +34,7 @@ func (repo *userRepository) ErrorMsg(method model.RepositoryMethod, err error) e
 }
 
 // GetUserByID gets and returns a record specified by id.
-func (repo *userRepository) GetUserByID(m DBManager, id uint32) (*model.User, error) {
+func (repo *userRepository) GetUserByID(m SQLManager, id uint32) (*model.User, error) {
 	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE id=?"
 
 	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
@@ -52,14 +52,14 @@ func (repo *userRepository) GetUserByID(m DBManager, id uint32) (*model.User, er
 	}
 
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodREAD, errors.WithStack(err)))
+		return nil, repo.ErrorMsg(model.RepositoryMethodREAD, errors.WithStack(err))
 	}
 
 	return list[0], nil
 }
 
 // GetUserByName gets and returns a record specified by name.
-func (repo *userRepository) GetUserByName(m DBManager, name string) (*model.User, error) {
+func (repo *userRepository) GetUserByName(m SQLManager, name string) (*model.User, error) {
 	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
 	list, err := repo.list(m, model.RepositoryMethodREAD, query, name)
 
@@ -76,17 +76,17 @@ func (repo *userRepository) GetUserByName(m DBManager, name string) (*model.User
 	}
 
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodREAD, err))
+		return nil, repo.ErrorMsg(model.RepositoryMethodREAD, errors.WithStack(err))
 	}
 
 	return list[0], nil
 }
 
 // list gets and returns list of records.
-func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
+func (repo *userRepository) list(m SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
-		return nil, repo.ErrorMsg(method, err)
+		return nil, repo.ErrorMsg(method, errors.WithStack(err))
 	}
 	defer func() {
 		err = stmt.Close()
@@ -97,7 +97,7 @@ func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, que
 
 	rows, err := stmt.QueryContext(repo.ctx, args...)
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(method, err))
+		return nil, repo.ErrorMsg(method, errors.WithStack(err))
 	}
 	defer func() {
 		err = rows.Close()
@@ -120,7 +120,7 @@ func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, que
 		)
 
 		if err != nil {
-			return nil, errors.WithStack(repo.ErrorMsg(method, err))
+			return nil, repo.ErrorMsg(method, errors.WithStack(err))
 		}
 
 		list = append(list, user)
@@ -130,11 +130,11 @@ func (repo *userRepository) list(m DBManager, method model.RepositoryMethod, que
 }
 
 // InsertUser insert a record.
-func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, error) {
+func (repo *userRepository) InsertUser(m SQLManager, user *model.User) (uint32, error) {
 	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
 	defer func() {
 		err = stmt.Close()
@@ -145,30 +145,30 @@ func (repo *userRepository) InsertUser(m DBManager, user *model.User) (uint32, e
 
 	result, err := stmt.ExecContext(repo.ctx, user.Name, user.SessionID, user.Password, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
 
 	affect, err := result.RowsAffected()
 	if affect != 1 {
 		err = fmt.Errorf("total affected: %d ", affect)
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
 
 	return uint32(id), nil
 }
 
 // UpdateUser updates a record.
-func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User) error {
+func (repo *userRepository) UpdateUser(m SQLManager, id uint32, user *model.User) error {
 	query := "UPDATE users SET session_id=?, password=?, updated_at=? WHERE id=?"
 
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
 
 	defer func() {
@@ -180,25 +180,25 @@ func (repo *userRepository) UpdateUser(m DBManager, id uint32, user *model.User)
 
 	result, err := stmt.ExecContext(repo.ctx, user.SessionID, user.Password, user.UpdatedAt, id)
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
 
 	affect, err := result.RowsAffected()
 	if affect != 1 {
 		err = fmt.Errorf("total affected: %d ", affect)
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
 
 	return nil
 }
 
 // DeleteUser delete a record.
-func (repo *userRepository) DeleteUser(m DBManager, id uint32) error {
+func (repo *userRepository) DeleteUser(m SQLManager, id uint32) error {
 	query := "DELETE FROM users WHERE id=?"
 
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
 	defer func() {
 		err = stmt.Close()
@@ -209,16 +209,16 @@ func (repo *userRepository) DeleteUser(m DBManager, id uint32) error {
 
 	result, err := stmt.ExecContext(repo.ctx, id)
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
 
 	affect, err := result.RowsAffected()
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
 	if affect != 1 {
 		err = fmt.Errorf("total affected: %d ", affect)
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodDELETE, err))
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
 
 	return nil

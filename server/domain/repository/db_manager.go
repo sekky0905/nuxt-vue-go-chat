@@ -5,21 +5,21 @@ import (
 	"database/sql"
 )
 
-// SQLManager is the manager of SQL.
-type SQLManager interface {
-	DBManager
+// DBManager is the manager of SQL.
+type DBManager interface {
+	SQLManager
 	Beginner
 }
 
 // TxManager is the manager of Tx.
 type TxManager interface {
-	DBManager
+	SQLManager
 	Commit() error
 	Rollback() error
 }
 
-// DBManager is the manager of DB.
-type DBManager interface {
+// SQLManager is the manager of DB.
+type SQLManager interface {
 	Querier
 	Preparer
 	Executor

@@ -20,7 +20,8 @@ func (p DomainModelNameForDeveloper) String() string {
 
 // Model name for developer.
 const (
-	DomainModelNameUserForDeveloper DomainModelNameForDeveloper = "User"
+	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
+	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
 )
 
 // DomainModelNameForUser is Model name for user.
@@ -33,7 +34,8 @@ func (p DomainModelNameForUser) String() string {
 
 // Model name for user.
 const (
-	DomainModelNameUserForUser DomainModelNameForUser = "ユーザー"
+	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
+	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
 )
 
 // PropertyNameForDeveloper is property name for developer.
@@ -46,8 +48,9 @@ func (p PropertyNameForDeveloper) String() string {
 
 // Property name for developer.
 const (
-	IDPropertyForDeveloper   PropertyNameForDeveloper = "id"
-	NamePropertyForDeveloper PropertyNameForDeveloper = "name"
+	IDPropertyForDeveloper       PropertyNameForDeveloper = "id"
+	NamePropertyForDeveloper     PropertyNameForDeveloper = "name"
+	PassWordPropertyForDeveloper PropertyNameForDeveloper = "password"
 )
 
 // PropertyNameForUser is Property name for user.
@@ -60,6 +63,27 @@ func (p PropertyNameForUser) String() string {
 
 // Property name for user.
 const (
-	IDPropertyForUser   PropertyNameForUser = "ID"
-	NamePropertyForUser PropertyNameForUser = "名前"
+	IDPropertyForUser       PropertyNameForUser = "ID"
+	NamePropertyForUser     PropertyNameForUser = "名前"
+	PassWordPropertyForUser PropertyNameForUser = "パスワード"
+)
+
+// == for test ==
+// User
+const (
+	UserNameForTest             = "testUserName"
+	PasswordForTest             = "testPasswor"
+	UserValidIDForTest   uint32 = 1
+	UserInValidIDForTest uint32 = 2
+)
+
+// Session
+const (
+	SessionValidIDForTest   = "testValidSessionID12345678"
+	SessionInValidIDForTest = "testInvalidSessionID12345678"
+)
+
+// error message for test
+const (
+	ErrorMessageForTest = "some error has occurred"
 )

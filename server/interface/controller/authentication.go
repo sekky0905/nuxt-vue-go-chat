@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
@@ -31,7 +32,41 @@ func NewAuthenticationController(rm router.RequestManager, uAPP application.Auth
 
 // SignUp sign up an user.
 func (c *authenticationController) SignUp(w http.ResponseWriter, r *http.Request) {
-	return
+	b, err := GetValueFromPayLoad(r)
+	if err != nil {
+		ResponseAndLogError(w, err)
+		return
+	}
+
+	user, err := ParseUserFromPayLoad(b)
+	if err != nil {
+		ResponseAndLogError(w, err)
+		return
+	}
+
+	user, err = model.NewUser(user.Name, user.Password)
+	if err != nil {
+		ResponseAndLogError(w, err)
+		return
+	}
+
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
+
+	ctx := r.Context()
+	user, err = c.aApp.SignUp(ctx, user)
+	if err != nil {
+		ResponseAndLogError(w, err)
+		return
+	}
+
+	cookie := c.newCookieWithSessionID(user.SessionID, 86400)
+	uDTO := TranslateFromUserToUserDTO(user)
+
+	if err := ResponseWithCookie(w, http.StatusOK, cookie, uDTO); err != nil {
+		ResponseAndLogError(w, err)
+		return
+	}
 }
 
 //  ParseUserFromPayLoad parses user from payload.

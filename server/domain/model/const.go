@@ -68,6 +68,13 @@ const (
 	PassWordPropertyForUser PropertyNameForUser = "パスワード"
 )
 
+// PropertyNameKV is the Key/Value of PropertyNameForDeveloper and PropertyNameForUser,
+var PropertyNameKV = map[PropertyNameForDeveloper]PropertyNameForUser{
+	IDPropertyForDeveloper:       IDPropertyForUser,
+	NamePropertyForDeveloper:     NamePropertyForUser,
+	PassWordPropertyForDeveloper: PassWordPropertyForUser,
+}
+
 // == for test ==
 // User
 const (

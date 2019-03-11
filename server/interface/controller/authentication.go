@@ -49,3 +49,12 @@ func ParseUserFromPayLoad(b []byte) (*model.User, error) {
 	}
 	return u, nil
 }
+
+// newCookieWithSessionID generates and returns cookie with session id.
+func (c *authenticationController) newCookieWithSessionID(sessionID string, maxAge int) *http.Cookie {
+	return &http.Cookie{
+		Name:   model.SessionIDAtCookie,
+		Value:  sessionID,
+		MaxAge: maxAge,
+	}
+}

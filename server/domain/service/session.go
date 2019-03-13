@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -11,8 +12,9 @@ import (
 
 // SessionService is interface of domain service of session.
 type SessionService interface {
-	IsAlreadyExistID(ctx context.Context, id string) (bool, error)
+	NewSession(userID uint32) *model.Session
 	SessionID() string
+	IsAlreadyExistID(ctx context.Context, id string) (bool, error)
 }
 
 // SessionRepoFactory is factory of SessionRepository.
@@ -30,6 +32,15 @@ func NewSessionService(m repository.DBManager, repo repository.SessionRepository
 		m:    m,
 		repo: repo,
 	}
+}
+
+// NewSession generates and returns Session.
+func (s *sessionService) NewSession(userID uint32) *model.Session {
+	session := &model.Session{
+		UserID:    userID,
+		CreatedAt: time.Now(),
+	}
+	return session
 }
 
 // SessionID generates and returns SessionID.

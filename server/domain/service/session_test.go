@@ -57,7 +57,6 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 					ID:        model.SessionValidIDForTest,
 					UserID:    model.UserValidIDForTest,
 					CreatedAt: testutil.TimeNow(),
-					UpdatedAt: testutil.TimeNow(),
 				},
 				err: nil,
 			},

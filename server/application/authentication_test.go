@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"testing"
+	"time"
 
 	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
 
@@ -43,13 +44,15 @@ func Test_authenticationService_SignUp(t *testing.T) {
 	}
 
 	type mockUserServiceArgs struct {
-		ctx  context.Context
-		name string
+		ctx      context.Context
+		name     string
+		password string
 	}
 
 	type mockSessionServiceArgs struct {
-		ctx context.Context
-		id  string
+		ctx    context.Context
+		id     string
+		userID uint32
 	}
 
 	type mockUserRepoReturns struct {
@@ -59,6 +62,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 	type mockUserServiceReturns struct {
 		found bool
 		err   error
+		user  *model.User
 	}
 
 	type mockSessionRepoReturns struct {
@@ -66,21 +70,12 @@ func Test_authenticationService_SignUp(t *testing.T) {
 	}
 
 	type mockSessionServiceReturns struct {
-		found bool
-		err   error
+		found   bool
+		err     error
+		session *model.Session
 	}
 
-	user, err := model.NewUser(model.UserNameForTest, model.PasswordForTest)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	userForSession, err := model.NewUser(model.UserNameForTest, model.PasswordForTest)
-	if err != nil {
-		t.Fatal(err)
-	}
-	userForSession.Password = user.Password
-	userForSession.SessionID = model.SessionValidIDForTest
+	testutil.SetFakeTime(time.Now())
 
 	tests := []struct {
 		name   string
@@ -110,27 +105,38 @@ func Test_authenticationService_SignUp(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:  context.Background(),
-				user: user,
+				ctx: context.Background(),
+				user: &model.User{
+					Name:     model.UserNameForTest,
+					Password: model.PasswordForTest,
+				},
 			},
 			mockUserRepoArgs: mockUserRepoArgs{
-				user: userForSession,
+				user: &model.User{
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
 			},
 			mockSessionRepoArgs: mockSessionRepoArgs{
 				session: &model.Session{
 					ID:        model.SessionValidIDForTest,
 					UserID:    model.UserValidIDForTest,
 					CreatedAt: testutil.TimeNow(),
-					UpdatedAt: testutil.TimeNow(),
 				},
 			},
 			mockUserServiceArgs: mockUserServiceArgs{
-				ctx:  context.Background(),
-				name: model.UserNameForTest,
+				ctx:      context.Background(),
+				name:     model.UserNameForTest,
+				password: model.PasswordForTest,
 			},
 			mockSessionServiceArgs: mockSessionServiceArgs{
-				ctx: context.Background(),
-				id:  model.SessionValidIDForTest,
+				ctx:    context.Background(),
+				id:     model.SessionValidIDForTest,
+				userID: model.UserValidIDForTest,
 			},
 			mockUserRepoReturns: mockUserRepoReturns{
 				id:  model.UserValidIDForTest,
@@ -142,14 +148,27 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			mockUserServiceReturns: mockUserServiceReturns{
 				found: false,
 				err:   nil,
+				user: &model.User{
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					Password:  model.PasswordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
 			},
 			mockSessionServiceReturns: mockSessionServiceReturns{
 				found: false,
 				err:   nil,
+				session: &model.Session{
+					ID:        model.SessionValidIDForTest,
+					UserID:    model.UserValidIDForTest,
+					CreatedAt: testutil.TimeNow(),
+				},
 			},
 			wantUser: &model.User{
 				ID:        model.UserValidIDForTest,
 				Name:      model.UserNameForTest,
+				SessionID: model.SessionValidIDForTest,
 				Password:  model.PasswordForTest,
 				CreatedAt: testutil.TimeNow(),
 				UpdatedAt: testutil.TimeNow(),
@@ -171,6 +190,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 				t.Fatal("failed to assert MockUserRepository")
 			}
 			us.EXPECT().IsAlreadyExistName(tt.args.ctx, tt.mockUserServiceArgs.name).Return(tt.mockUserServiceReturns.found, tt.mockUserServiceReturns.err)
+			us.EXPECT().NewUser(tt.mockUserServiceArgs.name, tt.mockUserServiceArgs.password).Return(tt.mockUserServiceReturns.user, tt.mockUserServiceReturns.err)
 
 			ur, ok := tt.fields.userRepository.(*mock_repository.MockUserRepository)
 			if !ok {
@@ -183,8 +203,8 @@ func Test_authenticationService_SignUp(t *testing.T) {
 				t.Fatal("failed to assert MockUserRepository")
 			}
 			ss.EXPECT().IsAlreadyExistID(tt.mockSessionServiceArgs.ctx, tt.mockSessionServiceArgs.id).Return(tt.mockSessionServiceReturns.found, tt.mockSessionServiceReturns.err)
-
 			ss.EXPECT().SessionID().Return(model.SessionValidIDForTest)
+			ss.EXPECT().NewSession(tt.mockSessionServiceArgs.userID).Return(tt.mockSessionServiceReturns.session)
 
 			sr, ok := tt.fields.sessionRepository.(*mock_repository.MockSessionRepository)
 			if !ok {

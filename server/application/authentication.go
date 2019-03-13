@@ -68,6 +68,11 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 		}
 	}()
 
+	user, err = s.userService.NewUser(param.Name, param.Password)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to new user")
+	}
+
 	sessionID := s.sessionService.SessionID()
 	user.SessionID = sessionID
 
@@ -77,8 +82,11 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 		return nil, errors.Wrap(err, "failed to create user")
 	}
 
+	session := s.sessionService.NewSession(user.ID)
+	session.ID = user.SessionID
+
 	// create Session
-	if _, err := s.createSession(ctx, sessionID, user.ID); err != nil {
+	if _, err := s.createSession(ctx, session); err != nil {
 		return nil, errors.Wrap(err, "failed to create session")
 	}
 
@@ -86,14 +94,14 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 }
 
 // createUser creates the user.
-func (s *authenticationService) createUser(ctx context.Context, param *model.User) (*model.User, error) {
+func (s *authenticationService) createUser(ctx context.Context, user *model.User) (*model.User, error) {
 	// not allow duplicated name.
-	yes, err := s.userService.IsAlreadyExistName(ctx, param.Name)
+	yes, err := s.userService.IsAlreadyExistName(ctx, user.Name)
 	if yes {
 		err = &model.AlreadyExistError{
 			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
 			PropertyNameForUser:         model.NamePropertyForUser,
-			PropertyValue:               param.Name,
+			PropertyValue:               user.Name,
 			DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
 			DomainModelNameForUser:      model.DomainModelNameUserForUser,
 		}
@@ -107,20 +115,17 @@ func (s *authenticationService) createUser(ctx context.Context, param *model.Use
 		}
 	}
 
-	id, err := s.userRepository.InsertUser(s.m, param)
+	id, err := s.userRepository.InsertUser(s.m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
 	}
-	param.ID = id
+	user.ID = id
 
-	return param, nil
+	return user, nil
 }
 
 // createSession creates the session.
-func (s *authenticationService) createSession(ctx context.Context, sessionID string, userID uint32) (*model.Session, error) {
-	session := model.NewSession(userID)
-	session.ID = sessionID
-
+func (s *authenticationService) createSession(ctx context.Context, session *model.Session) (*model.Session, error) {
 	// ready for collision of UUID.
 	yes := true
 	var err error

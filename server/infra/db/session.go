@@ -32,13 +32,12 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 		DomainModelNameForUser:      model.DomainModelNameSessionForUser,
 	}
 
-	log.Errorf("EX--->%#v", ex)
 	return ex
 }
 
 // GetSessionByID gets and returns a record specified by id.
 func (repo *sessionRepository) GetSessionByID(m repository.SQLManager, id string) (*model.Session, error) {
-	query := "SELECT id, user_id, created_at, updated_at FROM sessions WHERE id=?"
+	query := "SELECT id, user_id, created_at FROM sessions WHERE id=?"
 
 	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
 
@@ -94,7 +93,6 @@ func (repo *sessionRepository) list(m repository.SQLManager, method model.Reposi
 			&session.ID,
 			&session.UserID,
 			&session.CreatedAt,
-			&session.UpdatedAt,
 		)
 
 		if err != nil {
@@ -109,7 +107,7 @@ func (repo *sessionRepository) list(m repository.SQLManager, method model.Reposi
 
 // InsertSession insert a record.
 func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *model.Session) error {
-	query := "INSERT INTO sessions (id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, ?, ?)"
 	stmt, err := m.PrepareContext(repo.ctx, query)
 	if err != nil {
 		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
@@ -121,9 +119,8 @@ func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *m
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, session.ID, session.UserID, session.CreatedAt, session.UpdatedAt)
+	result, err := stmt.ExecContext(repo.ctx, session.ID, session.UserID, session.CreatedAt)
 	if err != nil {
-		log.Errorf("[]==%s", err.Error())
 		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
 	}
 

@@ -14,7 +14,5 @@ func ResponseAndLogError(g *gin.Context, err error) {
 		log.Errorf("error message: %v", he.Message)
 	}
 
-	log.Infof("=====HE====%#v", he)
-
 	g.JSON(he.Status, he)
 }

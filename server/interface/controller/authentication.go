@@ -36,6 +36,7 @@ func (c *authenticationController) InitAuthenticationAPI(g *gin.RouterGroup) {
 func (c *authenticationController) SignUp(g *gin.Context) {
 	param := &model.User{}
 	if err := g.BindJSON(param); err != nil {
+		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to bind json"))
 		return
 	}

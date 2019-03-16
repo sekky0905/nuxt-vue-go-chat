@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -31,10 +32,16 @@ func Test_authenticationController_SignUp(t *testing.T) {
 		user *model.User
 	}
 
+	type errBody struct {
+		errCode ErrCode
+		filed   string
+	}
+
 	type want struct {
 		statusCode int
 		cookie     string
 		body       *UserDTO
+		errBody
 	}
 
 	type mockArgs struct {
@@ -78,6 +85,85 @@ func Test_authenticationController_SignUp(t *testing.T) {
 					CreatedAt: testutil.TimeNow(),
 					UpdatedAt: testutil.TimeNow(),
 				},
+				errBody: errBody{},
+			},
+			mockArgs: mockArgs{
+				ctx: context.Background(),
+				user: &model.User{
+					Name:     model.UserNameForTest,
+					Password: model.PasswordForTest,
+				},
+			},
+			mockReturns: mockReturns{
+				user: &model.User{
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "When name is empty, SingUp returns status code 400",
+			fields: fields{
+				aApp: mock_application.NewMockAuthenticationService(ctrl),
+			},
+			args: args{
+				user: &model.User{
+					Name:     "",
+					Password: model.PasswordForTest,
+				},
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				cookie:     "",
+				body:       nil,
+				errBody: errBody{
+					errCode: InvalidParameterValueFailure,
+					filed:   model.NamePropertyForDeveloper.String(),
+				},
+			},
+			mockArgs: mockArgs{
+				ctx: context.Background(),
+				user: &model.User{
+					Name:     model.UserNameForTest,
+					Password: model.PasswordForTest,
+				},
+			},
+			mockReturns: mockReturns{
+				user: &model.User{
+					ID:        model.UserValidIDForTest,
+					Name:      model.UserNameForTest,
+					SessionID: model.SessionValidIDForTest,
+					Password:  model.PasswordForTest,
+					CreatedAt: testutil.TimeNow(),
+					UpdatedAt: testutil.TimeNow(),
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "When password is empty, SingUp returns status code 400",
+			fields: fields{
+				aApp: mock_application.NewMockAuthenticationService(ctrl),
+			},
+			args: args{
+				user: &model.User{
+					Name:     model.UserNameForTest,
+					Password: "",
+				},
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				cookie:     "",
+				body:       nil,
+				errBody: errBody{
+					errCode: InvalidParameterValueFailure,
+					filed:   model.PassWordPropertyForDeveloper.String(),
+				},
 			},
 			mockArgs: mockArgs{
 				ctx: context.Background(),
@@ -106,7 +192,9 @@ func Test_authenticationController_SignUp(t *testing.T) {
 				t.Fatal("failed to assert MockUserRepository")
 			}
 
-			aa.EXPECT().SignUp(tt.mockArgs.ctx, tt.mockArgs.user).Return(tt.mockReturns.user, tt.mockReturns.err)
+			if tt.want.statusCode != http.StatusBadRequest {
+				aa.EXPECT().SignUp(tt.mockArgs.ctx, tt.mockArgs.user).Return(tt.mockReturns.user, tt.mockReturns.err)
+			}
 
 			ac := NewAuthenticationController(tt.fields.aApp)
 			r := gin.New()
@@ -136,16 +224,29 @@ func Test_authenticationController_SignUp(t *testing.T) {
 				return
 			}
 
-			bBody := rec.Body.Bytes()
-			uDTO := &UserDTO{}
-			if err := json.Unmarshal(bBody, uDTO); err != nil {
-				t.Fatal(err)
-				return
-			}
+			if tt.want.errBody.filed == "" {
+				bBody := rec.Body.Bytes()
+				uDTO := &UserDTO{}
+				if err := json.Unmarshal(bBody, uDTO); err != nil {
+					t.Fatal(err)
+					return
+				}
 
-			if !reflect.DeepEqual(uDTO, tt.want.body) {
-				t.Errorf("body = %#v, want %#v", uDTO, tt.want.body)
-				return
+				if !reflect.DeepEqual(uDTO, tt.want.body) {
+					t.Errorf("body = %#v, want %#v", uDTO, tt.want.body)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+
+				if !strings.Contains(sBody, tt.want.errBody.filed) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.filed)
+					return
+				}
 			}
 		})
 	}

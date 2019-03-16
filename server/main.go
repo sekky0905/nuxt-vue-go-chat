@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	// for static file
 	entryPoint := "../client/nuxt-vue-go-chat/dist/index.html"
 	router.Router.Path("/").HandlerFunc(ServeStaticFile(entryPoint))

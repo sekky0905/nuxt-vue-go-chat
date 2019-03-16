@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
@@ -38,23 +37,14 @@ func (c *authenticationController) SignUp(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	user, err := ParseUserFromPayLoad(b)
+	param, err := ParseUserFromPayLoad(b)
 	if err != nil {
 		ResponseAndLogError(w, err)
 		return
 	}
-
-	user, err = model.NewUser(user.Name, user.Password)
-	if err != nil {
-		ResponseAndLogError(w, err)
-		return
-	}
-
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
 
 	ctx := r.Context()
-	user, err = c.aApp.SignUp(ctx, user)
+	user, err := c.aApp.SignUp(ctx, param)
 	if err != nil {
 		ResponseAndLogError(w, err)
 		return

@@ -50,9 +50,9 @@ func (p PropertyNameForDeveloper) String() string {
 
 // Property name for developer.
 const (
-	IDPropertyForDeveloper       PropertyNameForDeveloper = "id"
-	NamePropertyForDeveloper     PropertyNameForDeveloper = "name"
-	PassWordPropertyForDeveloper PropertyNameForDeveloper = "password"
+	IDPropertyForDeveloper       PropertyNameForDeveloper = "ID"
+	NamePropertyForDeveloper     PropertyNameForDeveloper = "Name"
+	PassWordPropertyForDeveloper PropertyNameForDeveloper = "Password"
 )
 
 // PropertyNameForUser is Property name for user.

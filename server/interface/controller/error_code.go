@@ -13,9 +13,10 @@ const (
 
 // User error.
 const (
-	InvalidParameterValueFailure ErrCode = "InvalidParameterValueFailure"
-	NoSuchDataFailure            ErrCode = "NoSuchDataFailure"
-	RequiredFailure              ErrCode = "RequiredError"
-	AlreadyExistsFailure         ErrCode = "AlreadyExistsFailure"
-	AuthenticationFailure        ErrCode = "AuthenticationFailure"
+	InvalidParameterValueFailure  ErrCode = "InvalidParameterValueFailure"
+	InvalidParametersValueFailure ErrCode = "InvalidParametersValueFailure"
+	NoSuchDataFailure             ErrCode = "NoSuchDataFailure"
+	RequiredFailure               ErrCode = "RequiredError"
+	AlreadyExistsFailure          ErrCode = "AlreadyExistsFailure"
+	AuthenticationFailure         ErrCode = "AuthenticationFailure"
 )

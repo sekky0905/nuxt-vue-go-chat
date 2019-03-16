@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // RepositoryMethod is method of Repository.
 type RepositoryMethod string
@@ -67,6 +70,21 @@ type InvalidParamError struct {
 // Error returns error message.
 func (e *InvalidParamError) Error() string {
 	return fmt.Sprintf("%s, %v, is invalid, %s", e.PropertyNameForDeveloper, e.PropertyValue, e.InvalidReasonForDeveloper)
+}
+
+// InvalidParamsError is inappropriate parameters error。
+type InvalidParamsError struct {
+	Errors []*InvalidParamError
+}
+
+// Error returns error message.
+func (e *InvalidParamsError) Error() string {
+	length := len(e.Errors)
+	messages := make([]string, length, length)
+	for i, err := range e.Errors {
+		messages[i] = err.Error()
+	}
+	return strings.Join(messages, ",")
 }
 
 // NoSuchDataError is not existing specified data error.

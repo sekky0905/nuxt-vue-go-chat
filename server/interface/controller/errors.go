@@ -55,6 +55,14 @@ func handleError(err error) *handledError {
 			ErrorUserTitle: "不正な入力",
 			ErrorUserMsg:   realErr.InvalidReasonForUser,
 		}
+	case *model.InvalidParamsError:
+		return &handledError{
+			Status:         http.StatusBadRequest,
+			Code:           InvalidParametersValueFailure,
+			Message:        errors.Cause(err).Error(),
+			ErrorUserTitle: "不正な入力",
+			ErrorUserMsg:   "不正な入力です",
+		}
 	case *model.AlreadyExistError:
 		realErr := errors.Cause(err).(*model.AlreadyExistError)
 		return &handledError{

@@ -51,7 +51,7 @@ func (s *userService) NewUser(name, password string) (*model.User, error) {
 
 // IsAlreadyExistID checks whether the data specified by id already exists or not.
 func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
-	searched, err := s.repo.GetUserByID(s.m, id)
+	searched, err := s.repo.GetUserByID(ctx, s.m, id)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by id")
 	}
@@ -60,7 +60,7 @@ func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, er
 
 // IsAlreadyExistName checks whether the data specified by name already exists or not.
 func (s *userService) IsAlreadyExistName(ctx context.Context, name string) (bool, error) {
-	searched, err := s.repo.GetUserByName(s.m, name)
+	searched, err := s.repo.GetUserByName(ctx, s.m, name)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by Name")
 	}

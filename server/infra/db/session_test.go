@@ -13,39 +13,7 @@ import (
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
-func TestNewSessionRepository(t *testing.T) {
-	type args struct {
-		ctx context.Context
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want repository.SessionRepository
-	}{
-		{
-			name: "When given appropriate args, returns SessionRepository",
-			args: args{
-				ctx: context.Background(),
-			},
-			want: &sessionRepository{
-				context.Background(),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSessionRepository(tt.args.ctx); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewSessionRepository() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_sessionRepository_ErrorMsg(t *testing.T) {
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
 		method model.RepositoryMethod
 		err    error
@@ -53,15 +21,11 @@ func Test_sessionRepository_ErrorMsg(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		wantErr *model.RepositoryError
 	}{
 		{
 			name: "When given appropriate args, returns appropriate error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
 				method: model.RepositoryMethodInsert,
 				err:    errors.New(model.ErrorMessageForTest),
@@ -77,9 +41,7 @@ func Test_sessionRepository_ErrorMsg(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := &sessionRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &sessionRepository{}
 			if err := repo.ErrorMsg(tt.args.method, tt.args.err); errors.Cause(err).Error() != tt.wantErr.Error() {
 				t.Errorf("sessionRepository.ErrorMsg() error = %#v, wantErr %#v", err, tt.wantErr)
 			}
@@ -99,29 +61,24 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
-		m  repository.SQLManager
-		id string
+		ctx context.Context
+		m   repository.SQLManager
+		id  string
 	}
 
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *model.Session
 		wantErr *model.NoSuchDataError
 	}{
 		{
 			name: "When a session specified by id exists, returns a session",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.SessionValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.SessionValidIDForTest,
 			},
 			want: &model.Session{
 				ID:        model.SessionValidIDForTest,
@@ -132,12 +89,10 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 		},
 		{
 			name: "When a session specified by id does not exist, returns NoSuchDataError",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.SessionInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.SessionInValidIDForTest,
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
@@ -162,10 +117,8 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 				prep.ExpectQuery().WithArgs(tt.want.ID).WillReturnRows(rows)
 			}
 
-			repo := &sessionRepository{
-				ctx: tt.fields.ctx,
-			}
-			got, err := repo.GetSessionByID(tt.args.m, tt.args.id)
+			repo := &sessionRepository{}
+			got, err := repo.GetSessionByID(tt.args.ctx, tt.args.m, tt.args.id)
 
 			if tt.wantErr != nil {
 				if err.Error() != tt.wantErr.Error() {
@@ -192,10 +145,8 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx     context.Context
 		m       repository.SQLManager
 		session *model.Session
 		err     error
@@ -203,7 +154,6 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		fields      fields
 		args        args
 		rowAffected int64
 		want        string
@@ -211,11 +161,9 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 	}{
 		{
 			name: "When a session which has ID, User_ID, CreatedAt is given, returns ID",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				session: &model.Session{
 					ID:        model.SessionValidIDForTest,
 					UserID:    model.UserValidIDForTest,
@@ -227,11 +175,9 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 0、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				session: &model.Session{
 					ID:        model.SessionInValidIDForTest,
 					UserID:    model.UserValidIDForTest,
@@ -247,11 +193,9 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 2、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				session: &model.Session{
 					ID:        model.SessionInValidIDForTest,
 					UserID:    model.UserValidIDForTest,
@@ -267,11 +211,9 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 		},
 		{
 			name: "when DB error has occurred、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				session: &model.Session{
 					ID:        model.SessionInValidIDForTest,
 					UserID:    model.UserValidIDForTest,
@@ -298,11 +240,9 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 				prep.ExpectExec().WithArgs(tt.args.session.ID, tt.args.session.UserID, tt.args.session.CreatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
 
-			repo := &sessionRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &sessionRepository{}
 
-			err := repo.InsertSession(tt.args.m, tt.args.session)
+			err := repo.InsertSession(tt.args.ctx, tt.args.m, tt.args.session)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("sessionRepository.InsertSession() error = %v, wantErr %v", err, tt.wantErr)
@@ -321,10 +261,8 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 	}
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx context.Context
 		m   repository.SQLManager
 		id  uint32
 		err error
@@ -332,32 +270,27 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		fields      fields
 		rowAffected int64
 		args        args
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user specified by id exists, returns nil",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "When a user specified by id exists, returns nil",
 			rowAffected: 1,
 			args: args{
-				m:  db,
-				id: model.UserValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserValidIDForTest,
 			},
 			wantErr: nil,
 		},
 		{
-			name: "when RowAffected is 0、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when RowAffected is 0、returns error",
 			rowAffected: 0,
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -366,14 +299,12 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 			},
 		},
 		{
-			name: "when RowAffected is 2、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when RowAffected is 2、returns error",
 			rowAffected: 2,
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -382,12 +313,10 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 			},
 		},
 		{
-			name: "when DB error has occurred、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when DB error has occurred、returns error",
 			rowAffected: 0,
 			args: args{
+				ctx: context.Background(),
 				m:   db,
 				id:  model.UserInValidIDForTest,
 				err: errors.New(model.ErrorMessageForTest),
@@ -410,11 +339,9 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &userRepository{}
 
-			err := repo.DeleteUser(tt.args.m, tt.args.id)
+			err := repo.DeleteUser(tt.args.ctx, tt.args.m, tt.args.id)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userRepository.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)

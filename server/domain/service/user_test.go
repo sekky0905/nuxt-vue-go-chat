@@ -108,7 +108,7 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetUserByID(tt.fields.m, tt.args.id).Return(tt.returnArgs.user, tt.returnArgs.err)
+			mock.EXPECT().GetUserByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.returnArgs.user, tt.returnArgs.err)
 
 			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.id)
 			if tt.wantErr != nil {
@@ -219,7 +219,7 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetUserByName(tt.fields.m, tt.args.name).Return(tt.returnArgs.user, tt.returnArgs.err)
+			mock.EXPECT().GetUserByName(tt.args.ctx, tt.fields.m, tt.args.name).Return(tt.returnArgs.user, tt.returnArgs.err)
 
 			got, err := s.IsAlreadyExistName(tt.args.ctx, tt.args.name)
 			if tt.wantErr != nil {

@@ -17,41 +17,41 @@ type AuthenticationService interface {
 
 // AuthenticationServiceDIInput is DI input of AuthenticationService.
 type AuthenticationServiceDIInput struct {
-	userRepoFactory    repository.UserRepoFactory
-	sessionRepoFactory repository.SessionRepoFactory
-	userService        service.UserService
-	sessionService     service.SessionService
+	userRepository    repository.UserRepository
+	sessionRepository repository.SessionRepository
+	userService       service.UserService
+	sessionService    service.SessionService
 }
 
 // NewAuthenticationServiceDIInput generates and returns AuthenticationServiceDIInput.
-func NewAuthenticationServiceDIInput(uFactory repository.UserRepoFactory, sFactory repository.SessionRepoFactory, uService service.UserService, sService service.SessionService) *AuthenticationServiceDIInput {
+func NewAuthenticationServiceDIInput(uRepo repository.UserRepository, sRepo repository.SessionRepository, uService service.UserService, sService service.SessionService) *AuthenticationServiceDIInput {
 	return &AuthenticationServiceDIInput{
-		userRepoFactory:    uFactory,
-		sessionRepoFactory: sFactory,
-		userService:        uService,
-		sessionService:     sService,
+		userRepository:    uRepo,
+		sessionRepository: sRepo,
+		userService:       uService,
+		sessionService:    sService,
 	}
 }
 
 // authenticationService is the service of authentication.
 type authenticationService struct {
-	m                  repository.DBManager
-	userRepoFactory    repository.UserRepoFactory
-	sessionRepoFactory repository.SessionRepoFactory
-	userService        service.UserService
-	sessionService     service.SessionService
-	txCloser           CloseTransaction
+	m                 repository.DBManager
+	userRepository    repository.UserRepository
+	sessionRepository repository.SessionRepository
+	userService       service.UserService
+	sessionService    service.SessionService
+	txCloser          CloseTransaction
 }
 
 // NewAuthenticationService generates and returns AuthenticationService.
 func NewAuthenticationService(m repository.DBManager, diInput AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
 	return &authenticationService{
-		m:                  m,
-		userRepoFactory:    diInput.userRepoFactory,
-		sessionRepoFactory: diInput.sessionRepoFactory,
-		userService:        diInput.userService,
-		sessionService:     diInput.sessionService,
-		txCloser:           txCloser,
+		m:                 m,
+		userRepository:    diInput.userRepository,
+		sessionRepository: diInput.sessionRepository,
+		userService:       diInput.userService,
+		sessionService:    diInput.sessionService,
+		txCloser:          txCloser,
 	}
 }
 
@@ -115,8 +115,7 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 		}
 	}
 
-	uRepository := s.userRepoFactory(ctx)
-	id, err := uRepository.InsertUser(s.m, user)
+	id, err := s.userRepository.InsertUser(ctx, s.m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
 	}
@@ -139,8 +138,7 @@ func (s *authenticationService) createSession(ctx context.Context, session *mode
 		}
 	}
 
-	sRepository := s.sessionRepoFactory(ctx)
-	if err := sRepository.InsertSession(s.m, session); err != nil {
+	if err := s.sessionRepository.InsertSession(ctx, s.m, session); err != nil {
 		return nil, errors.Wrap(err, "failed to insert session")
 	}
 	return session, nil

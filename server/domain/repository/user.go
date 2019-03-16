@@ -8,12 +8,9 @@ import (
 
 // UserRepository is repository of user.
 type UserRepository interface {
-	GetUserByID(m SQLManager, id uint32) (*model.User, error)
-	GetUserByName(m SQLManager, name string) (*model.User, error)
-	InsertUser(m SQLManager, user *model.User) (uint32, error)
-	UpdateUser(m SQLManager, id uint32, user *model.User) error
-	DeleteUser(m SQLManager, id uint32) error
+	GetUserByID(ctx context.Context, m SQLManager, id uint32) (*model.User, error)
+	GetUserByName(ctx context.Context, m SQLManager, name string) (*model.User, error)
+	InsertUser(ctx context.Context, m SQLManager, user *model.User) (uint32, error)
+	UpdateUser(ctx context.Context, m SQLManager, id uint32, user *model.User) error
+	DeleteUser(ctx context.Context, m SQLManager, id uint32) error
 }
-
-// UserRepoFactory is Factory of UserRepository.
-type UserRepoFactory func(ctx context.Context) UserRepository

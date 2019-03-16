@@ -8,10 +8,7 @@ import (
 
 // SessionRepository is repository of session.
 type SessionRepository interface {
-	GetSessionByID(m SQLManager, id string) (*model.Session, error)
-	InsertSession(m SQLManager, user *model.Session) error
-	DeleteSession(m SQLManager, id string) error
+	GetSessionByID(ctx context.Context, m SQLManager, id string) (*model.Session, error)
+	InsertSession(ctx context.Context, m SQLManager, user *model.Session) error
+	DeleteSession(ctx context.Context, m SQLManager, id string) error
 }
-
-// SessionRepoFactory is Factory of SessionRepository.
-type SessionRepoFactory func(ctx context.Context) SessionRepository

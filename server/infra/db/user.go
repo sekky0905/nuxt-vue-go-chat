@@ -13,14 +13,11 @@ import (
 
 // userRepository is repository of user.
 type userRepository struct {
-	ctx context.Context
 }
 
 // NewUserRepository generates and returns userRepository.
-func NewUserRepository(ctx context.Context) UserRepository {
-	return &userRepository{
-		ctx: ctx,
-	}
+func NewUserRepository() UserRepository {
+	return &userRepository{}
 }
 
 // ErrorMsg generates and returns error message.
@@ -34,10 +31,10 @@ func (repo *userRepository) ErrorMsg(method model.RepositoryMethod, err error) e
 }
 
 // GetUserByID gets and returns a record specified by id.
-func (repo *userRepository) GetUserByID(m SQLManager, id uint32) (*model.User, error) {
+func (repo *userRepository) GetUserByID(ctx context.Context, m SQLManager, id uint32) (*model.User, error) {
 	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE id=?"
 
-	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -59,9 +56,9 @@ func (repo *userRepository) GetUserByID(m SQLManager, id uint32) (*model.User, e
 }
 
 // GetUserByName gets and returns a record specified by name.
-func (repo *userRepository) GetUserByName(m SQLManager, name string) (*model.User, error) {
+func (repo *userRepository) GetUserByName(ctx context.Context, m SQLManager, name string) (*model.User, error) {
 	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
-	list, err := repo.list(m, model.RepositoryMethodREAD, query, name)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, name)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -83,8 +80,8 @@ func (repo *userRepository) GetUserByName(m SQLManager, name string) (*model.Use
 }
 
 // list gets and returns list of records.
-func (repo *userRepository) list(m SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
-	stmt, err := m.PrepareContext(repo.ctx, query)
+func (repo *userRepository) list(ctx context.Context, m SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, errors.WithStack(err))
 	}
@@ -95,7 +92,7 @@ func (repo *userRepository) list(m SQLManager, method model.RepositoryMethod, qu
 		}
 	}()
 
-	rows, err := stmt.QueryContext(repo.ctx, args...)
+	rows, err := stmt.QueryContext(ctx, args...)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, errors.WithStack(err))
 	}
@@ -130,9 +127,9 @@ func (repo *userRepository) list(m SQLManager, method model.RepositoryMethod, qu
 }
 
 // InsertUser insert a record.
-func (repo *userRepository) InsertUser(m SQLManager, user *model.User) (uint32, error) {
+func (repo *userRepository) InsertUser(ctx context.Context, m SQLManager, user *model.User) (uint32, error) {
 	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
-	stmt, err := m.PrepareContext(repo.ctx, query)
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
@@ -143,7 +140,7 @@ func (repo *userRepository) InsertUser(m SQLManager, user *model.User) (uint32, 
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, user.Name, user.SessionID, user.Password, user.CreatedAt, user.UpdatedAt)
+	result, err := stmt.ExecContext(ctx, user.Name, user.SessionID, user.Password, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
@@ -163,10 +160,10 @@ func (repo *userRepository) InsertUser(m SQLManager, user *model.User) (uint32, 
 }
 
 // UpdateUser updates a record.
-func (repo *userRepository) UpdateUser(m SQLManager, id uint32, user *model.User) error {
+func (repo *userRepository) UpdateUser(ctx context.Context, m SQLManager, id uint32, user *model.User) error {
 	query := "UPDATE users SET session_id=?, password=?, updated_at=? WHERE id=?"
 
-	stmt, err := m.PrepareContext(repo.ctx, query)
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
@@ -178,7 +175,7 @@ func (repo *userRepository) UpdateUser(m SQLManager, id uint32, user *model.User
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, user.SessionID, user.Password, user.UpdatedAt, id)
+	result, err := stmt.ExecContext(ctx, user.SessionID, user.Password, user.UpdatedAt, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
@@ -193,10 +190,10 @@ func (repo *userRepository) UpdateUser(m SQLManager, id uint32, user *model.User
 }
 
 // DeleteUser delete a record.
-func (repo *userRepository) DeleteUser(m SQLManager, id uint32) error {
+func (repo *userRepository) DeleteUser(ctx context.Context, m SQLManager, id uint32) error {
 	query := "DELETE FROM users WHERE id=?"
 
-	stmt, err := m.PrepareContext(repo.ctx, query)
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
@@ -207,7 +204,7 @@ func (repo *userRepository) DeleteUser(m SQLManager, id uint32) error {
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, id)
+	result, err := stmt.ExecContext(ctx, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}

@@ -2,6 +2,8 @@ package model
 
 const InvalidID = 0
 
+const SessionIDAtCookie = "SESSION_ID"
+
 // InvalidReasonForDeveloper is InvalidReason message for developer.
 type InvalidReasonForDeveloper string
 

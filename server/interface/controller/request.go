@@ -14,6 +14,7 @@ const ContentLength = "Content-Length"
 // GetValueFromPayLoad load http payload.
 func GetValueFromPayLoad(r *http.Request) ([]byte, error) {
 	cl := r.Header.Get(ContentLength)
+
 	length, err := strconv.Atoi(cl)
 	if err != nil {
 		err = &model.InvalidDataError{

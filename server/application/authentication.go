@@ -44,7 +44,7 @@ type authenticationService struct {
 }
 
 // NewAuthenticationService generates and returns AuthenticationService.
-func NewAuthenticationService(m repository.DBManager, diInput AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
+func NewAuthenticationService(m repository.DBManager, diInput *AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
 	return &authenticationService{
 		m:                 m,
 		userRepository:    diInput.userRepository,

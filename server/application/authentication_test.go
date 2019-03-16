@@ -196,7 +196,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().InsertUser(tt.fields.m, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
+			ur.EXPECT().InsertUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {
@@ -210,7 +210,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.args.ctx, tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
 
 			a := &authenticationService{
 				m:                 tt.fields.m,

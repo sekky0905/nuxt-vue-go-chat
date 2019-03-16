@@ -115,7 +115,7 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 		}
 	}
 
-	id, err := s.userRepository.InsertUser(s.m, user)
+	id, err := s.userRepository.InsertUser(ctx, s.m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
 	}
@@ -138,7 +138,7 @@ func (s *authenticationService) createSession(ctx context.Context, session *mode
 		}
 	}
 
-	if err := s.sessionRepository.InsertSession(s.m, session); err != nil {
+	if err := s.sessionRepository.InsertSession(ctx, s.m, session); err != nil {
 		return nil, errors.Wrap(err, "failed to insert session")
 	}
 	return session, nil

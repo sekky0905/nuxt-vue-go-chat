@@ -213,12 +213,16 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			sr.EXPECT().InsertSession(tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
 
 			a := &authenticationService{
-				m:                 tt.fields.m,
-				userRepository:    tt.fields.userRepository,
-				sessionRepository: tt.fields.sessionRepository,
-				userService:       tt.fields.userService,
-				sessionService:    tt.fields.sessionService,
-				txCloser:          tt.fields.txCloser,
+				m: tt.fields.m,
+				userRepoFactory: func(ctx context.Context) repository.UserRepository {
+					return tt.fields.userRepository
+				},
+				sessionRepoFactory: func(ctx context.Context) repository.SessionRepository {
+					return tt.fields.sessionRepository
+				},
+				userService:    tt.fields.userService,
+				sessionService: tt.fields.sessionService,
+				txCloser:       tt.fields.txCloser,
 			}
 
 			gotUser, err := a.SignUp(tt.args.ctx, tt.args.user)

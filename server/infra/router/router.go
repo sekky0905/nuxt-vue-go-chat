@@ -1,15 +1,13 @@
 package router
 
 import (
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-// Router is the gorilla router for API.
-var Router *mux.Router
+// G is the gin engine.
+var G *gin.Engine
 
 func init() {
-	// Instantiation for  gorilla Router.
-	r := mux.NewRouter()
-
-	Router = r
+	g := gin.New()
+	G = g
 }

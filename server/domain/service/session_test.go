@@ -105,7 +105,7 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetSessionByID(tt.fields.m, tt.args.id).Return(tt.returnArgs.session, tt.returnArgs.err)
+			mock.EXPECT().GetSessionByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.returnArgs.session, tt.returnArgs.err)
 
 			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.id)
 			if tt.wantErr != nil {

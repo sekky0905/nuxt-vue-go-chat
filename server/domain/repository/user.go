@@ -14,6 +14,3 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, m SQLManager, id uint32, user *model.User) error
 	DeleteUser(ctx context.Context, m SQLManager, id uint32) error
 }
-
-// UserRepoFactory is Factory of UserRepository.
-type UserRepoFactory func(ctx context.Context) UserRepository

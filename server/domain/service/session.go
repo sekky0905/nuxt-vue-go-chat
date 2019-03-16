@@ -53,7 +53,7 @@ func (s sessionService) IsAlreadyExistID(ctx context.Context, id string) (bool, 
 	var searched *model.Session
 	var err error
 
-	if searched, err = s.repo.GetSessionByID(s.m, id); err != nil {
+	if searched, err = s.repo.GetSessionByID(ctx, s.m, id); err != nil {
 		return false, errors.Wrap(err, "failed to get session by id")
 	}
 	return searched != nil, nil

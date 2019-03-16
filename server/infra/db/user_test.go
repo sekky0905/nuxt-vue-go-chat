@@ -28,14 +28,12 @@ func TestNewUserRepository(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: &userRepository{
-				context.Background(),
-			},
+			want: &userRepository{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewUserRepository(tt.args.ctx); !reflect.DeepEqual(got, tt.want) {
+			if got := NewUserRepository(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewUserRepository() = %v, want %v", got, tt.want)
 			}
 		})
@@ -77,9 +75,7 @@ func Test_userRepository_ErrorMsg(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &userRepository{}
 			if err := repo.ErrorMsg(tt.args.method, tt.args.err); errors.Cause(err).Error() != tt.wantErr.Error() {
 				t.Errorf("userRepository.ErrorMsg() error = %#v, wantErr %#v", err, tt.wantErr)
 			}
@@ -99,29 +95,24 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
-		m  repository.SQLManager
-		id uint32
+		ctx context.Context
+		m   repository.SQLManager
+		id  uint32
 	}
 
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *model.User
 		wantErr *model.NoSuchDataError
 	}{
 		{
 			name: "When a user specified by id exists, returns a user",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserValidIDForTest,
 			},
 			want: &model.User{
 				ID:        model.UserValidIDForTest,
@@ -135,12 +126,10 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 		},
 		{
 			name: "When a user specified by id does not exist, returns NoSuchDataError",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
@@ -165,10 +154,8 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 				prep.ExpectQuery().WithArgs(tt.want.ID).WillReturnRows(rows)
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
-			got, err := repo.GetUserByID(tt.args.m, tt.args.id)
+			repo := &userRepository{}
+			got, err := repo.GetUserByID(tt.args.ctx, tt.args.m, tt.args.id)
 
 			if tt.wantErr != nil {
 				if !reflect.DeepEqual(err, tt.wantErr) {
@@ -194,27 +181,22 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 
 	defer db.Close()
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx  context.Context
 		m    repository.SQLManager
 		name string
 	}
 
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *model.User
 		wantErr *model.NoSuchDataError
 	}{
 		{
 			name: "When a user specified by name exists, returns a user",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
+				ctx:  context.Background(),
 				m:    db,
 				name: model.UserNameForTest,
 			},
@@ -229,10 +211,8 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 		},
 		{
 			name: "When a user specified by name does not exist, returns NoSuchDataError",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
+				ctx:  context.Background(),
 				m:    db,
 				name: "test2",
 			},
@@ -260,10 +240,8 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 				prep.ExpectQuery().WithArgs(tt.want.Name).WillReturnRows(rows)
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
-			got, err := repo.GetUserByName(tt.args.m, tt.args.name)
+			repo := &userRepository{}
+			got, err := repo.GetUserByName(tt.args.ctx, tt.args.m, tt.args.name)
 			if tt.wantErr != nil {
 				if !reflect.DeepEqual(err, tt.wantErr) {
 					t.Errorf("userRepository.GetUserByName() error = %v, wantErr %v", err, tt.wantErr)
@@ -288,10 +266,8 @@ func Test_userRepository_InsertUser(t *testing.T) {
 
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx  context.Context
 		m    repository.SQLManager
 		user *model.User
 		err  error
@@ -299,18 +275,15 @@ func Test_userRepository_InsertUser(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		fields      fields
 		args        args
 		rowAffected int64
 		wantErr     *model.RepositoryError
 	}{
 		{
 			name: "When a user which has ID, Name, Session_ID, Password, CreatedAt, UpdatedAt is given, returns ID",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				user: &model.User{
 					ID:        model.UserValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -325,11 +298,9 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 0、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -348,11 +319,9 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 2、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -371,11 +340,9 @@ func Test_userRepository_InsertUser(t *testing.T) {
 		},
 		{
 			name: "when DB error has occurred、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m: db,
+				ctx: context.Background(),
+				m:   db,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -405,11 +372,9 @@ func Test_userRepository_InsertUser(t *testing.T) {
 				prep.ExpectExec().WithArgs(tt.args.user.ID, tt.args.user.Name, tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &userRepository{}
 
-			_, err := repo.InsertUser(tt.args.m, tt.args.user)
+			_, err := repo.InsertUser(tt.args.ctx, tt.args.m, tt.args.user)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userRepository.InsertUser() error = %v, wantErr %v", err, tt.wantErr)
@@ -428,10 +393,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 	}
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx  context.Context
 		m    repository.SQLManager
 		id   uint32
 		user *model.User
@@ -440,19 +403,16 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		fields      fields
 		args        args
 		rowAffected int64
 		wantErr     *model.RepositoryError
 	}{
 		{
 			name: "When a user which has Name, Session_ID, Password, UpdatedAt is given, returns nil",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserValidIDForTest,
 				user: &model.User{
 					ID:        model.UserValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -467,12 +427,10 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 0、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -491,12 +449,10 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "when RowAffected is 2、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -515,12 +471,10 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 		},
 		{
 			name: "when DB error has occurred、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 				user: &model.User{
 					ID:        model.UserInValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -550,10 +504,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 				prep.ExpectExec().WithArgs(tt.args.user.SessionID, tt.args.user.Password, tt.args.user.CreatedAt, tt.args.user.UpdatedAt, tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
-			err := repo.UpdateUser(tt.args.m, tt.args.id, tt.args.user)
+			repo := &userRepository{}
+			err := repo.UpdateUser(tt.args.ctx, tt.args.m, tt.args.id, tt.args.user)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userRepository.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
@@ -572,10 +524,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 	}
 	testutil.SetFakeTime(time.Now())
 
-	type fields struct {
-		ctx context.Context
-	}
 	type args struct {
+		ctx context.Context
 		m   repository.SQLManager
 		id  uint32
 		err error
@@ -583,32 +533,27 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		fields      fields
 		rowAffected int64
 		args        args
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user specified by id exists, returns nil",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "When a user specified by id exists, returns nil",
 			rowAffected: 1,
 			args: args{
-				m:  db,
-				id: model.UserValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserValidIDForTest,
 			},
 			wantErr: nil,
 		},
 		{
-			name: "when RowAffected is 0、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when RowAffected is 0、returns error",
 			rowAffected: 0,
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -617,14 +562,12 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			},
 		},
 		{
-			name: "when RowAffected is 2、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when RowAffected is 2、returns error",
 			rowAffected: 2,
 			args: args{
-				m:  db,
-				id: model.UserInValidIDForTest,
+				ctx: context.Background(),
+				m:   db,
+				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
 				RepositoryMethod:            model.RepositoryMethodDELETE,
@@ -633,12 +576,10 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 			},
 		},
 		{
-			name: "when DB error has occurred、returns error",
-			fields: fields{
-				ctx: context.Background(),
-			},
+			name:        "when DB error has occurred、returns error",
 			rowAffected: 0,
 			args: args{
+				ctx: context.Background(),
 				m:   db,
 				id:  model.UserInValidIDForTest,
 				err: errors.New(model.ErrorMessageForTest),
@@ -661,11 +602,9 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
 			}
 
-			repo := &userRepository{
-				ctx: tt.fields.ctx,
-			}
+			repo := &userRepository{}
 
-			err := repo.DeleteUser(tt.args.m, tt.args.id)
+			err := repo.DeleteUser(tt.args.ctx, tt.args.m, tt.args.id)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userRepository.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)

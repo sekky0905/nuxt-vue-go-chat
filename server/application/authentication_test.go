@@ -196,7 +196,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().InsertUser(tt.fields.m, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
+			ur.EXPECT().InsertUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {
@@ -210,19 +210,15 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.args.ctx, tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
 
 			a := &authenticationService{
-				m: tt.fields.m,
-				userRepoFactory: func(ctx context.Context) repository.UserRepository {
-					return tt.fields.userRepository
-				},
-				sessionRepoFactory: func(ctx context.Context) repository.SessionRepository {
-					return tt.fields.sessionRepository
-				},
-				userService:    tt.fields.userService,
-				sessionService: tt.fields.sessionService,
-				txCloser:       tt.fields.txCloser,
+				m:                 tt.fields.m,
+				userRepository:    tt.fields.userRepository,
+				sessionRepository: tt.fields.sessionRepository,
+				userService:       tt.fields.userService,
+				sessionService:    tt.fields.sessionService,
+				txCloser:          tt.fields.txCloser,
 			}
 
 			gotUser, err := a.SignUp(tt.args.ctx, tt.args.user)

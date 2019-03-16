@@ -13,14 +13,11 @@ import (
 
 // sessionRepository is repository of user.
 type sessionRepository struct {
-	ctx context.Context
 }
 
 // NewSessionRepository generates and returns sessionRepository.
-func NewSessionRepository(ctx context.Context) repository.SessionRepository {
-	return &sessionRepository{
-		ctx: ctx,
-	}
+func NewSessionRepository() repository.SessionRepository {
+	return &sessionRepository{}
 }
 
 // ErrorMsg generates and returns error message.
@@ -36,10 +33,10 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 }
 
 // GetSessionByID gets and returns a record specified by id.
-func (repo *sessionRepository) GetSessionByID(m repository.SQLManager, id string) (*model.Session, error) {
+func (repo *sessionRepository) GetSessionByID(ctx context.Context, m repository.SQLManager, id string) (*model.Session, error) {
 	query := "SELECT id, user_id, created_at FROM sessions WHERE id=?"
 
-	list, err := repo.list(m, model.RepositoryMethodREAD, query, id)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -61,8 +58,8 @@ func (repo *sessionRepository) GetSessionByID(m repository.SQLManager, id string
 }
 
 // list gets and returns list of records.
-func (repo *sessionRepository) list(m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
-	stmt, err := m.PrepareContext(repo.ctx, query)
+func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, errors.WithStack(err))
 	}
@@ -73,7 +70,7 @@ func (repo *sessionRepository) list(m repository.SQLManager, method model.Reposi
 		}
 	}()
 
-	rows, err := stmt.QueryContext(repo.ctx, args...)
+	rows, err := stmt.QueryContext(ctx, args...)
 	if err != nil {
 		err = repo.ErrorMsg(method, errors.WithStack(err))
 		return nil, err
@@ -106,9 +103,9 @@ func (repo *sessionRepository) list(m repository.SQLManager, method model.Reposi
 }
 
 // InsertSession insert a record.
-func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *model.Session) error {
+func (repo *sessionRepository) InsertSession(ctx context.Context, m repository.SQLManager, session *model.Session) error {
 	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, ?, ?)"
-	stmt, err := m.PrepareContext(repo.ctx, query)
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
 	}
@@ -119,7 +116,7 @@ func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *m
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, session.ID, session.UserID, session.CreatedAt)
+	result, err := stmt.ExecContext(ctx, session.ID, session.UserID, session.CreatedAt)
 	if err != nil {
 		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
 	}
@@ -134,10 +131,10 @@ func (repo *sessionRepository) InsertSession(m repository.SQLManager, session *m
 }
 
 // DeleteSession delete a record.
-func (repo *sessionRepository) DeleteSession(m repository.SQLManager, id string) error {
+func (repo *sessionRepository) DeleteSession(ctx context.Context, m repository.SQLManager, id string) error {
 	query := "DELETE FROM sessions WHERE id=?"
 
-	stmt, err := m.PrepareContext(repo.ctx, query)
+	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}
@@ -148,7 +145,7 @@ func (repo *sessionRepository) DeleteSession(m repository.SQLManager, id string)
 		}
 	}()
 
-	result, err := stmt.ExecContext(repo.ctx, id)
+	result, err := stmt.ExecContext(ctx, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
 	}

@@ -5,6 +5,7 @@
 package mock_repository
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	model "github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
@@ -35,44 +36,44 @@ func (m *MockSessionRepository) EXPECT() *MockSessionRepositoryMockRecorder {
 }
 
 // GetSessionByID mocks base method
-func (m_2 *MockSessionRepository) GetSessionByID(m repository.SQLManager, id string) (*model.Session, error) {
+func (m_2 *MockSessionRepository) GetSessionByID(ctx context.Context, m repository.SQLManager, id string) (*model.Session, error) {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "GetSessionByID", m, id)
+	ret := m_2.ctrl.Call(m_2, "GetSessionByID", ctx, m, id)
 	ret0, _ := ret[0].(*model.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSessionByID indicates an expected call of GetSessionByID
-func (mr *MockSessionRepositoryMockRecorder) GetSessionByID(m, id interface{}) *gomock.Call {
+func (mr *MockSessionRepositoryMockRecorder) GetSessionByID(ctx, m, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionByID", reflect.TypeOf((*MockSessionRepository)(nil).GetSessionByID), m, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionByID", reflect.TypeOf((*MockSessionRepository)(nil).GetSessionByID), ctx, m, id)
 }
 
 // InsertSession mocks base method
-func (m_2 *MockSessionRepository) InsertSession(m repository.SQLManager, user *model.Session) error {
+func (m_2 *MockSessionRepository) InsertSession(ctx context.Context, m repository.SQLManager, user *model.Session) error {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "InsertSession", m, user)
+	ret := m_2.ctrl.Call(m_2, "InsertSession", ctx, m, user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertSession indicates an expected call of InsertSession
-func (mr *MockSessionRepositoryMockRecorder) InsertSession(m, user interface{}) *gomock.Call {
+func (mr *MockSessionRepositoryMockRecorder) InsertSession(ctx, m, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSession", reflect.TypeOf((*MockSessionRepository)(nil).InsertSession), m, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSession", reflect.TypeOf((*MockSessionRepository)(nil).InsertSession), ctx, m, user)
 }
 
 // DeleteSession mocks base method
-func (m_2 *MockSessionRepository) DeleteSession(m repository.SQLManager, id string) error {
+func (m_2 *MockSessionRepository) DeleteSession(ctx context.Context, m repository.SQLManager, id string) error {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "DeleteSession", m, id)
+	ret := m_2.ctrl.Call(m_2, "DeleteSession", ctx, m, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteSession indicates an expected call of DeleteSession
-func (mr *MockSessionRepositoryMockRecorder) DeleteSession(m, id interface{}) *gomock.Call {
+func (mr *MockSessionRepositoryMockRecorder) DeleteSession(ctx, m, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockSessionRepository)(nil).DeleteSession), m, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSession", reflect.TypeOf((*MockSessionRepository)(nil).DeleteSession), ctx, m, id)
 }

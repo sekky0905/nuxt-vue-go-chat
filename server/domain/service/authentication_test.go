@@ -41,10 +41,11 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr error
+		name     string
+		args     args
+		wantOk   bool
+		wantUser *model.User
+		wantErr  error
 		mockReturns
 	}{
 		{
@@ -54,7 +55,15 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 				userName: model.UserNameForTest,
 				password: model.PasswordForTest,
 			},
-			want:    true,
+			wantOk: true,
+			wantUser: &model.User{
+				ID:        model.UserValidIDForTest,
+				Name:      model.UserNameForTest,
+				SessionID: model.SessionValidIDForTest,
+				Password:  hashedPass,
+				CreatedAt: testutil.TimeNow(),
+				UpdatedAt: testutil.TimeNow(),
+			},
 			wantErr: nil,
 			mockReturns: mockReturns{
 				user: &model.User{
@@ -75,8 +84,9 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 				userName: model.UserNameForTest,
 				password: "invalidPassword",
 			},
-			want:    false,
-			wantErr: nil,
+			wantOk:   false,
+			wantUser: nil,
+			wantErr:  nil,
 			mockReturns: mockReturns{
 				user: &model.User{
 					ID:        model.UserValidIDForTest,
@@ -96,7 +106,8 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 				userName: model.UserNameForTest,
 				password: model.PasswordForTest,
 			},
-			want: false,
+			wantOk:   false,
+			wantUser: nil,
 			wantErr: &model.AuthenticationErr{
 				BaseErr: &model.NoSuchDataError{
 					BaseErr:                     nil,
@@ -134,13 +145,17 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 
 			ur.EXPECT().GetUserByName(tt.args.ctx, s.m, tt.args.userName).Return(tt.mockReturns.user, tt.mockReturns.err)
 
-			got, err := s.Authenticate(tt.args.ctx, tt.args.userName, tt.args.password)
+			gotOk, gotUser, err := s.Authenticate(tt.args.ctx, tt.args.userName, tt.args.password)
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("authenticationService.Authenticate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("authenticationService.Authenticate() = %v, want %v", got, tt.want)
+			if gotOk != tt.wantOk {
+				t.Errorf("authenticationService.Authenticate() = %v, want %v", gotOk, tt.wantOk)
+			}
+
+			if !reflect.DeepEqual(gotUser, tt.wantUser) {
+				t.Errorf("authenticationService.Authenticate() = %v, want %v", gotUser, tt.wantUser)
 			}
 		})
 	}

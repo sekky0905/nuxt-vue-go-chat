@@ -12,7 +12,7 @@ import (
 
 // AuthenticationService is interface of domain service of authentication.
 type AuthenticationService interface {
-	Authenticate(ctx context.Context, userName, password string) (bool, error)
+	Authenticate(ctx context.Context, userName, password string) (ok bool, user *model.User, err error)
 }
 
 // authenticationService is domain service of authentication.
@@ -30,17 +30,21 @@ func NewAuthenticationService(m repository.DBManager, repo repository.UserReposi
 }
 
 // Authenticate authenticate user.
-func (s *authenticationService) Authenticate(ctx context.Context, userName, password string) (bool, error) {
-	user, err := s.repo.GetUserByName(ctx, s.m, userName)
+func (s *authenticationService) Authenticate(ctx context.Context, userName, password string) (ok bool, user *model.User, err error) {
+	gotUser, err := s.repo.GetUserByName(ctx, s.m, userName)
 	if err != nil {
 		if _, ok := errors.Cause(err).(*model.NoSuchDataError); ok {
-			return false, &model.AuthenticationErr{
+			return false, nil, &model.AuthenticationErr{
 				BaseErr: err,
 			}
 		}
 
-		return false, errors.Wrap(err, "failed, to get user by name")
+		return false, nil, errors.Wrap(err, "failed, to get user by name")
 	}
 
-	return util.CheckHashOfPassword(password, user.Password), nil
+	if !util.CheckHashOfPassword(password, gotUser.Password) {
+		return false, nil, nil
+	}
+
+	return true, gotUser, nil
 }

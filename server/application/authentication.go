@@ -13,6 +13,7 @@ import (
 // AuthenticationService is the interface of AuthenticationService.
 type AuthenticationService interface {
 	SignUp(ctx context.Context, param *model.User) (*model.User, error)
+	Login(ctx context.Context, param *model.User) (*model.User, error)
 }
 
 // AuthenticationServiceDIInput is DI input of AuthenticationService.

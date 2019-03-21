@@ -48,3 +48,18 @@ func (mr *MockAuthenticationServiceMockRecorder) SignUp(ctx, param interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignUp", reflect.TypeOf((*MockAuthenticationService)(nil).SignUp), ctx, param)
 }
+
+// Login mocks base method
+func (m *MockAuthenticationService) Login(ctx context.Context, param *model.User) (*model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Login", ctx, param)
+	ret0, _ := ret[0].(*model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Login indicates an expected call of Login
+func (mr *MockAuthenticationServiceMockRecorder) Login(ctx, param interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockAuthenticationService)(nil).Login), ctx, param)
+}

@@ -34,8 +34,9 @@ func initializeAuthenticationController(m repository.DBManager) controller.Authe
 	sRepo := db.NewSessionRepository()
 	uService := service.NewUserService(m, uRepo)
 	sService := service.NewSessionService(m, sRepo)
+	aService := service.NewAuthenticationService(m, uRepo)
 
-	di := application.NewAuthenticationServiceDIInput(uRepo, sRepo, uService, sService)
+	di := application.NewAuthenticationServiceDIInput(uRepo, sRepo, uService, sService, aService)
 	aApp := application.NewAuthenticationService(m, di, txCloser)
 
 	return controller.NewAuthenticationController(aApp)

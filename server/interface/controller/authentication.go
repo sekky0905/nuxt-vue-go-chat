@@ -13,6 +13,7 @@ import (
 type AuthenticationController interface {
 	InitAuthenticationAPI(g *gin.RouterGroup)
 	SignUp(g *gin.Context)
+	Login(g *gin.Context)
 }
 
 // authenticationController is the controller of authentication.
@@ -30,6 +31,7 @@ func NewAuthenticationController(uAPP application.AuthenticationService) Authent
 // InitAuthenticationAPI initialize Authentication API.
 func (c *authenticationController) InitAuthenticationAPI(g *gin.RouterGroup) {
 	g.POST("/signUp", c.SignUp)
+	g.POST("/login", c.Login)
 }
 
 // SignUp sign up an user.
@@ -43,6 +45,28 @@ func (c *authenticationController) SignUp(g *gin.Context) {
 
 	ctx := g.Request.Context()
 	user, err := c.aApp.SignUp(ctx, param)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		return
+	}
+
+	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "", "", true, true)
+
+	uDTO := TranslateFromUserToUserDTO(user)
+	g.JSON(http.StatusOK, uDTO)
+}
+
+// Login login an user.
+func (c *authenticationController) Login(g *gin.Context) {
+	param := &model.User{}
+	if err := g.BindJSON(param); err != nil {
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to bind json"))
+		return
+	}
+
+	ctx := g.Request.Context()
+	user, err := c.aApp.Login(ctx, param)
 	if err != nil {
 		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
 		return

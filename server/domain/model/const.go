@@ -77,6 +77,8 @@ var PropertyNameKV = map[PropertyNameForDeveloper]PropertyNameForUser{
 	PassWordPropertyForDeveloper: PassWordPropertyForUser,
 }
 
+const FailedToBeginTx InvalidReasonForDeveloper = "failed to begin tx"
+
 // == for test ==
 // User
 const (

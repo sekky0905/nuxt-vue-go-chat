@@ -16,7 +16,7 @@
         <v-text-field
           v-model="pw"
           append-icon="visibility_off"
-          :type="password"
+          type="password"
           :error-messages="passwordErrors"
           label="Password"
           required

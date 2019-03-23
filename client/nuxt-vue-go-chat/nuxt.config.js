@@ -38,7 +38,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['@/plugins/vuetify', '@/plugins/vuelidate'],
+  plugins: ['@/plugins/vuetify', '@/plugins/vuelidate', '@/plugins/axios.js'],
 
   /*
    ** Nuxt.js modules
@@ -61,6 +61,7 @@ export default {
    */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
+    baseURL: 'http://localhost:8080/v1'
   },
 
   /*

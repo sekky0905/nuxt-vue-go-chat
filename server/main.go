@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
@@ -11,10 +10,7 @@ import (
 )
 
 func main() {
-	router.G.GET("/", func(g *gin.Context) {
-		g.File("../client/nuxt-vue-go-chat/dist/index.html")
-	})
-
+	router.G.Static("/", "../client/nuxt-vue-go-chat/dist")
 	apiV1 := router.G.Group("/v1")
 
 	dbm := db.NewDBManager()

@@ -3,7 +3,11 @@
     <v-app id="inspire" dark>
       <Navigation />
       <Toolbar />
-      <Container />
+      <v-content>
+        <v-container fluid fill-height>
+          <nuxt />
+        </v-container>
+      </v-content>
       <Footer />
     </v-app>
   </div>
@@ -11,13 +15,11 @@
 <script>
 import Navigation from '../components/Navigation'
 import Toolbar from '../components/Toolbar'
-import Container from '../components/Container'
 import Footer from '../components/Footer'
 export default {
   components: {
     Navigation,
     Toolbar,
-    Container,
     Footer
   }
 }

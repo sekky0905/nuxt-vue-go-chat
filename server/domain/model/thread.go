@@ -8,7 +8,7 @@ import (
 type Thread struct {
 	ID        uint32 `json:"id"`
 	Title     string `json:"title"`
-	User      `json:"user"`
+	*User     `json:"user"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

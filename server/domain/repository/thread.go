@@ -8,12 +8,12 @@ import (
 
 // ThreadRepository is Repository of Thread.
 type ThreadRepository interface {
-	ListThreads(m DBManager, limit int, cursor uint32) (*model.ThreadList, error)
-	GetThreadByID(m DBManager, id uint32) (*model.Thread, error)
-	GetThreadByTitle(m DBManager, name string) (*model.Thread, error)
-	InsertThread(m DBManager, user *model.Thread) (uint32, error)
-	UpdateThread(m DBManager, id uint32, thead *model.Thread) error
-	DeleteThread(m DBManager, id uint32) error
+	ListThreads(ctx context.Context, m SQLManager, cursor uint32, limit int) (*model.ThreadList, error)
+	GetThreadByID(ctx context.Context, m SQLManager, id uint32) (*model.Thread, error)
+	GetThreadByTitle(ctx context.Context, m SQLManager, name string) (*model.Thread, error)
+	InsertThread(ctx context.Context, m SQLManager, user *model.Thread) (uint32, error)
+	UpdateThread(ctx context.Context, m SQLManager, id uint32, thead *model.Thread) error
+	DeleteThread(ctx context.Context, m SQLManager, id uint32) error
 }
 
 // ThreadRepoFactory は、ThreadRepositoryのFactory。

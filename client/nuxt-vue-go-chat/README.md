@@ -1,6 +1,6 @@
 # nuxt-vue-go-chat
 
-> My neat Nuxt.js project
+> My impressive Nuxt.js project
 
 ## Build Setup
 

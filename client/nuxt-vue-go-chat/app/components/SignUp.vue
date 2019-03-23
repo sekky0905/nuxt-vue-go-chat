@@ -12,26 +12,27 @@
           @input="$v.name.$touch()"
           @blur="$v.name.$touch()"
         ></v-text-field>
+
         <v-text-field
-          v-model="password"
+          v-model="pw"
           append-icon="visibility_off"
           :type="password"
           :error-messages="passwordErrors"
           label="Password"
           required
-          @input="$v.password.$touch()"
-          @blur="$v.password.$touch()"
+          @input="$v.pw.$touch()"
+          @blur="$v.pw.$touch()"
         ></v-text-field>
 
         <v-text-field
-          v-model="confirmPassword"
+          v-model="confirmPw"
           append-icon="visibility_off"
           :type="password"
           :error-messages="confirmPasswordErrors"
           label="Confirm Password"
           required
-          @input="$v.confirmPassword.$touch()"
-          @blur="$v.confirmPassword.$touch()"
+          @input="$v.confirmPw.$touch()"
+          @blur="$v.confirmPw.$touch()"
         ></v-text-field>
 
         <v-btn @click="submit">submit</v-btn>
@@ -68,8 +69,8 @@ export default {
 
   validations: {
     name: { required, minLength: minLength(3), maxLength: maxLength(10) },
-    password: { required, minLength: minLength(10), maxLength: maxLength(32) },
-    confirmPassword: {
+    pw: { required, minLength: minLength(10), maxLength: maxLength(32) },
+    confirmPw: {
       required,
       minLength: minLength(10),
       maxLength: maxLength(32)
@@ -78,8 +79,8 @@ export default {
 
   data: () => ({
     name: '',
-    password: '',
-    confirmPassword: '',
+    pw: '',
+    confirmPw: '',
     snackbar: {
       isOpen: false,
       color: '',
@@ -100,25 +101,25 @@ export default {
     },
     passwordErrors() {
       const errors = []
-      if (!this.$v.password.$dirty) return errors
-      !this.$v.password.minLength &&
+      if (!this.$v.pw.$dirty) return errors
+      !this.$v.pw.minLength &&
         errors.push('Password must be at least 10 characters long')
-      !this.$v.password.maxLength &&
+      !this.$v.pw.maxLength &&
         errors.push('Password must be at most 32 characters long')
-      !this.$v.password.required && errors.push('Password is required.')
+      !this.$v.pw.required && errors.push('Password is required.')
       return errors
     },
     confirmPasswordErrors() {
       const errors = []
-      if (!this.$v.confirmPassword.$dirty) return errors
-      !this.$v.confirmPassword.minLength &&
+      if (!this.$v.confirmPw.$dirty) return errors
+      !this.$v.confirmPw.minLength &&
         errors.push('Confirm Password must be at least 10 characters long')
-      !this.$v.confirmPassword.maxLength &&
+      !this.$v.confirmPw.maxLength &&
         errors.push('Confirm Password must be at most 32 characters long')
-      !this.$v.confirmPassword.required &&
+      !this.$v.confirmPw.required &&
         errors.push('Confirm Password is required.')
 
-      if (this.$v.password !== this.$v.confirmPassword) {
+      if (this.$v.pw !== this.$v.confirmPw) {
         errors.push('Password and Confirm Password should be same.')
       }
 
@@ -131,7 +132,7 @@ export default {
     async submit() {
       this.$v.$touch()
       try {
-        await this.SIGN_UP({ name: this.name, password: this.password })
+        await this.SIGN_UP({ name: this.name, password: this.pw })
         this.snackbar.color = 'success'
         this.snackbar.text = 'success sign up'
         this.snackbar.isOpen = true
@@ -151,7 +152,7 @@ export default {
     clear() {
       this.$v.$reset()
       this.name = ''
-      this.password = ''
+      this.pw = ''
     },
     ...mapActions([SIGN_UP])
   }

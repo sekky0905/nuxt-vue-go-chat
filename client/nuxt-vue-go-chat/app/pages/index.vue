@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="radios === 'login'">
-      TODO LOGIN Component
+      <Login />
     </div>
     <div v-else>
       <SignUp />
@@ -16,9 +16,11 @@
 </template>
 
 <script>
+import Login from '~/components/Login'
 import SignUp from '~/components/SignUp'
 export default {
   components: {
+    Login,
     SignUp
   },
   data() {

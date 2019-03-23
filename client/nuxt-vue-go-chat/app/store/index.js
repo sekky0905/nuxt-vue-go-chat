@@ -1,5 +1,5 @@
 import { SET_USER } from './mutation-types.js'
-import { SIGN_UP } from './action-types.js'
+import { LOGIN, SIGN_UP } from './action-types.js'
 
 export const state = () => ({
   isLoggedIn: false,
@@ -19,6 +19,14 @@ export const mutations = {
 }
 
 export const actions = {
+  async [LOGIN]({ commit }, { name, password }) {
+    const payload = {
+      name: name,
+      password: password
+    }
+    const response = await this.$axios.$post('/login', payload)
+    commit(SET_USER, { user: response, isLoggedIn: true })
+  },
   async [SIGN_UP]({ commit, state }, { name, password }) {
     const payload = {
       name: name,

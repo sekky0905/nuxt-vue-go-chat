@@ -4,6 +4,7 @@
       <form>
         <v-text-field
           v-model="name"
+          type="text"
           :error-messages="nameErrors"
           :counter="10"
           label="Name"
@@ -12,20 +13,25 @@
           @blur="$v.name.$touch()"
         ></v-text-field>
         <v-text-field
-          v-model="email"
+          v-model="password"
+          append-icon="visibility_off"
+          :type="password"
           :error-messages="passwordErrors"
-          label="E-mail"
+          label="Password"
           required
-          @input="$v.email.$touch()"
-          @blur="$v.email.$touch()"
+          @input="$v.password.$touch()"
+          @blur="$v.password.$touch()"
         ></v-text-field>
+
         <v-text-field
-          v-model="email"
-          :error-messages="emailErrors"
-          label="E-mail"
+          v-model="confirmPassword"
+          append-icon="visibility_off"
+          :type="password"
+          :error-messages="confirmPasswordErrors"
+          label="Confirm Password"
           required
-          @input="$v.email.$touch()"
-          @blur="$v.email.$touch()"
+          @input="$v.confirmPassword.$touch()"
+          @blur="$v.confirmPassword.$touch()"
         ></v-text-field>
 
         <v-btn @click="submit">submit</v-btn>
@@ -62,12 +68,18 @@ export default {
 
   validations: {
     name: { required, minLength: minLength(3), maxLength: maxLength(10) },
-    password: { required, minLength: minLength(10), maxLength: maxLength(32) }
+    password: { required, minLength: minLength(10), maxLength: maxLength(32) },
+    confirmPassword: {
+      required,
+      minLength: minLength(10),
+      maxLength: maxLength(32)
+    }
   },
 
   data: () => ({
     name: '',
     password: '',
+    confirmPassword: '',
     snackbar: {
       isOpen: false,
       color: '',
@@ -94,6 +106,22 @@ export default {
       !this.$v.password.maxLength &&
         errors.push('Password must be at most 32 characters long')
       !this.$v.password.required && errors.push('Password is required.')
+      return errors
+    },
+    confirmPasswordErrors() {
+      const errors = []
+      if (!this.$v.confirmPassword.$dirty) return errors
+      !this.$v.confirmPassword.minLength &&
+        errors.push('Confirm Password must be at least 10 characters long')
+      !this.$v.confirmPassword.maxLength &&
+        errors.push('Confirm Password must be at most 32 characters long')
+      !this.$v.confirmPassword.required &&
+        errors.push('Confirm Password is required.')
+
+      if (this.$v.password !== this.$v.confirmPassword) {
+        errors.push('Password and Confirm Password should be same.')
+      }
+
       return errors
     },
     ...mapGetters(['user'])

@@ -81,18 +81,18 @@ func (mr *MockThreadRepositoryMockRecorder) GetThreadByTitle(ctx, m, name interf
 }
 
 // InsertThread mocks base method
-func (m_2 *MockThreadRepository) InsertThread(ctx context.Context, m repository.SQLManager, user *model.Thread) (uint32, error) {
+func (m_2 *MockThreadRepository) InsertThread(ctx context.Context, m repository.SQLManager, thead *model.Thread) (uint32, error) {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "InsertThread", ctx, m, user)
+	ret := m_2.ctrl.Call(m_2, "InsertThread", ctx, m, thead)
 	ret0, _ := ret[0].(uint32)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // InsertThread indicates an expected call of InsertThread
-func (mr *MockThreadRepositoryMockRecorder) InsertThread(ctx, m, user interface{}) *gomock.Call {
+func (mr *MockThreadRepositoryMockRecorder) InsertThread(ctx, m, thead interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertThread", reflect.TypeOf((*MockThreadRepository)(nil).InsertThread), ctx, m, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertThread", reflect.TypeOf((*MockThreadRepository)(nil).InsertThread), ctx, m, thead)
 }
 
 // UpdateThread mocks base method

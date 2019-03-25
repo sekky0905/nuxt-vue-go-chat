@@ -8,12 +8,12 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
-	"github.com/sekky0905/go-vue-chat/server/testutil"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
 func Test_authenticationService_SignUp(t *testing.T) {

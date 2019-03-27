@@ -8,8 +8,8 @@ Nuxt(Vue.js) + Goでの簡単なチャットアプリ。
 ### 言語
 Go
 
-### Routingライブラリ
-[gorilla/mux](https://github.com/gorilla/mux)
+### フレームワーク
+[Gin](https://github.com/gin-gonic/gin)
 
 
 ## アーキテクチャ
@@ -53,5 +53,4 @@ JavaScript
 
 - [Vue.js](https://jp.vuejs.org/index.html)
 - [Nuxt.js](https://ja.nuxtjs.org/)
-- [ElementUI](https://element.eleme.io/#/en-US)
-
+- [vuetify](https://github.com/vuetifyjs/vuetify)

@@ -755,3 +755,148 @@ func Test_threadController_UpdateThread(t *testing.T) {
 		})
 	}
 }
+
+func Test_threadController_DeleteThread(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type fields struct {
+		tApp application.ThreadService
+	}
+	type args struct {
+		id uint32
+	}
+
+	type parameter struct {
+		id string
+	}
+
+	type errBody struct {
+		errCode ErrCode
+	}
+
+	type want struct {
+		statusCode int
+		errBody
+	}
+
+	type mockReturns struct {
+		err error
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args
+		parameter
+		mockReturns
+		want
+	}{
+		{
+			name: "When appropriate id is given and data exists, returns thread and status code 200",
+			fields: fields{
+				tApp: mock_application.NewMockThreadService(ctrl),
+			},
+			args: args{
+				id: model.ThreadValidIDForTest,
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			mockReturns: mockReturns{
+				err: nil,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				errBody:    errBody{},
+			},
+		},
+		{
+			name: "When inappropriate id is given returns nil and status code 400",
+			fields: fields{
+				tApp: mock_application.NewMockThreadService(ctrl),
+			},
+			args: args{
+				id: model.ThreadValidIDForTest,
+			},
+			parameter: parameter{
+				id: "a",
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParametersValueFailure,
+				},
+			},
+		},
+		{
+			name: "When some error occurs, GetThread returns nil and status code 404",
+			fields: fields{
+				tApp: mock_application.NewMockThreadService(ctrl),
+			},
+			args: args{
+				id: model.ThreadValidIDForTest,
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			mockReturns: mockReturns{
+				err: &model.NoSuchDataError{
+					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+					PropertyValue:            "",
+				},
+			},
+			want: want{
+				statusCode: http.StatusNotFound,
+				errBody: errBody{
+					errCode: NoSuchDataFailure,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			at, ok := tt.fields.tApp.(*mock_application.MockThreadService)
+			if !ok {
+				t.Fatal("failed to assert MockThreadService")
+			}
+
+			if tt.want.statusCode != http.StatusBadRequest {
+				at.EXPECT().DeleteThread(context.Background(), tt.args.id).Return(tt.mockReturns.err)
+			}
+
+			tc := NewThreadController(tt.fields.tApp)
+			r := gin.New()
+
+			r.DELETE("/threads/:id", tc.DeleteThread)
+
+			rec := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("/threads/%s", tt.parameter.id), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			if tt.want.errBody.errCode == "" {
+				bBody := rec.Body.Bytes()
+				thread := &model.Thread{}
+				if err := json.Unmarshal(bBody, thread); err != nil {
+					t.Fatal(err)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+			}
+		})
+	}
+}

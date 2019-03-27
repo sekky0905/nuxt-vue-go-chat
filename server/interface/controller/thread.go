@@ -17,7 +17,7 @@ type ThreadController interface {
 	GetThread(g *gin.Context)
 	CreateThread(g *gin.Context)
 	UpdateThread(g *gin.Context)
-	// DeleteThread(g *gin.Context)
+	DeleteThread(g *gin.Context)
 }
 
 // threadController is the controller of thread.
@@ -38,7 +38,7 @@ func (c *threadController) InitThreadAPI(g *gin.RouterGroup) {
 	g.GET("/threads/:id", c.GetThread)
 	g.POST("/threads", c.CreateThread)
 	g.PUT("/threads/:id", c.UpdateThread)
-	// g.DELETE("/threads/:id", c.DeleteThread)
+	g.DELETE("/threads/:id", c.DeleteThread)
 }
 
 // ListThreads gets ThreadList.
@@ -145,4 +145,29 @@ func (c *threadController) UpdateThread(g *gin.Context) {
 	}
 
 	g.JSON(http.StatusOK, thread)
+}
+
+// DeleteThread deletes Thread.
+func (c *threadController) DeleteThread(g *gin.Context) {
+	idInt, err := strconv.Atoi(g.Param("id"))
+	if err != nil {
+		err = &model.InvalidParamError{
+			BaseErr:                  err,
+			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+			PropertyValue:            g.Param("id"),
+		}
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
+		return
+	}
+
+	id := uint32(idInt)
+
+	ctx := g.Request.Context()
+	if err := c.tApp.DeleteThread(ctx, id); err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		return
+	}
+
+	g.JSON(http.StatusOK, nil)
 }

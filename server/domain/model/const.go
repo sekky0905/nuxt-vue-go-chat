@@ -24,6 +24,7 @@ func (p DomainModelNameForDeveloper) String() string {
 const (
 	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
 	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
+	DomainModelNameThreadForDeveloper  DomainModelNameForDeveloper = "Thread"
 )
 
 // DomainModelNameForUser is Model name for user.
@@ -38,6 +39,7 @@ func (p DomainModelNameForUser) String() string {
 const (
 	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
 	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
+	DomainModelNameThreadForUser  DomainModelNameForUser = "スレッド"
 )
 
 // PropertyNameForDeveloper is property name for developer.
@@ -52,6 +54,7 @@ func (p PropertyNameForDeveloper) String() string {
 const (
 	IDPropertyForDeveloper       PropertyNameForDeveloper = "ID"
 	NamePropertyForDeveloper     PropertyNameForDeveloper = "Name"
+	TitlePropertyForDeveloper    PropertyNameForDeveloper = "Title"
 	PassWordPropertyForDeveloper PropertyNameForDeveloper = "Password"
 )
 
@@ -67,6 +70,7 @@ func (p PropertyNameForUser) String() string {
 const (
 	IDPropertyForUser       PropertyNameForUser = "ID"
 	NamePropertyForUser     PropertyNameForUser = "名前"
+	TitlePropertyForUser    PropertyNameForUser = "タイトル"
 	PassWordPropertyForUser PropertyNameForUser = "パスワード"
 )
 
@@ -74,6 +78,7 @@ const (
 var PropertyNameKV = map[PropertyNameForDeveloper]PropertyNameForUser{
 	IDPropertyForDeveloper:       IDPropertyForUser,
 	NamePropertyForDeveloper:     NamePropertyForUser,
+	TitlePropertyForDeveloper:    TitlePropertyForUser,
 	PassWordPropertyForDeveloper: PassWordPropertyForUser,
 }
 
@@ -92,6 +97,13 @@ const (
 const (
 	SessionValidIDForTest   = "testValidSessionID12345678"
 	SessionInValidIDForTest = "testInvalidSessionID12345678"
+	TitleForTest            = "TitleForTest"
+)
+
+// Thread
+const (
+	ThreadValidIDForTest   uint32 = 1
+	ThreadInValidIDForTest uint32 = 2
 )
 
 // error message for test

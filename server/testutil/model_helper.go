@@ -20,8 +20,6 @@ func GenerateThreadHelper(startNum, endNum int) []*model.Thread {
 				ID:   model.UserValidIDForTest,
 				Name: model.UserNameForTest,
 			},
-			CreatedAt: TimeNow(),
-			UpdatedAt: TimeNow(),
 		}
 		threads[i] = thread
 		i++

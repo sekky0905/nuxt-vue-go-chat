@@ -16,8 +16,8 @@ type ThreadController interface {
 	ListThreads(g *gin.Context)
 	GetThread(g *gin.Context)
 	CreateThread(g *gin.Context)
-	UpdateThread(g *gin.Context)
-	DeleteThread(g *gin.Context)
+	// UpdateThread(g *gin.Context)
+	// DeleteThread(g *gin.Context)
 }
 
 // threadController is the controller of thread.
@@ -37,8 +37,8 @@ func (c *threadController) InitThreadAPI(g *gin.RouterGroup) {
 	g.GET("/threads", c.ListThreads)
 	g.GET("/threads/:id", c.GetThread)
 	g.POST("/threads", c.CreateThread)
-	g.PUT("/threads/:id", c.UpdateThread)
-	g.DELETE("/threads/:id", c.DeleteThread)
+	// g.PUT("/threads/:id", c.UpdateThread)
+	// g.DELETE("/threads/:id", c.DeleteThread)
 }
 
 // ListThreads gets ThreadList.
@@ -83,6 +83,27 @@ func (c *threadController) GetThread(g *gin.Context) {
 
 	ctx := g.Request.Context()
 	thread, err := c.tApp.GetThread(ctx, id)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		return
+	}
+
+	g.JSON(http.StatusOK, thread)
+}
+
+// CreateThread creates Thread.
+func (c *threadController) CreateThread(g *gin.Context) {
+	dto := &ThreadDTO{}
+	if err := g.BindJSON(dto); err != nil {
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to bind json"))
+		return
+	}
+
+	param := TranslateFromThreadDTOToThread(dto)
+
+	ctx := g.Request.Context()
+	thread, err := c.tApp.CreateThread(ctx, param)
 	if err != nil {
 		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
 		return

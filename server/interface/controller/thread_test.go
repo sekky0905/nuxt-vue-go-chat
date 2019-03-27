@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -369,6 +370,166 @@ func Test_threadController_GetThread(t *testing.T) {
 
 			rec := httptest.NewRecorder()
 			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/threads/%s", tt.parameter.id), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			if tt.want.errBody.errCode == "" {
+				bBody := rec.Body.Bytes()
+				thread := &model.Thread{}
+				if err := json.Unmarshal(bBody, thread); err != nil {
+					t.Fatal(err)
+					return
+				}
+
+				if !reflect.DeepEqual(thread, tt.want.body) {
+					t.Errorf("body = %#v, want %#v", thread, tt.want.body)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_threadController_CreateThread(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type fields struct {
+		tApp application.ThreadService
+	}
+	type args struct {
+		thread *ThreadDTO
+	}
+
+	type errBody struct {
+		errCode ErrCode
+	}
+
+	type want struct {
+		statusCode int
+		body       *model.Thread
+		errBody
+	}
+
+	type mockArg struct {
+		thread *model.Thread
+	}
+
+	type mockReturns struct {
+		thread *model.Thread
+		err    error
+	}
+
+	dto := &ThreadDTO{
+		Title: model.TitleForTest,
+		UserDTO: &UserDTO{
+			ID:   model.UserValidIDForTest,
+			Name: model.UserNameForTest,
+		},
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args
+		mockArg
+		mockReturns
+		want
+	}{
+		{
+			name: "When appropriate id is given and data exists, returns thread and status code 200",
+			fields: fields{
+				tApp: mock_application.NewMockThreadService(ctrl),
+			},
+			args: args{
+				thread: dto,
+			},
+			mockArg: mockArg{
+				thread: TranslateFromThreadDTOToThread(dto),
+			},
+			mockReturns: mockReturns{
+				thread: &model.Thread{
+					ID:    model.ThreadValidIDForTest,
+					Title: model.TitleForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+				},
+				err: nil,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				body: &model.Thread{
+					ID:    model.ThreadValidIDForTest,
+					Title: model.TitleForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+				},
+				errBody: errBody{},
+			},
+		},
+		{
+			name: "When validation error occurs, CreateThread returns nil and status code 400",
+			fields: fields{
+				tApp: mock_application.NewMockThreadService(ctrl),
+			},
+			args: args{
+				thread: &ThreadDTO{
+					UserDTO: &UserDTO{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+				},
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParameterValueFailure,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			at, ok := tt.fields.tApp.(*mock_application.MockThreadService)
+			if !ok {
+				t.Fatal("failed to assert MockThreadService")
+			}
+
+			if tt.want.statusCode != http.StatusBadRequest {
+				at.EXPECT().CreateThread(context.Background(), tt.mockArg.thread).Return(tt.mockReturns.thread, tt.mockReturns.err)
+			}
+
+			tc := NewThreadController(tt.fields.tApp)
+			r := gin.New()
+
+			r.POST("/threads", tc.CreateThread)
+
+			rec := httptest.NewRecorder()
+
+			b, err := json.Marshal(tt.args.thread)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req, err := http.NewRequest(http.MethodPost, "/threads", bytes.NewBuffer(b))
 			if err != nil {
 				t.Fatal(err)
 			}

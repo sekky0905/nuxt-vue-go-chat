@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 )
 
 // ThreadController is the interface of ThreadController.
@@ -56,6 +57,32 @@ func (c *threadController) ListThreads(g *gin.Context) {
 
 	ctx := g.Request.Context()
 	thread, err := c.tApp.ListThreads(ctx, limit, cursor)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		return
+	}
+
+	g.JSON(http.StatusOK, thread)
+}
+
+// GetThread gets Thread.
+func (c *threadController) GetThread(g *gin.Context) {
+	idInt, err := strconv.Atoi(g.Param("id"))
+	if err != nil {
+		err = &model.InvalidParamError{
+			BaseErr:                  err,
+			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+			PropertyValue:            g.Param("id"),
+		}
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
+		return
+	}
+
+	id := uint32(idInt)
+
+	ctx := g.Request.Context()
+	thread, err := c.tApp.GetThread(ctx, id)
 	if err != nil {
 		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
 		return

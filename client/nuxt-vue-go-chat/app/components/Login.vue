@@ -32,7 +32,7 @@
     <div>
       <v-snackbar
         v-model="snackbar.isOpen"
-        :color="color"
+        :color="snackbar.color"
         :multi-line="true"
         :timeout="6000"
         :top="true"

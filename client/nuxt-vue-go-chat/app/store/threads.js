@@ -23,8 +23,7 @@ export const state = () => ({
     threads: [],
     hasNext: false,
     cursor: ''
-  },
-  isDialogVisible: false
+  }
 })
 
 export const getters = {

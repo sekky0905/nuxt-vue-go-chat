@@ -6,7 +6,6 @@ import {
   LIST_THREADS_MORE,
   CHANGE_IS_DIALOG_VISIBLE
 } from './action-types'
-
 import {
   SET_THREADS,
   SET_THREAD_LIST,
@@ -23,7 +22,8 @@ export const state = () => ({
     threads: [],
     hasNext: false,
     cursor: ''
-  }
+  },
+  isDialogVisible: false
 })
 
 export const getters = {
@@ -61,6 +61,7 @@ export const mutations = {
     state.threadList = null
   },
   [SET_IS_DIALOG_VISIBLE](state, { dialogState }) {
+    console.log(`[SET_IS_DIALOG_VISIBLE] =${dialogState}`)
     state.isDialogVisible = !dialogState
   }
 }

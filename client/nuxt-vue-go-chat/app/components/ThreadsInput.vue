@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" persistent max-width="600px">
+    <v-dialog v-model="dialogVisible" persistent max-width="600px">
       <v-card>
         <v-card-title>
           <span class="headline">Thread Title</span>
@@ -19,11 +19,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <el-button type="primary" @click="submitForm('formData')"
-            >Create</el-button
-          >
-          <el-button @click="closeDialogState()">Cancel</el-button>
-          <el-button @click="resetForm('formData')">Reset</el-button>
+          <v-btn color="info" @click="submitForm('formData')">Create</v-btn>
+          <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
+          <v-btn color="warning" @click="resetForm('formData')">Reset</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -39,7 +37,6 @@ export default {
   mixins: [validationMixin],
   data() {
     return {
-      dialog: false,
       title: '',
       snackbar: {
         isOpen: false,
@@ -52,6 +49,9 @@ export default {
     title: { required, minLength: minLength(1), maxLength: maxLength(20) }
   },
   computed: {
+    dialogVisible() {
+      return this.isDialogVisible
+    },
     titleErrors() {
       const errors = []
       if (!this.$v.title.$dirty) return errors
@@ -62,7 +62,7 @@ export default {
       !this.$v.title.required && errors.push('Name is required.')
       return errors
     },
-    ...mapGetters('threads', ['threads']),
+    ...mapGetters('threads', ['threads', 'isDialogVisible']),
     ...mapGetters(['user'])
   },
   methods: {
@@ -88,7 +88,7 @@ export default {
       this.title = ''
     },
     closeDialogState() {
-      this.dialog = false
+      this.CHANGE_IS_DIALOG_VISIBLE({ dialogState: this.dialogVisible })
     },
     ...mapActions('threads', [SAVE_THREAD, CHANGE_IS_DIALOG_VISIBLE])
   }

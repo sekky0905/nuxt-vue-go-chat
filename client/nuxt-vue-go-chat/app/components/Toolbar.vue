@@ -7,7 +7,10 @@
 
 <script>
 export default {
-  name: 'Toolbar'
+  name: 'Toolbar',
+  data: () => ({
+    drawer: true
+  })
 }
 </script>
 

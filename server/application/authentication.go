@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
@@ -121,6 +124,8 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
+
+	logger.Logger.Info("XXXXXX", zap.Object("user", user))
 
 	id, err := s.userRepository.InsertUser(ctx, s.m, user)
 	if err != nil {

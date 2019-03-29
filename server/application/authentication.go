@@ -4,13 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
-	"go.uber.org/zap"
-
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
 )
 
 // AuthenticationService is the interface of AuthenticationService.

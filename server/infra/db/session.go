@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
-	log "github.com/sirupsen/logrus"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
 )
 
 // sessionRepository is repository of user.
@@ -66,7 +66,7 @@ func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -78,7 +78,7 @@ func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager
 	defer func() {
 		err = rows.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("rows.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -112,7 +112,7 @@ func (repo *sessionRepository) InsertSession(ctx context.Context, m repository.S
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -141,7 +141,7 @@ func (repo *sessionRepository) DeleteSession(ctx context.Context, m repository.S
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 

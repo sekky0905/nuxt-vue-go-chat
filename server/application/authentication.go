@@ -171,6 +171,8 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 		}
 	}()
 
+	logger.Logger.Info("DDDD", zap.Object("param", param))
+
 	ok, user, err := s.authenticationService.Authenticate(ctx, param.Name, param.Password)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate")

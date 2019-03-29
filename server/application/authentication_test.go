@@ -196,7 +196,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().InsertUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
+			ur.EXPECT().InsertUser(tt.args.ctx, tt.fields.m, gomock.Any()).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {
@@ -210,7 +210,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.args.ctx, tt.fields.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.args.ctx, tt.fields.m, gomock.Any()).Return(tt.mockSessionRepoReturns.err)
 
 			a := &authenticationService{
 				m:                 tt.fields.m,
@@ -222,6 +222,11 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			}
 
 			gotUser, err := a.SignUp(tt.args.ctx, tt.args.user)
+			if gotUser != nil {
+				gotUser.CreatedAt = tt.wantUser.CreatedAt
+				gotUser.UpdatedAt = tt.wantUser.UpdatedAt
+			}
+
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("authenticationService.SignUp() error = %v, wantErr %v", err, tt.wantErr)
@@ -413,13 +418,13 @@ func Test_authenticationService_Login(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().UpdateUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user.ID, tt.mockUserRepoArgs.user).Return(tt.mockUserRepoReturns.err)
+			ur.EXPECT().UpdateUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user.ID, gomock.Any()).Return(tt.mockUserRepoReturns.err)
 
 			sr, ok := tt.fields.sessionRepository.(*mock_repository.MockSessionRepository)
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.mockSessionRepoArgs.ctx, tt.mockSessionRepoArgs.m, tt.mockSessionRepoArgs.session).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.mockSessionRepoArgs.ctx, tt.mockSessionRepoArgs.m, gomock.Any()).Return(tt.mockSessionRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {

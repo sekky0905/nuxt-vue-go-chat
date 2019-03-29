@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -109,7 +110,7 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 			DomainModelNameForUser:      model.DomainModelNameUserForUser,
 		}
 
-		return nil, errors.Wrap(err, "failed to check whether already exists name or not")
+		return nil, errors.WithStack(err)
 	}
 
 	if err != nil {
@@ -117,6 +118,9 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 			return nil, errors.Wrap(err, "failed to check whether already exists name or not")
 		}
 	}
+
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 
 	id, err := s.userRepository.InsertUser(ctx, s.m, user)
 	if err != nil {
@@ -140,6 +144,8 @@ func (s *authenticationService) createSession(ctx context.Context, session *mode
 			}
 		}
 	}
+
+	session.CreatedAt = time.Now()
 
 	if err := s.sessionRepository.InsertSession(ctx, s.m, session); err != nil {
 		return nil, errors.Wrap(err, "failed to insert session")

@@ -17,6 +17,9 @@ func main() {
 	ac := initializeAuthenticationController(dbm)
 	ac.InitAuthenticationAPI(apiV1)
 
+	tc := initializeThreadController(dbm)
+	tc.InitThreadAPI(apiV1)
+
 	if err := router.G.Run(":8080"); err != nil {
 		panic(err.Error())
 	}
@@ -36,4 +39,16 @@ func initializeAuthenticationController(m repository.DBManager) controller.Authe
 	aApp := application.NewAuthenticationService(m, di, txCloser)
 
 	return controller.NewAuthenticationController(aApp)
+}
+
+// initializeThreadCController generates and returns ThreadCController.
+func initializeThreadController(m repository.DBManager) controller.ThreadController {
+	txCloser := db.CloseTransaction
+
+	tRepo := db.NewThreadRepository()
+	tService := service.NewThreadService(m, tRepo)
+
+	tApp := application.NewThreadService(m, tService, tRepo, txCloser)
+
+	return controller.NewThreadController(tApp)
 }

@@ -53,12 +53,13 @@ type authenticationService struct {
 // NewAuthenticationService generates and returns AuthenticationService.
 func NewAuthenticationService(m repository.DBManager, diInput *AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
 	return &authenticationService{
-		m:                 m,
-		userRepository:    diInput.userRepository,
-		sessionRepository: diInput.sessionRepository,
-		userService:       diInput.userService,
-		sessionService:    diInput.sessionService,
-		txCloser:          txCloser,
+		m:                     m,
+		userRepository:        diInput.userRepository,
+		sessionRepository:     diInput.sessionRepository,
+		userService:           diInput.userService,
+		sessionService:        diInput.sessionService,
+		authenticationService: diInput.authenticationService,
+		txCloser:              txCloser,
 	}
 }
 
@@ -125,8 +126,6 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 
-	logger.Logger.Info("XXXXXX", zap.Object("user", user))
-
 	id, err := s.userRepository.InsertUser(ctx, s.m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
@@ -174,6 +173,9 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 	logger.Logger.Info("DDDD", zap.Object("param", param))
 
 	ok, user, err := s.authenticationService.Authenticate(ctx, param.Name, param.Password)
+
+	logger.Logger.Info("DDDD", zap.Object("user", user))
+
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate")
 	} else if !ok {

@@ -2,8 +2,7 @@ package controller
 
 import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-	log "github.com/sirupsen/logrus"
-
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"gopkg.in/go-playground/validator.v8"
 )
 
@@ -13,7 +12,7 @@ import (
 func handleValidatorErr(err error) error {
 	errors, ok := err.(validator.ValidationErrors)
 	if !ok {
-		log.Warnf("failed to assert ValidationErrors")
+		logger.Logger.Error("failed to assert ValidationErrors")
 	}
 
 	errs := &model.InvalidParamsError{}

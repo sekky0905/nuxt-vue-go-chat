@@ -7,7 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
-	log "github.com/sirupsen/logrus"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
 )
 
 // threadRepository は、ThreadのRepository。
@@ -96,7 +97,6 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m SQLManager, i
 	}
 
 	if err != nil {
-		log.Error(err.Error())
 		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
 	}
 
@@ -143,7 +143,7 @@ func (repo *threadRepository) list(ctx context.Context, m SQLManager, method mod
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -155,7 +155,7 @@ func (repo *threadRepository) list(ctx context.Context, m SQLManager, method mod
 	defer func() {
 		err = rows.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("rows.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -194,7 +194,7 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, th
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -224,7 +224,7 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -257,7 +257,7 @@ func (repo *threadRepository) DeleteThread(ctx context.Context, m SQLManager, id
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 

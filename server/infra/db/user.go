@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 )
 
 // userRepository is repository of user.
@@ -88,7 +89,7 @@ func (repo *userRepository) list(ctx context.Context, m SQLManager, method model
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -99,7 +100,7 @@ func (repo *userRepository) list(ctx context.Context, m SQLManager, method model
 	defer func() {
 		err = rows.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("rows.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -136,7 +137,7 @@ func (repo *userRepository) InsertUser(ctx context.Context, m SQLManager, user *
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -171,7 +172,7 @@ func (repo *userRepository) UpdateUser(ctx context.Context, m SQLManager, id uin
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 
@@ -200,7 +201,7 @@ func (repo *userRepository) DeleteUser(ctx context.Context, m SQLManager, id uin
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
 		}
 	}()
 

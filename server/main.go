@@ -12,7 +12,7 @@ import (
 func main() {
 
 	router.G.StaticFile("/", "./../client/nuxt-vue-go-chat/dist/index.html")
-	router.G.Static("/dist", "./../client/nuxt-vue-go-chat/dist")
+	router.G.Static("/_nuxt", "./../client/nuxt-vue-go-chat/dist/_nuxt/")
 
 	apiV1 := router.G.Group("/v1")
 

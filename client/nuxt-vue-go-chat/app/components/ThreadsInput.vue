@@ -70,7 +70,7 @@ export default {
       this.closeDialogState()
       const payload = {
         user: this.user,
-        ...this.formData
+        ...this.title
       }
       try {
         await this.SAVE_THREAD({ payload: payload })

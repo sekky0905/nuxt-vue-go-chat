@@ -22,7 +22,7 @@ func (u User) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("name", u.Name)
 	enc.AddString("sessionID", u.SessionID)
 	enc.AddString("password", u.Password)
-	enc.AddTime("created_at", u.CreatedAt)
-	enc.AddTime("updated_at", u.CreatedAt)
+	enc.AddTime("createdAt", u.CreatedAt)
+	enc.AddTime("updatedAt", u.CreatedAt)
 	return nil
 }

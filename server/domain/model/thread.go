@@ -24,7 +24,7 @@ func (t Thread) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return err
 	}
 	enc.AddTime("createdAt", t.CreatedAt)
-	enc.AddTime("updatedAt", t.CreatedAt)
+	enc.AddTime("updatedAt", t.UpdatedAt)
 	return nil
 }
 

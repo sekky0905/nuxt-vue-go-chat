@@ -199,7 +199,36 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, 
 }
 
 // UpdateComment updates a record.
-func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, id uint32, thead *model.Comment) error {
+func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, id uint32, comment *model.Comment) error {
+	query := "UPDATE comments SET content=?, updated_at=? WHERE id=?;"
+
+	stmt, err := m.PrepareContext(ctx, query)
+	if err != nil {
+		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+	}
+
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
+		}
+	}()
+
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+	}
+
+	result, err := stmt.ExecContext(ctx, comment.Content, comment.UpdatedAt, id)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+	}
+
+	affect, err := result.RowsAffected()
+	if affect != 1 {
+		err = fmt.Errorf("total affected id: %d ", affect)
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+	}
+
 	return nil
 }
 

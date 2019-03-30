@@ -245,7 +245,7 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 		wantErr *model.NoSuchDataError
 	}{
 		{
-			name: "When a user specified by id exists, returns a user",
+			name: "When a comment specified by id exists, returns a comment",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -263,7 +263,7 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "When a user specified by id does not exist, returns NoSuchDataError",
+			name: "When a comment specified by id does not exist, returns NoSuchDataError",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -337,7 +337,7 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a comment which has ID, Name, Title, User, CreatedAt, UpdatedAt is given, returns ID",
+			name: "When a comment which has ID, ThreadID, User, Content is given, returns ID",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -441,6 +441,143 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("commentRepository.InsertComment() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_commentRepository_UpdateComment(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testutil.SetFakeTime(time.Now())
+
+	type args struct {
+		ctx     context.Context
+		m       SQLManager
+		id      uint32
+		comment *model.Comment
+		err     error
+	}
+
+	tests := []struct {
+		name        string
+		args        args
+		rowAffected int64
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a comment which has ID, ThreadID, User, Content is given, returns nil",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentValidIDForTest,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 1,
+			wantErr:     nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 2,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				err: errors.New(model.ErrorMessageForTest),
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodUPDATE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "UPDATE comments SET title=\\?, updated_at=\\? WHERE id=\\?"
+			prep := mock.ExpectPrepare(query)
+
+			exec := prep.ExpectExec().WithArgs(tt.args.comment.Content, tt.args.comment.User.ID, tt.args.comment.ThreadID, tt.args.comment.CreatedAt, tt.args.comment.UpdatedAt)
+
+			if tt.args.err != nil {
+				exec.WillReturnError(tt.args.err)
+			} else {
+				exec.WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &commentRepository{}
+			err := repo.UpdateComment(tt.args.ctx, tt.args.m, tt.args.id, tt.args.comment)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("commentRepository.UpdateComment() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
 			}

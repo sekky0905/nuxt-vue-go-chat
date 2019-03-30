@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -26,5 +27,28 @@ func (c Comment) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	}
 	enc.AddTime("createdAt", c.CreatedAt)
 	enc.AddTime("updatedAt", c.UpdatedAt)
+	return nil
+}
+
+// CommentLList is list of comment.
+type CommentList struct {
+	Comments []*Comment `json:"comments"`
+	HasNext  bool       `json:"hasNext"`
+	Cursor   uint32     `json:"cursor"`
+}
+
+// MarshalLogObject for zap logger.
+func (cl CommentList) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	zap.Array("comments", zapcore.ArrayMarshalerFunc(func(inner zapcore.ArrayEncoder) error {
+		for _, c := range cl.Comments {
+			if err := enc.AddObject("comment", c); err != nil {
+				return err
+			}
+		}
+		return nil
+	}))
+
+	enc.AddBool("hasNext", cl.HasNext)
+	enc.AddInt32("cursor", int32(cl.Cursor))
 	return nil
 }

@@ -465,3 +465,95 @@ func Test_authenticationService_Login(t *testing.T) {
 		})
 	}
 }
+
+func Test_authenticationService_Logout(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type mockArgs struct {
+		ctx       context.Context
+		m         repository.DBManager
+		sessionID string
+	}
+
+	type mockReturn struct {
+		err error
+	}
+
+	type fields struct {
+		m                     repository.DBManager
+		userRepository        repository.UserRepository
+		sessionRepository     repository.SessionRepository
+		userService           service.UserService
+		sessionService        service.SessionService
+		authenticationService service.AuthenticationService
+		txCloser              CloseTransaction
+	}
+	type args struct {
+		ctx       context.Context
+		sessionID string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		mockArgs
+		mockReturn
+		wantErr bool
+	}{
+		{
+			name: "",
+			fields: fields{
+				m:                     mock_repository.NewMockDBManager(ctrl),
+				userRepository:        mock_repository.NewMockUserRepository(ctrl),
+				sessionService:        mock_service.NewMockSessionService(ctrl),
+				authenticationService: mock_service.NewMockAuthenticationService(ctrl),
+				sessionRepository:     mock_repository.NewMockSessionRepository(ctrl),
+				txCloser: func(tx repository.TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx:       context.Background(),
+				sessionID: model.SessionValidIDForTest,
+			},
+			mockArgs: mockArgs{
+				ctx:       context.Background(),
+				m:         mock_repository.NewMockDBManager(ctrl),
+				sessionID: model.SessionValidIDForTest,
+			},
+			mockReturn: mockReturn{
+				err: nil,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			if !ok {
+				t.Fatal("failed to assert MockUserRepository")
+			}
+			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+
+			sr, ok := tt.fields.sessionRepository.(*mock_repository.MockSessionRepository)
+			if !ok {
+				t.Fatal("failed to assert MockSessionRepository")
+			}
+			sr.EXPECT().DeleteSession(tt.mockArgs.ctx, tt.mockArgs.m, tt.mockArgs.sessionID).Return(tt.mockReturn.err)
+
+			a := &authenticationService{
+				m:                     tt.fields.m,
+				userRepository:        tt.fields.userRepository,
+				sessionRepository:     tt.fields.sessionRepository,
+				userService:           tt.fields.userService,
+				sessionService:        tt.fields.sessionService,
+				authenticationService: tt.fields.authenticationService,
+				txCloser:              tt.fields.txCloser,
+			}
+			if err := a.Logout(tt.args.ctx, tt.args.sessionID); (err != nil) != tt.wantErr {
+				t.Errorf("authenticationService.Logout() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

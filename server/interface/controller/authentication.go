@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 )
 
 // AuthenticationController is the interface of AuthenticationController.
@@ -14,6 +15,7 @@ type AuthenticationController interface {
 	InitAuthenticationAPI(g *gin.RouterGroup)
 	SignUp(g *gin.Context)
 	Login(g *gin.Context)
+	Logout(g *gin.Context)
 }
 
 // authenticationController is the controller of authentication.
@@ -32,6 +34,7 @@ func NewAuthenticationController(uAPP application.AuthenticationService) Authent
 func (c *authenticationController) InitAuthenticationAPI(g *gin.RouterGroup) {
 	g.POST("/signUp", c.SignUp)
 	g.POST("/login", c.Login)
+	g.POST("/logout", c.Logout)
 }
 
 // SignUp sign up an user.
@@ -76,4 +79,24 @@ func (c *authenticationController) Login(g *gin.Context) {
 
 	uDTO := TranslateFromUserToUserDTO(user)
 	g.JSON(http.StatusOK, uDTO)
+}
+
+// Logout logout an user.
+func (c *authenticationController) Logout(g *gin.Context) {
+	sessionID, err := g.Cookie(model.SessionIDAtCookie)
+	if err != nil && err != http.ErrNoCookie {
+		logger.Logger.Warn("failed to read session from Cookie")
+		return
+	}
+
+	ctx := g.Request.Context()
+	if err = c.aApp.Logout(ctx, sessionID); err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to logout"))
+		return
+	}
+
+	// empty cookie
+	g.SetCookie(model.SessionIDAtCookie, "", 0, "", "", true, true)
+
+	g.JSON(http.StatusOK, nil)
 }

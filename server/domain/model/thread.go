@@ -36,9 +36,9 @@ type ThreadList struct {
 }
 
 // MarshalLogObject for zap logger.
-func (t ThreadList) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+func (tl ThreadList) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	zap.Array("threads", zapcore.ArrayMarshalerFunc(func(inner zapcore.ArrayEncoder) error {
-		for _, t := range t.Threads {
+		for _, t := range tl.Threads {
 			if err := enc.AddObject("thread", t); err != nil {
 				return err
 			}
@@ -46,7 +46,7 @@ func (t ThreadList) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return nil
 	}))
 
-	enc.AddBool("hasNext", t.HasNext)
-	enc.AddInt32("cursor", int32(t.Cursor))
+	enc.AddBool("hasNext", tl.HasNext)
+	enc.AddInt32("cursor", int32(tl.Cursor))
 	return nil
 }

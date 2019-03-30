@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sekky0905/go-vue-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
@@ -98,11 +97,11 @@ func Test_commentRepository_ListComments(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type args struct {
-		ctx      context.Context
-		m        SQLManager
-		threadID uint32
-		limit    int
-		cursor   uint32
+		ctx       context.Context
+		m         SQLManager
+		commentID uint32
+		limit     int
+		cursor    uint32
 	}
 
 	tests := []struct {
@@ -117,11 +116,11 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			name: "When limit = 20, cursor = 1 are given and there are over 21 data, ListComments returns CommentList which has Comments(ID: 1~20), HasNext = yes, Cursor = 21",
 			repo: &commentRepository{},
 			args: args{
-				ctx:      context.Background(),
-				m:        db,
-				threadID: model.ThreadValidIDForTest,
-				limit:    20,
-				cursor:   1,
+				ctx:       context.Background(),
+				m:         db,
+				commentID: model.ThreadValidIDForTest,
+				limit:     20,
+				cursor:    1,
 			},
 			want: &model.CommentList{
 				Comments: testutil.GenerateCommentHelper(1, 20),
@@ -135,11 +134,11 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			name: "When limit = 20, cursor = 21 are given and there are over 41 data, ListComments returns CommentList which has 21 Comments(ID: 21~40), HasNext = yes, Cursor = 41",
 			repo: &commentRepository{},
 			args: args{
-				ctx:      context.Background(),
-				m:        db,
-				threadID: model.ThreadValidIDForTest,
-				limit:    20,
-				cursor:   21,
+				ctx:       context.Background(),
+				m:         db,
+				commentID: model.ThreadValidIDForTest,
+				limit:     20,
+				cursor:    21,
 			},
 			want: &model.CommentList{
 				Comments: testutil.GenerateCommentHelper(21, 40),
@@ -153,11 +152,11 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			name: "When limit = 20, cursor = 1 are given and there are over 10 data, ListComments returns CommentList which has 10 Comments(ID: 1~10), HasNext = yes, Cursor = 10",
 			repo: &commentRepository{},
 			args: args{
-				ctx:      context.Background(),
-				m:        db,
-				threadID: model.ThreadValidIDForTest,
-				limit:    20,
-				cursor:   1,
+				ctx:       context.Background(),
+				m:         db,
+				commentID: model.ThreadValidIDForTest,
+				limit:     20,
+				cursor:    1,
 			},
 			want: &model.CommentList{
 				Comments: testutil.GenerateCommentHelper(1, 10),
@@ -171,11 +170,11 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			name: "When limit = 20, cursor = 1 are given and there are no data, ListComments returns error",
 			repo: &commentRepository{},
 			args: args{
-				ctx:      context.Background(),
-				m:        db,
-				threadID: model.ThreadValidIDForTest,
-				limit:    20,
-				cursor:   1,
+				ctx:       context.Background(),
+				m:         db,
+				commentID: model.ThreadValidIDForTest,
+				limit:     20,
+				cursor:    1,
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
@@ -196,17 +195,17 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			if tt.wantErr != nil {
 				prep.ExpectQuery().WithArgs(tt.args.cursor, readyLimitForHasNext(tt.args.limit)).WillReturnError(tt.wantErr)
 			} else {
-				rows := sqlmock.NewRows([]string{"c.id", "c.content", "u.id", "u.name", "c.thread_id", "c.created_at", "c.updated_at"})
+				rows := sqlmock.NewRows([]string{"c.id", "c.content", "u.id", "u.name", "c.comment_id", "c.created_at", "c.updated_at"})
 
 				for _, comment := range tt.returnMock {
 					rows.AddRow(comment.ID, comment.Content, comment.User.ID, comment.User.Name, comment.ThreadID, comment.CreatedAt, comment.UpdatedAt)
 				}
 
-				prep.ExpectQuery().WithArgs(tt.args.cursor, tt.args.threadID, readyLimitForHasNext(tt.args.limit)).WillReturnRows(rows)
+				prep.ExpectQuery().WithArgs(tt.args.cursor, tt.args.commentID, readyLimitForHasNext(tt.args.limit)).WillReturnRows(rows)
 			}
 
 			repo := &commentRepository{}
-			got, err := repo.ListComments(tt.args.ctx, tt.args.m, tt.args.threadID, tt.args.limit, tt.args.cursor)
+			got, err := repo.ListComments(tt.args.ctx, tt.args.m, tt.args.commentID, tt.args.limit, tt.args.cursor)
 			if tt.wantErr != nil {
 				if err.Error() != tt.wantErr.Error() {
 					t.Errorf("commentRepository.ListComments() error = %v, wantErr %v", err, tt.wantErr)
@@ -283,7 +282,7 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			q := `SELECT (.+)
-	FROM threads AS c
+	FROM comments AS c
 	INNER JOIN users AS u
 	(.+);`
 			prep := mock.ExpectPrepare(q)
@@ -291,7 +290,7 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 			if tt.wantErr != nil {
 				prep.ExpectQuery().WillReturnError(tt.wantErr)
 			} else {
-				rows := sqlmock.NewRows([]string{"c.id", "c.content", "u.id", "u.name", "c.thread_id", "c.created_at", "c.updated_at"}).
+				rows := sqlmock.NewRows([]string{"c.id", "c.content", "u.id", "u.name", "c.comment_id", "c.created_at", "c.updated_at"}).
 					AddRow(tt.want.ID, tt.want.Content, tt.want.User.ID, tt.want.User.Name, tt.want.ThreadID, tt.want.CreatedAt, tt.want.UpdatedAt)
 				prep.ExpectQuery().WithArgs(tt.want.ID).WillReturnRows(rows)
 			}
@@ -308,6 +307,142 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("commentRepository.GetCommentByID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_commentRepository_InsertComment(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer db.Close()
+
+	testutil.SetFakeTime(time.Now())
+
+	type args struct {
+		ctx     context.Context
+		m       SQLManager
+		comment *model.Comment
+		err     error
+	}
+
+	tests := []struct {
+		name        string
+		args        args
+		rowAffected int64
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name: "When a comment which has ID, Name, Title, User, CreatedAt, UpdatedAt is given, returns ID",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				comment: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 1,
+			wantErr:     nil,
+		},
+		{
+			name: "when RowAffected is 0、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name: "when RowAffected is 2、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			rowAffected: 2,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name: "when DB error has occurred、returns error",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				err: errors.New(model.ErrorMessageForTest),
+			},
+			rowAffected: 0,
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodInsert,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "INSERT INTO comments"
+			prep := mock.ExpectPrepare(query)
+
+			exec := prep.ExpectExec().WithArgs(tt.args.comment.Content, tt.args.comment.User.ID, tt.args.comment.ThreadID, tt.args.comment.CreatedAt, tt.args.comment.UpdatedAt)
+
+			if tt.args.err != nil {
+				exec.WillReturnError(tt.args.err)
+			} else {
+				exec.WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &commentRepository{}
+
+			_, err := repo.InsertComment(tt.args.ctx, tt.args.m, tt.args.comment)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("commentRepository.InsertComment() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
 			}
 		})
 	}

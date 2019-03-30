@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/go-vue-chat/server/domain/repository"
@@ -165,8 +166,36 @@ func (repo *commentRepository) list(ctx context.Context, m repository.DBManager,
 }
 
 // InsertThread insert a record.
-func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, user *model.Comment) (uint32, error) {
-	return 1, nil
+func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, comment *model.Comment) (uint32, error) {
+	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?);"
+	stmt, err := m.PrepareContext(ctx, query)
+	if err != nil {
+		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
+		}
+	}()
+
+	result, err := stmt.ExecContext(ctx, comment.Content, comment.User.ID, comment.ThreadID, comment.CreatedAt, comment.UpdatedAt)
+	if err != nil {
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+	}
+
+	affect, err := result.RowsAffected()
+	if affect != 1 {
+		err = fmt.Errorf("total affected id: %d ", affect)
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+	}
+
+	return uint32(id), nil
 }
 
 // UpdateComment updates a record.

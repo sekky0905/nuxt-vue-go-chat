@@ -32,7 +32,53 @@ func (repo *commentRepository) ErrorMsg(method model.RepositoryMethod, err error
 
 // ListThreads lists ThreadList.
 func (repo *commentRepository) ListComments(ctx context.Context, m DBManager, threadID uint32, limit int, cursor uint32) (*model.CommentList, error) {
-	return nil, nil
+	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
+	FROM comments AS c
+	INNER JOIN users AS u
+	ON c.user_id = u.id
+	WHERE c.id > ?
+	AND c.thread_id = ?
+	ORDER BY c.id ASC
+	LIMIT ?;`
+
+	limitForCheckHasNext := readyLimitForHasNext(limit)
+	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, cursor, threadID, limitForCheckHasNext)
+
+	length := len(comments)
+
+	if length == 0 {
+		err = &model.NoSuchDataError{
+			BaseErr:                     err,
+			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+		}
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+	}
+
+	hasNext := checkHasNext(length, limit)
+	if hasNext {
+		cursor = comments[limitForCheckHasNext-1].ID
+	} else {
+		cursor = 0
+	}
+
+	if length == limitForCheckHasNext {
+		// exclude thread for cursor
+		return &model.CommentList{
+			Comments: comments[:limitForCheckHasNext-1],
+			HasNext:  hasNext,
+			Cursor:   cursor}, nil
+	}
+
+	return &model.CommentList{
+		Comments: comments,
+		HasNext:  hasNext,
+		Cursor:   cursor,
+	}, nil
 }
 
 // GetThreadByID gets and returns a record specified by id.

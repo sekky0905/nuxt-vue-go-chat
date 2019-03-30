@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sekky0905/go-vue-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
@@ -215,6 +216,98 @@ func Test_commentRepository_ListComments(t *testing.T) {
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("commentepository.ListComments() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_commentRepository_GetCommentByID(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	defer db.Close()
+
+	testutil.SetFakeTime(time.Now())
+
+	type args struct {
+		ctx context.Context
+		m   SQLManager
+		id  uint32
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *model.Comment
+		wantErr *model.NoSuchDataError
+	}{
+		{
+			name: "When a user specified by id exists, returns a user",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentValidIDForTest,
+			},
+			want: &model.Comment{
+				ID:       model.CommentValidIDForTest,
+				ThreadID: model.ThreadValidIDForTest,
+				User: &model.User{
+					ID:   model.UserValidIDForTest,
+					Name: model.UserNameForTest,
+				},
+				Content: model.CommentContentForTest,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "When a user specified by id does not exist, returns NoSuchDataError",
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+			},
+			want: nil,
+			wantErr: &model.NoSuchDataError{
+				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
+				PropertyNameForUser:         model.IDPropertyForUser,
+				PropertyValue:               model.UserInValidIDForTest,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := `SELECT (.+)
+	FROM threads AS c
+	INNER JOIN users AS u
+	(.+);`
+			prep := mock.ExpectPrepare(q)
+
+			if tt.wantErr != nil {
+				prep.ExpectQuery().WillReturnError(tt.wantErr)
+			} else {
+				rows := sqlmock.NewRows([]string{"c.id", "c.content", "u.id", "u.name", "c.thread_id", "c.created_at", "c.updated_at"}).
+					AddRow(tt.want.ID, tt.want.Content, tt.want.User.ID, tt.want.User.Name, tt.want.ThreadID, tt.want.CreatedAt, tt.want.UpdatedAt)
+				prep.ExpectQuery().WithArgs(tt.want.ID).WillReturnRows(rows)
+			}
+
+			repo := &commentRepository{}
+			got, err := repo.GetCommentByID(tt.args.ctx, tt.args.m, tt.args.id)
+
+			if tt.wantErr != nil {
+				if !reflect.DeepEqual(err, tt.wantErr) {
+					t.Errorf("commentRepository.GetCommentByID() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("commentRepository.GetCommentByID() = %v, want %v", got, tt.want)
 			}
 		})
 	}

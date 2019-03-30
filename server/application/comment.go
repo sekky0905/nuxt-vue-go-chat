@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -59,8 +60,27 @@ func (cs *commentService) GetComment(ctx context.Context, id uint32) (*model.Com
 
 // CreateComment creates Comment.
 func (cs *commentService) CreateComment(ctx context.Context, param *model.Comment) (comment *model.Comment, err error) {
+	tx, err := cs.m.Begin()
+	if err != nil {
+		return nil, beginTxErrorMsg(err)
+	}
 
-	return nil, nil
+	defer func() {
+		if err := cs.txCloser(tx, err); err != nil {
+			err = errors.Wrap(err, "failed to close tx")
+		}
+	}()
+
+	param.CreatedAt = time.Now()
+	param.UpdatedAt = time.Now()
+
+	id, err := cs.repo.InsertComment(ctx, tx, param)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to insert comment")
+	}
+	param.ID = id
+
+	return param, nil
 }
 
 // UpdateComment updates Comment.

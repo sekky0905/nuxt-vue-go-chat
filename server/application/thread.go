@@ -82,11 +82,11 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
 			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
 		}
-		return nil, errors.Wrap(err, "already exist title")
+		return nil, errors.Wrap(err, "already exist id")
 	}
 
 	if _, ok := errors.Cause(err).(*model.NoSuchDataError); !ok {
-		return nil, errors.Wrap(err, "failed is already exist title")
+		return nil, errors.Wrap(err, "failed is already exist id")
 	}
 
 	id, err := a.repo.InsertThread(ctx, tx, param)

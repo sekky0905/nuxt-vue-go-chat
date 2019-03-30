@@ -349,7 +349,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "When given title has already existed, CreateThread returns nil and error",
+			name: "When given id has already existed, CreateThread returns nil and error",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),

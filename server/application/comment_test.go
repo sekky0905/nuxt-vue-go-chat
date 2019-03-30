@@ -6,14 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
-	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
-
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
@@ -124,6 +123,117 @@ func Test_commentService_ListComments(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("commentService.ListComments() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_commentService_GetComment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		m        DBManager
+		repo     CommentRepository
+		txCloser CloseTransaction
+	}
+	type args struct {
+		ctx context.Context
+		id  uint32
+	}
+
+	type mockReturns struct {
+		comment *model.Comment
+		err     error
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		mockReturns
+		want    *model.Comment
+		wantErr bool
+	}{
+		{
+			name: "When appropriate args given, GetComment returns Comment and nil",
+			fields: fields{
+				m:    mock_repository.NewMockDBManager(ctrl),
+				repo: mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  1,
+			},
+			mockReturns: mockReturns{
+				comment: &model.Comment{
+					ID:       model.CommentInValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				err: nil,
+			},
+			want: &model.Comment{
+				ID:       model.CommentInValidIDForTest,
+				ThreadID: model.ThreadValidIDForTest,
+				User: &model.User{
+					ID:   model.UserValidIDForTest,
+					Name: model.UserNameForTest,
+				},
+				Content: model.CommentContentForTest,
+			},
+			wantErr: false,
+		},
+		{
+			name: "When some error occurs at repository layer, GetComment returns nil and error",
+			fields: fields{
+				m:    mock_repository.NewMockDBManager(ctrl),
+				repo: mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  model.CommentInValidIDForTest,
+			},
+			mockReturns: mockReturns{
+				comment: nil,
+				err:     errors.New(model.ErrorMessageForTest),
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr, ok := tt.fields.repo.(*mock_repository.MockCommentRepository)
+			if !ok {
+				t.Fatal("failed to assert MockCommentRepository")
+			}
+			tr.EXPECT().GetCommentByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.mockReturns.comment, tt.mockReturns.err)
+
+			a := &commentService{
+				m:        tt.fields.m,
+				repo:     tt.fields.repo,
+				txCloser: tt.fields.txCloser,
+			}
+			got, err := a.GetComment(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("commentService.GetComment() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("commentService.GetComment() = %v, want %v", got, tt.want)
 			}
 		})
 	}

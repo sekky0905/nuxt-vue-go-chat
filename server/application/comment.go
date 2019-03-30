@@ -49,8 +49,12 @@ func (cs *commentService) ListComments(ctx context.Context, threadId uint32, lim
 
 // GetComment gets Comment.
 func (cs *commentService) GetComment(ctx context.Context, id uint32) (*model.Comment, error) {
+	comment, err := cs.repo.GetCommentByID(ctx, cs.m, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get comment by id")
+	}
 
-	return nil, nil
+	return comment, nil
 }
 
 // CreateComment creates Comment.

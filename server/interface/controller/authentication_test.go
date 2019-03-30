@@ -482,3 +482,113 @@ func Test_authenticationController_Login(t *testing.T) {
 		})
 	}
 }
+
+func Test_authenticationController_Logout(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type errBody struct {
+		errCode ErrCode
+		filed   string
+	}
+
+	type want struct {
+		statusCode int
+		cookie     string
+		errBody
+	}
+
+	type mockArgs struct {
+		ctx       context.Context
+		sessionID string
+	}
+
+	type mockReturns struct {
+		err error
+	}
+
+	type fields struct {
+		aApp application.AuthenticationService
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want
+		mockArgs
+		mockReturns
+	}{
+		{
+			name: "When appropriate process completed, returns cookie which sessionID is empty and maxAge is 0",
+			fields: fields{
+				aApp: mock_application.NewMockAuthenticationService(ctrl),
+			},
+			want: want{
+				statusCode: 200,
+				cookie:     "SESSION_ID=; Path=/; HttpOnly; Secure",
+				errBody: errBody{
+					errCode: "",
+					filed:   "",
+				},
+			},
+			mockArgs: mockArgs{
+				ctx:       context.Background(),
+				sessionID: model.SessionValidIDForTest,
+			},
+			mockReturns: mockReturns{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			aa, ok := tt.fields.aApp.(*mock_application.MockAuthenticationService)
+			if !ok {
+				t.Fatal("failed to assert MockUserRepository")
+			}
+
+			aa.EXPECT().Logout(tt.mockArgs.ctx, tt.mockArgs.sessionID).Return(tt.mockReturns.err)
+
+			ac := NewAuthenticationController(tt.fields.aApp)
+			r := gin.New()
+
+			r.POST("/logout", ac.Logout)
+
+			rec := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodPost, "/logout", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req.AddCookie(&http.Cookie{
+				Name:   model.SessionIDAtCookie,
+				Value:  model.SessionValidIDForTest,
+				MaxAge: 100,
+			})
+
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			gotCookieVal := rec.Header().Get("Set-Cookie")
+			if gotCookieVal != tt.want.cookie {
+				t.Errorf("cookie = %v, want %v", gotCookieVal, tt.want.cookie)
+				return
+			}
+
+			sBody := rec.Body.String()
+			if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+				t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+				return
+			}
+
+			if !strings.Contains(sBody, tt.want.errBody.filed) {
+				t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.filed)
+				return
+			}
+		})
+	}
+}

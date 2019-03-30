@@ -196,7 +196,7 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 }
 
 // Logout logout a user.
-func (a *authenticationService) Logout(ctx context.Context, sessionID string) (err error) {
+func (a *authenticationService) Logout(ctx context.Context, sessionID string) error {
 	tx, err := a.m.Begin()
 	if err != nil {
 		return beginTxErrorMsg(err)

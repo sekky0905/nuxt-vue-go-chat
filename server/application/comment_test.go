@@ -1,1 +1,130 @@
 package application
+
+import (
+	"context"
+	"reflect"
+	"testing"
+	"time"
+
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
+
+	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
+)
+
+func Test_commentService_ListComments(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		m        DBManager
+		repo     CommentRepository
+		service  service.CommentService
+		txCloser CloseTransaction
+	}
+	type args struct {
+		ctx      context.Context
+		threadID uint32
+		limit    int
+		cursor   uint32
+	}
+
+	type mockReturns struct {
+		list *model.CommentList
+		err  error
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		mockReturns
+		want    *model.CommentList
+		wantErr bool
+	}{
+		{
+			name: "When appropriate args given, ListComments returns CommentList and nil",
+			fields: fields{
+				m:       mock_repository.NewMockDBManager(ctrl),
+				repo:    mock_repository.NewMockCommentRepository(ctrl),
+				service: mock_service.NewMockCommentService(ctrl),
+				txCloser: func(tx TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: model.ThreadValidIDForTest,
+				limit:    20,
+				cursor:   21,
+			},
+			mockReturns: mockReturns{
+				list: &model.CommentList{
+					Comments: testutil.GenerateCommentHelper(21, 40),
+					HasNext:  true,
+					Cursor:   41,
+				},
+				err: nil,
+			},
+			want: &model.CommentList{
+				Comments: testutil.GenerateCommentHelper(21, 40),
+				HasNext:  true,
+				Cursor:   41,
+			},
+			wantErr: false,
+		},
+		{
+			name: "When some error occurs at repository layer, ListComments returns nil and error",
+			fields: fields{
+				m:    mock_repository.NewMockDBManager(ctrl),
+				repo: mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: model.ThreadValidIDForTest,
+				limit:    20,
+				cursor:   21,
+			},
+			mockReturns: mockReturns{
+				list: nil,
+				err:  errors.New(model.ErrorMessageForTest),
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr, ok := tt.fields.repo.(*mock_repository.MockCommentRepository)
+			if !ok {
+				t.Fatal("failed to assert MockCommentRepository")
+			}
+			tr.EXPECT().ListComments(tt.args.ctx, tt.fields.m, tt.args.threadID, tt.args.limit, tt.args.cursor).Return(tt.mockReturns.list, tt.mockReturns.err)
+
+			a := &commentService{
+				m:        tt.fields.m,
+				service:  tt.fields.service,
+				repo:     tt.fields.repo,
+				txCloser: tt.fields.txCloser,
+			}
+			got, err := a.ListComments(tt.args.ctx, tt.args.threadID, tt.args.limit, tt.args.cursor)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("commentService.ListComments() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("commentService.ListComments() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

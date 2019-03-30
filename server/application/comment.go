@@ -85,6 +85,39 @@ func (cs *commentService) CreateComment(ctx context.Context, param *model.Commen
 
 // UpdateComment updates Comment.
 func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *model.Comment) (comment *model.Comment, err error) {
+	tx, err := cs.m.Begin()
+	if err != nil {
+		return nil, beginTxErrorMsg(err)
+	}
+
+	defer func() {
+		if err := cs.txCloser(tx, err); err != nil {
+			err = errors.Wrap(err, "failed to close tx")
+		}
+	}()
+
+	yes, err := cs.service.IsAlreadyExistID(ctx, param.ID)
+	if !yes {
+		err = &model.NoSuchDataError{
+			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
+			PropertyNameForUser:         model.IDPropertyForUser,
+			PropertyValue:               param.ID,
+			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+		}
+		return nil, errors.Wrap(err, "does not exists ID")
+	}
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to is already exist ID")
+	}
+
+	param.UpdatedAt = time.Now()
+
+	if err := cs.repo.UpdateComment(ctx, tx, param.ID, param); err != nil {
+		return nil, errors.Wrap(err, "failed to update comment")
+	}
+
 	return param, nil
 }
 

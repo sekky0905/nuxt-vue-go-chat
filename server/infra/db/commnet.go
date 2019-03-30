@@ -234,5 +234,32 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, 
 
 // DeleteComment delete a record.
 func (repo *commentRepository) DeleteComment(ctx context.Context, m SQLManager, id uint32) error {
+	query := "DELETE FROM comments WHERE id=?;"
+
+	stmt, err := m.PrepareContext(ctx, query)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			logger.Logger.Error("stmt.Close", zap.String("error message", err.Error()))
+		}
+	}()
+
+	result, err := stmt.ExecContext(ctx, id)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+
+	affect, err := result.RowsAffected()
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+	if affect != 1 {
+		err = fmt.Errorf("total affected id: %d ", affect)
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+	}
+
 	return nil
 }

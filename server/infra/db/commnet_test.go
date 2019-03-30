@@ -584,3 +584,102 @@ func Test_commentRepository_UpdateComment(t *testing.T) {
 		})
 	}
 }
+
+func Test_commentRepository_DeleteComment(t *testing.T) {
+	// set sqlmock
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	testutil.SetFakeTime(time.Now())
+
+	type args struct {
+		ctx context.Context
+		m   SQLManager
+		id  uint32
+		err error
+	}
+
+	tests := []struct {
+		name        string
+		rowAffected int64
+		args        args
+		wantErr     *model.RepositoryError
+	}{
+		{
+			name:        "When a comment specified by id exists, returns nil",
+			rowAffected: 1,
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentValidIDForTest,
+			},
+			wantErr: nil,
+		},
+		{
+			name:        "when RowAffected is 0、returns error",
+			rowAffected: 0,
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name:        "when RowAffected is 2、returns error",
+			rowAffected: 2,
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+		{
+			name:        "when DB error has occurred、returns error",
+			rowAffected: 0,
+			args: args{
+				ctx: context.Background(),
+				m:   db,
+				id:  model.CommentInValidIDForTest,
+				err: errors.New(model.ErrorMessageForTest),
+			},
+			wantErr: &model.RepositoryError{
+				RepositoryMethod:            model.RepositoryMethodDELETE,
+				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := "DELETE FROM comments WHERE id=\\?"
+			prep := mock.ExpectPrepare(query)
+
+			if tt.args.err != nil {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnError(tt.args.err)
+			} else {
+				prep.ExpectExec().WithArgs(tt.args.id).WillReturnResult(sqlmock.NewResult(1, tt.rowAffected))
+			}
+
+			repo := &commentRepository{}
+
+			err := repo.DeleteComment(tt.args.ctx, tt.args.m, tt.args.id)
+			if tt.wantErr != nil {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
+					t.Errorf("commentRepository.DeleteComment() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+			}
+		})
+	}
+}

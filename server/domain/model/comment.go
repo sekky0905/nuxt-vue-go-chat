@@ -12,7 +12,7 @@ type Comment struct {
 	ID        uint32 `json:"id"`
 	Content   string `json:"content"`
 	ThreadID  uint32 `json:"threadId"`
-	User      `json:"user"`
+	*User     `json:"user"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

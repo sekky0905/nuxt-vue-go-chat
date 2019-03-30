@@ -108,6 +108,13 @@ const (
 	ThreadInValidIDForTest uint32 = 2
 )
 
+// Comment
+const (
+	CommentValidIDForTest   uint32 = 1
+	CommentInValidIDForTest uint32 = 2
+	CommentContentForTest          = "ContentForTest"
+)
+
 // error message for test
 const (
 	ErrorMessageForTest = "some error has occurred"

@@ -541,7 +541,7 @@ func Test_threadService_UpdateThread(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			name: "When appropriate args given, CreateThread returns Thread and err",
+			name: "When appropriate args given, UpdateThread returns Thread and err",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
@@ -647,7 +647,7 @@ func Test_threadService_UpdateThread(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "When some error occurs at repository layer, CreateThread returns nil and error",
+			name: "When some error occurs at repository layer, UpdateThread returns nil and error",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
@@ -796,7 +796,7 @@ func Test_threadService_DeleteThread(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			name: "When appropriate args given, CreateThread returns Thread and err",
+			name: "When appropriate args given, DeleteThread returns Thread and err",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
@@ -847,7 +847,7 @@ func Test_threadService_DeleteThread(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "When given id has not existed, UpdateThread returns nil and error",
+			name: "When given id has not existed, DeleteThread returns nil and error",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),

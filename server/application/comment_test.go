@@ -458,7 +458,7 @@ func Test_commentService_UpdateComment(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name: "When appropriate args given, CreateComment returns Comment and err",
+			name: "When appropriate args given, UpdateComment returns Comment and err",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
@@ -552,7 +552,7 @@ func Test_commentService_UpdateComment(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			name: "When some error occurs at repository layer, CreateComment returns nil and error",
+			name: "When some error occurs at repository layer, UpdateComment returns nil and error",
 			fields: fields{
 				m:       mock_repository.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
@@ -647,6 +647,207 @@ func Test_commentService_UpdateComment(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotComment, tt.wantComment) {
 				t.Errorf("commentService.UpdateComment() = %+v, want %+v", gotComment, tt.wantComment)
+			}
+		})
+	}
+}
+
+func Test_commentService_DeleteComment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testutil.SetFakeTime(time.Now())
+
+	type fields struct {
+		m        repository.DBManager
+		service  service.CommentService
+		repo     repository.CommentRepository
+		txCloser CloseTransaction
+	}
+	type args struct {
+		ctx   context.Context
+		id    uint32
+		param *model.Comment
+	}
+
+	type mockArgsIsAlreadyExistID struct {
+		ctx context.Context
+		id  uint32
+	}
+
+	type mockReturnsIsAlreadyExistID struct {
+		found bool
+		err   error
+	}
+
+	type mockReturnsDeleteComment struct {
+		err error
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		mockArgsIsAlreadyExistID
+		mockReturnsIsAlreadyExistID
+		mockReturnsDeleteComment
+		wantComment *model.Comment
+		wantErr     bool
+	}{
+		{
+			name: "When appropriate args given, DeleteComment returns Comment and err",
+			fields: fields{
+				m:       mock_repository.NewMockDBManager(ctrl),
+				service: mock_service.NewMockCommentService(ctrl),
+				repo:    mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx repository.TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+				param: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			mockArgsIsAlreadyExistID: mockArgsIsAlreadyExistID{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+			},
+			mockReturnsIsAlreadyExistID: mockReturnsIsAlreadyExistID{
+				found: true,
+				err:   nil,
+			},
+			mockReturnsDeleteComment: mockReturnsDeleteComment{
+				err: nil,
+			},
+			wantComment: &model.Comment{
+				ID:       model.CommentValidIDForTest,
+				ThreadID: model.ThreadValidIDForTest,
+				User: &model.User{
+					ID:   model.UserValidIDForTest,
+					Name: model.UserNameForTest,
+				},
+				Content: model.CommentContentForTest,
+			},
+			wantErr: false,
+		},
+		{
+			name: "When given id has not existed, DeleteComment returns nil and error",
+			fields: fields{
+				m:       mock_repository.NewMockDBManager(ctrl),
+				service: mock_service.NewMockCommentService(ctrl),
+				repo:    mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx repository.TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+				param: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			mockArgsIsAlreadyExistID: mockArgsIsAlreadyExistID{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+			},
+			mockReturnsIsAlreadyExistID: mockReturnsIsAlreadyExistID{
+				found: false,
+				err:   nil,
+			},
+			wantComment: nil,
+			wantErr:     true,
+		},
+		{
+			name: "When some error occurs at repository layer, DeleteComment returns nil and error",
+			fields: fields{
+				m:       mock_repository.NewMockDBManager(ctrl),
+				service: mock_service.NewMockCommentService(ctrl),
+				repo:    mock_repository.NewMockCommentRepository(ctrl),
+				txCloser: func(tx repository.TxManager, err error) error {
+					return nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+				param: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+			},
+			mockArgsIsAlreadyExistID: mockArgsIsAlreadyExistID{
+				ctx: context.Background(),
+				id:  model.CommentValidIDForTest,
+			},
+			mockReturnsIsAlreadyExistID: mockReturnsIsAlreadyExistID{
+				found: true,
+				err:   nil,
+			},
+			mockReturnsDeleteComment: mockReturnsDeleteComment{
+				err: errors.New(model.ErrorMessageForTest),
+			},
+			wantComment: nil,
+			wantErr:     true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			if !ok {
+				t.Fatal("failed to assert MockDBManager")
+			}
+			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+
+			ts, ok := tt.fields.service.(*mock_service.MockCommentService)
+			if !ok {
+				t.Fatal("failed to assert MockCommentService")
+			}
+
+			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
+
+			if tt.mockReturnsIsAlreadyExistID.found {
+				tr, ok := tt.fields.repo.(*mock_repository.MockCommentRepository)
+				if !ok {
+					t.Fatal("failed to assert MockCommentRepository")
+				}
+
+				txM := mock_repository.NewMockTxManager(ctrl)
+
+				tr.EXPECT().DeleteComment(tt.args.ctx, txM, tt.args.id).Return(tt.mockReturnsDeleteComment.err)
+			}
+
+			a := &commentService{
+				m:        tt.fields.m,
+				service:  tt.fields.service,
+				repo:     tt.fields.repo,
+				txCloser: tt.fields.txCloser,
+			}
+
+			err := a.DeleteComment(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("commentService.DeleteComment() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

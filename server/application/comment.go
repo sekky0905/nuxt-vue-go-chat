@@ -123,6 +123,35 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 
 // DeleteComment deletes Comment.
 func (cs *commentService) DeleteComment(ctx context.Context, id uint32) (err error) {
+	tx, err := cs.m.Begin()
+	if err != nil {
+		return beginTxErrorMsg(err)
+	}
+
+	defer func() {
+		if err := cs.txCloser(tx, err); err != nil {
+			err = errors.Wrap(err, "failed to close tx")
+		}
+	}()
+
+	yes, err := cs.service.IsAlreadyExistID(ctx, id)
+	if !yes {
+		err = &model.NoSuchDataError{
+			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
+			PropertyNameForUser:         model.IDPropertyForUser,
+			PropertyValue:               id,
+			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+		}
+		return errors.Wrap(err, "does not exists id")
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to is already exist id")
+	}
+
+	if err := cs.repo.DeleteComment(ctx, tx, id); err != nil {
+		return errors.Wrap(err, "failed to delete comment")
+	}
 
 	return nil
 }

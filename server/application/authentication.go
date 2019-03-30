@@ -14,6 +14,7 @@ import (
 type AuthenticationService interface {
 	SignUp(ctx context.Context, param *model.User) (*model.User, error)
 	Login(ctx context.Context, param *model.User) (*model.User, error)
+	Logout(ctx context.Context, sessionID string) error
 }
 
 // AuthenticationServiceDIInput is DI input of AuthenticationService.
@@ -192,4 +193,24 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 	}
 
 	return user, nil
+}
+
+// Logout logout a user.
+func (a *authenticationService) Logout(ctx context.Context, sessionID string) (err error) {
+	tx, err := a.m.Begin()
+	if err != nil {
+		return beginTxErrorMsg(err)
+	}
+
+	defer func() {
+		if err := a.txCloser(tx, err); err != nil {
+			err = errors.Wrap(err, "failed to close tx")
+		}
+	}()
+
+	if err := a.sessionRepository.DeleteSession(ctx, a.m, sessionID); err != nil {
+		return errors.Wrap(err, "failed to delete session")
+	}
+
+	return nil
 }

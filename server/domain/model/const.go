@@ -25,6 +25,7 @@ const (
 	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
 	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
 	DomainModelNameThreadForDeveloper  DomainModelNameForDeveloper = "Thread"
+	DomainModelNameCommentForDeveloper DomainModelNameForDeveloper = "Comment"
 )
 
 // DomainModelNameForUser is Model name for user.
@@ -40,6 +41,7 @@ const (
 	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
 	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
 	DomainModelNameThreadForUser  DomainModelNameForUser = "スレッド"
+	DomainModelNameCommentForUser DomainModelNameForUser = "コメント"
 )
 
 // PropertyNameForDeveloper is property name for developer.

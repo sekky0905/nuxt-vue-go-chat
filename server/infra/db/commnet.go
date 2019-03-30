@@ -9,12 +9,21 @@ import (
 
 // commentRepository is repository of comment.
 type commentRepository struct {
-	ctx context.Context
 }
 
 // NewCommentRepository generates and returns CommentRepository.
 func NewCommentRepository() CommentRepository {
 	return &commentRepository{}
+}
+
+// ErrorMsg generates and returns error message.
+func (repo *commentRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
+	return &model.RepositoryError{
+		BaseErr:                     err,
+		RepositoryMethod:            method,
+		DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+		DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+	}
 }
 
 // ListThreads lists ThreadList.

@@ -69,10 +69,11 @@ export default {
     async submitForm() {
       this.closeDialogState()
       const payload = {
-        user: this.user,
-        ...this.title
+        title:  this.title,
+        user: this.user
       }
       try {
+        console.log(` payload: payload => ${payload}`)
         await this.SAVE_THREAD({ payload: payload })
         this.snackbar.color = 'success'
         this.snackbar.text = `success create 【${this.title}】thread`

@@ -8,8 +8,6 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
-	"go.uber.org/zap"
 )
 
 // AuthenticationService is the interface of AuthenticationService.
@@ -169,12 +167,7 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 		}
 	}()
 
-	logger.Logger.Info("DDDD", zap.Object("param", param))
-
 	ok, user, err := s.authenticationService.Authenticate(ctx, param.Name, param.Password)
-
-	logger.Logger.Info("DDDD", zap.Object("user", user))
-
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate")
 	} else if !ok {

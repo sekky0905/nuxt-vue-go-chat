@@ -3,31 +3,33 @@ package application
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 )
 
-// ThreadService is interface of ThreadService.
+// CommentService is interface of CommentService.
 type CommentService interface {
-	ListComments(ctx context.Context, threadId uint32, limit int, cursor uint32) (*model.CommentList, error)
+	ListComments(ctx context.Context, commentId uint32, limit int, cursor uint32) (*model.CommentList, error)
 	GetComment(ctx context.Context, id uint32) (*model.Comment, error)
 	CreateComment(ctx context.Context, comment *model.Comment) (*model.Comment, error)
 	UpdateComment(ctx context.Context, id uint32, comment *model.Comment) (*model.Comment, error)
 	DeleteComment(ctx context.Context, id uint32) error
 }
 
-// threadService is application service of thread.
-type commentApplication struct {
+// commentService is application service of comment.
+type commentService struct {
 	m        DBManager
 	service  service.CommentService
 	repo     CommentRepository
 	txCloser CloseTransaction
 }
 
-// NewThreadService generates and returns ThreadService.
+// NewCommentService generates and returns CommentService.
 func NewCommentApplication(m DBManager, service service.CommentService, repo CommentRepository, txCloser CloseTransaction) CommentService {
-	return &commentApplication{
+	return &commentService{
 		m:        m,
 		service:  service,
 		repo:     repo,
@@ -36,30 +38,34 @@ func NewCommentApplication(m DBManager, service service.CommentService, repo Com
 }
 
 // ListThreads gets ThreadList.
-func (a *commentApplication) ListComments(ctx context.Context, threadId uint32, limit int, cursor uint32) (*model.CommentList, error) {
+func (cs *commentService) ListComments(ctx context.Context, threadId uint32, limit int, cursor uint32) (*model.CommentList, error) {
+	comments, err := cs.repo.ListComments(ctx, cs.m, threadId, limit, cursor)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list comments")
+	}
+
+	return comments, nil
+}
+
+// GetComment gets Comment.
+func (cs *commentService) GetComment(ctx context.Context, id uint32) (*model.Comment, error) {
 
 	return nil, nil
 }
 
-// GetThread gets Thread.
-func (a *commentApplication) GetComment(ctx context.Context, id uint32) (*model.Comment, error) {
+// CreateComment creates Comment.
+func (cs *commentService) CreateComment(ctx context.Context, param *model.Comment) (comment *model.Comment, err error) {
 
 	return nil, nil
 }
 
-// CreateThread creates Thread.
-func (a *commentApplication) CreateComment(ctx context.Context, param *model.Comment) (comment *model.Comment, err error) {
-
-	return nil, nil
-}
-
-// UpdateThread updates Thread.
-func (a *commentApplication) UpdateComment(ctx context.Context, id uint32, param *model.Comment) (comment *model.Comment, err error) {
+// UpdateComment updates Comment.
+func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *model.Comment) (comment *model.Comment, err error) {
 	return param, nil
 }
 
-// DeleteThread deletes Thread.
-func (a *commentApplication) DeleteComment(ctx context.Context, id uint32) (err error) {
+// DeleteComment deletes Comment.
+func (cs *commentService) DeleteComment(ctx context.Context, id uint32) (err error) {
 
 	return nil
 }

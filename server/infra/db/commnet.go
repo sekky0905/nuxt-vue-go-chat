@@ -37,7 +37,32 @@ func (repo *commentRepository) ListComments(ctx context.Context, m DBManager, th
 
 // GetThreadByID gets and returns a record specified by id.
 func (repo *commentRepository) GetCommentByID(ctx context.Context, m DBManager, id uint32) (*model.Comment, error) {
-	return nil, nil
+	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
+	FROM comments AS c
+	INNER JOIN users AS u
+	ON c.user_id = u.id
+	WHERE c.id=?
+	LIMIT 1;`
+
+	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
+
+	if len(comments) == 0 {
+		err = &model.NoSuchDataError{
+			BaseErr:                     err,
+			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
+			PropertyNameForUser:         model.IDPropertyForUser,
+			PropertyValue:               id,
+			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
+			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+		}
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+	}
+
+	return comments[0], nil
 }
 
 // list gets and returns list of records.

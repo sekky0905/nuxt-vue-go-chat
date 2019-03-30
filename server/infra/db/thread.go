@@ -11,16 +11,16 @@ import (
 	"go.uber.org/zap"
 )
 
-// threadRepository は、ThreadのRepository。
+// threadRepository is repository of thread.
 type threadRepository struct {
 }
 
-// NewThreadRepository は、threadRepository生成する。
+// NewThreadRepository generates and returns ThreadRepository.
 func NewThreadRepository() ThreadRepository {
 	return &threadRepository{}
 }
 
-// ErrorMsg は、エラー文を生成し、返す。
+// ErrorMsg generates and returns error message.
 func (repo *threadRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
 	return &model.RepositoryError{
 		BaseErr:                     err,
@@ -30,7 +30,7 @@ func (repo *threadRepository) ErrorMsg(method model.RepositoryMethod, err error)
 	}
 }
 
-// ListThreads は、レコードを複数件取得して返す。
+// ListThreads lists ThreadList.
 func (repo *threadRepository) ListThreads(ctx context.Context, m SQLManager, cursor uint32, limit int) (*model.ThreadList, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
@@ -73,7 +73,7 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m SQLManager, cur
 	return &model.ThreadList{Threads: threads, HasNext: hasNext, Cursor: cursor}, nil
 }
 
-// GetThreadByID は、レコードを1件取得して返す。
+// GetThreadByID gets and returns a record specified by id.
 func (repo *threadRepository) GetThreadByID(ctx context.Context, m SQLManager, id uint32) (*model.Thread, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
@@ -103,7 +103,7 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m SQLManager, i
 	return list[0], nil
 }
 
-// GetThreadByTitle は、指定したNameを保持するレコードを1返す。
+// GetThreadByTitle gets and returns a record specified by title.
 func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m SQLManager, name string) (*model.Thread, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
@@ -133,7 +133,7 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m SQLManager
 	return list[0], nil
 }
 
-// list は、レコードの一覧を取得して返す。
+// list gets and returns list of records.
 func (repo *threadRepository) list(ctx context.Context, m SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (threads []*model.Thread, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -184,7 +184,7 @@ func (repo *threadRepository) list(ctx context.Context, m SQLManager, method mod
 	return list, nil
 }
 
-// InsertThread は、レコードを1件生成する。
+// InsertThread insert a record.
 func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, thread *model.Thread) (uint32, error) {
 	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)"
 	stmt, err := m.PrepareContext(ctx, query)
@@ -217,7 +217,7 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, th
 	return uint32(id), nil
 }
 
-// UpdateThread は、レコードを1件更新する。
+// UpdateThread updates a record.
 func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id uint32, thread *model.Thread) error {
 	query := "UPDATE threads SET title=?, updated_at=? WHERE id=?"
 	stmt, err := m.PrepareContext(ctx, query)
@@ -246,7 +246,7 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id
 	return nil
 }
 
-// DeleteThread は、レコードを1件削除する。
+// DeleteThread delete a record.
 func (repo *threadRepository) DeleteThread(ctx context.Context, m SQLManager, id uint32) error {
 	query := "DELETE FROM threads WHERE id=?"
 

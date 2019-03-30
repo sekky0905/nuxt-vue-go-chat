@@ -21,10 +21,10 @@ type threadService struct {
 }
 
 // NewThreadService generates and returns ThreadService.
-func NewThreadService(repo repository.ThreadRepository, m repository.DBManager) ThreadService {
+func NewThreadService(m repository.DBManager, repo repository.ThreadRepository) ThreadService {
 	return &threadService{
-		repo: repo,
 		m:    m,
+		repo: repo,
 	}
 }
 

@@ -85,6 +85,7 @@ export const actions = {
     commit(ADD_THREAD_LIST, { threadList: list })
   },
   async [SAVE_THREAD]({ commit }, { payload }) {
+    console.log(`payload: ${JSON.stringify(payload)}`)
     const response = await this.$axios.$post(`/threads`, payload)
     commit(ADD_THREAD, { thread: response })
   },

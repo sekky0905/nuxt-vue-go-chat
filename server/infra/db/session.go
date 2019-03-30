@@ -104,7 +104,7 @@ func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager
 
 // InsertSession insert a record.
 func (repo *sessionRepository) InsertSession(ctx context.Context, m repository.SQLManager, session *model.Session) error {
-	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, ?)"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))

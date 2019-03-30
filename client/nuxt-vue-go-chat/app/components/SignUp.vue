@@ -142,6 +142,10 @@ export default {
           this.snackbar.color = 'error'
           this.snackbar.text = 'fail sign up\nName or Password is invalid'
           this.snackbar.isOpen = true
+        } else if (error.response.data.code === 'AlreadyExistsFailure') {
+          this.snackbar.color = 'error'
+          this.snackbar.text = 'fail sign up\nspecified name already exists'
+          this.snackbar.isOpen = true
         } else {
           this.snackbar.color = 'error'
           this.snackbar.text = 'fail sign up\nsystem error occur'

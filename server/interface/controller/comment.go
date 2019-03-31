@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
+
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 
 	"github.com/pkg/errors"
@@ -71,18 +74,44 @@ func (c commentController) ListComments(g *gin.Context) {
 	threadID := uint32(threadIInt)
 
 	ctx := g.Request.Context()
-	thread, err := c.cApp.ListComments(ctx, threadID, limit, cursor)
+	comment, err := c.cApp.ListComments(ctx, threadID, limit, cursor)
 	if err != nil {
 		ResponseAndLogError(g, errors.Wrap(err, "failed to list comments"))
 		return
 	}
 
-	g.JSON(http.StatusOK, thread)
+	g.JSON(http.StatusOK, comment)
 
 }
 
 // GetComment gets Comment.
 func (c commentController) GetComment(g *gin.Context) {
+	idInt, err := strconv.Atoi(g.Param("id"))
+	if err != nil || idInt < 1 {
+		logger.Logger.Info("DEBUG>>>", zap.String("ERR", err.Error()))
+		err = &model.InvalidParamError{
+			BaseErr:                   err,
+			PropertyNameForDeveloper:  model.IDPropertyForDeveloper,
+			InvalidReasonForDeveloper: "id should be number and over 0",
+		}
+
+		logger.Logger.Info("DEBUG", zap.String("ERR", err.Error()))
+
+		ResponseAndLogError(g, err)
+		return
+	}
+
+	id := uint32(idInt)
+
+	logger.Logger.Info("DEBUG", zap.Int("ID", idInt))
+
+	ctx := g.Request.Context()
+	comment, err := c.cApp.GetComment(ctx, id)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to get comment"))
+		return
+	}
+	g.JSON(http.StatusOK, comment)
 }
 
 // CreateComment creates Comment.

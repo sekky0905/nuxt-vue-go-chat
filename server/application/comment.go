@@ -13,7 +13,7 @@ import (
 
 // CommentService is interface of CommentService.
 type CommentService interface {
-	ListComments(ctx context.Context, commentId uint32, limit int, cursor uint32) (*model.CommentList, error)
+	ListComments(ctx context.Context, threadID uint32, limit int, cursor uint32) (*model.CommentList, error)
 	GetComment(ctx context.Context, id uint32) (*model.Comment, error)
 	CreateComment(ctx context.Context, comment *model.Comment) (*model.Comment, error)
 	UpdateComment(ctx context.Context, id uint32, comment *model.Comment) (*model.Comment, error)
@@ -39,8 +39,8 @@ func NewCommentApplication(m DBManager, service service.CommentService, repo Com
 }
 
 // ListThreads gets ThreadList.
-func (cs *commentService) ListComments(ctx context.Context, threadId uint32, limit int, cursor uint32) (*model.CommentList, error) {
-	comments, err := cs.repo.ListComments(ctx, cs.m, threadId, limit, cursor)
+func (cs *commentService) ListComments(ctx context.Context, threadID uint32, limit int, cursor uint32) (*model.CommentList, error) {
+	comments, err := cs.repo.ListComments(ctx, cs.m, threadID, limit, cursor)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list comments")
 	}

@@ -58,6 +58,7 @@ const (
 	NamePropertyForDeveloper     PropertyNameForDeveloper = "Name"
 	TitlePropertyForDeveloper    PropertyNameForDeveloper = "Title"
 	PassWordPropertyForDeveloper PropertyNameForDeveloper = "Password"
+	ThreadIDPropertyForDeveloper PropertyNameForDeveloper = "ThreadID"
 )
 
 // PropertyNameForUser is Property name for user.

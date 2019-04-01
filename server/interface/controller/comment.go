@@ -116,6 +116,23 @@ func (c commentController) GetComment(g *gin.Context) {
 
 // CreateComment creates Comment.
 func (c commentController) CreateComment(g *gin.Context) {
+	dto := &CommentDTO{}
+	if err := g.BindJSON(dto); err != nil {
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to bind json"))
+		return
+	}
+
+	param := TranslateFromCommentDTOToComment(dto)
+
+	ctx := g.Request.Context()
+	thread, err := c.cApp.CreateComment(ctx, param)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed created comment"))
+		return
+	}
+
+	g.JSON(http.StatusOK, thread)
 }
 
 // UpdateComment updates Comment.

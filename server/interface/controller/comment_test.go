@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -384,6 +385,167 @@ func Test_commentController_GetComment(t *testing.T) {
 
 			rec := httptest.NewRecorder()
 			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/threads/%s/comments/%s", tt.parameter.threadID, tt.parameter.id), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			if tt.want.errBody.errCode == "" {
+				bBody := rec.Body.Bytes()
+				comment := &model.Comment{}
+				if err := json.Unmarshal(bBody, comment); err != nil {
+					t.Fatal(err)
+					return
+				}
+
+				if !reflect.DeepEqual(comment, tt.want.body) {
+					t.Errorf("body = %#v, want %#v", comment, tt.want.body)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_commentController_CreateComment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type fields struct {
+		tApp application.CommentService
+	}
+	type args struct {
+		comment *CommentDTO
+	}
+
+	type errBody struct {
+		errCode ErrCode
+	}
+
+	type want struct {
+		statusCode int
+		body       *model.Comment
+		errBody
+	}
+
+	type mockArg struct {
+		comment *model.Comment
+	}
+
+	type mockReturns struct {
+		comment *model.Comment
+		err     error
+	}
+
+	dto := &CommentDTO{
+		ID:       model.CommentValidIDForTest,
+		ThreadID: model.ThreadValidIDForTest,
+		UserDTO: &UserDTO{
+			ID:   model.UserValidIDForTest,
+			Name: model.UserNameForTest,
+		},
+		Content: model.CommentContentForTest,
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args
+		mockArg
+		mockReturns
+		want
+	}{
+		{
+			name: "When appropriate id is given and data exists, returns comment and status code 200",
+			fields: fields{
+				tApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				comment: dto,
+			},
+			mockArg: mockArg{
+				comment: TranslateFromCommentDTOToComment(dto),
+			},
+			mockReturns: mockReturns{
+				comment: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				err: nil,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				body: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				errBody: errBody{},
+			},
+		},
+		{
+			name: "When validation error occurs, CreateComment returns nil and status code 400",
+			fields: fields{
+				tApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				comment: &CommentDTO{
+					UserDTO: &UserDTO{},
+				},
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParametersValueFailure,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			if !ok {
+				t.Fatal("failed to assert MockCommentService")
+			}
+
+			if tt.want.statusCode != http.StatusBadRequest {
+				at.EXPECT().CreateComment(context.Background(), tt.mockArg.comment).Return(tt.mockReturns.comment, tt.mockReturns.err)
+			}
+
+			tc := NewCommentController(tt.fields.tApp)
+			r := gin.New()
+
+			r.POST("/threads/:threadId/comments", tc.CreateComment)
+
+			rec := httptest.NewRecorder()
+
+			b, err := json.Marshal(tt.args.comment)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req, err := http.NewRequest(http.MethodPost, "/threads/1/comments", bytes.NewBuffer(b))
 			if err != nil {
 				t.Fatal(err)
 			}

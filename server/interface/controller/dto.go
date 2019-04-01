@@ -43,10 +43,36 @@ func TranslateFromThreadDTOToThread(dto *ThreadDTO) *model.Thread {
 		User: &model.User{
 			ID:        dto.ID,
 			Name:      dto.Name,
-			SessionID: dto.SessionID,
 			CreatedAt: dto.CreatedAt,
 			UpdatedAt: dto.UpdatedAt,
 		},
+		CreatedAt: dto.CreatedAt,
+		UpdatedAt: dto.UpdatedAt,
+	}
+}
+
+// CommentDDTO is DTO of CommentD.
+type CommentDTO struct {
+	ID        uint32 `json:"id"`
+	Content   string `json:"content"`
+	ThreadID  uint32 `json:"threadId"`
+	*UserDTO  `json:"user"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// TranslateFromThreadDTOToThread translates from ThreadDTO to Thread.
+func TranslateFromCommentDTOToComment(dto *CommentDTO) *model.Comment {
+	return &model.Comment{
+		ID:      dto.ID,
+		Content: dto.Content,
+		User: &model.User{
+			ID:        dto.UserDTO.ID,
+			Name:      dto.UserDTO.Name,
+			CreatedAt: dto.CreatedAt,
+			UpdatedAt: dto.UpdatedAt,
+		},
+		ThreadID:  dto.ThreadID,
 		CreatedAt: dto.CreatedAt,
 		UpdatedAt: dto.UpdatedAt,
 	}

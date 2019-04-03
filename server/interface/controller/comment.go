@@ -4,15 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"go.uber.org/zap"
-
-	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-
-	"github.com/pkg/errors"
-
-	"github.com/gin-gonic/gin"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
 )
 
 // CommentController is the interface of CommentController.

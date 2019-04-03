@@ -29,7 +29,7 @@ type commentService struct {
 }
 
 // NewCommentService generates and returns CommentService.
-func NewCommentApplication(m DBManager, service service.CommentService, repo CommentRepository, txCloser CloseTransaction) CommentService {
+func NewCommentService(m DBManager, service service.CommentService, repo CommentRepository, txCloser CloseTransaction) CommentService {
 	return &commentService{
 		m:        m,
 		service:  service,

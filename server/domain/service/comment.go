@@ -20,10 +20,10 @@ type commentService struct {
 }
 
 // NewThreadService generates and returns ThreadService.
-func NewCommentService(repo repository.CommentRepository, m repository.SQLManager) CommentService {
+func NewCommentService(m repository.SQLManager, repo repository.CommentRepository) CommentService {
 	return &commentService{
-		repo: repo,
 		m:    m,
+		repo: repo,
 	}
 }
 

@@ -14,6 +14,7 @@ import (
 
 // CommentController is the interface of CommentController.
 type CommentController interface {
+	InitCommentAPI(g *gin.RouterGroup)
 	ListComments(g *gin.Context)
 	GetComment(g *gin.Context)
 	CreateComment(g *gin.Context)

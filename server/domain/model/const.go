@@ -25,6 +25,7 @@ const (
 	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
 	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
 	DomainModelNameThreadForDeveloper  DomainModelNameForDeveloper = "Thread"
+	DomainModelNameCommentForDeveloper DomainModelNameForDeveloper = "Comment"
 )
 
 // DomainModelNameForUser is Model name for user.
@@ -40,6 +41,7 @@ const (
 	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
 	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
 	DomainModelNameThreadForUser  DomainModelNameForUser = "スレッド"
+	DomainModelNameCommentForUser DomainModelNameForUser = "コメント"
 )
 
 // PropertyNameForDeveloper is property name for developer.
@@ -56,6 +58,7 @@ const (
 	NamePropertyForDeveloper     PropertyNameForDeveloper = "Name"
 	TitlePropertyForDeveloper    PropertyNameForDeveloper = "Title"
 	PassWordPropertyForDeveloper PropertyNameForDeveloper = "Password"
+	ThreadIDPropertyForDeveloper PropertyNameForDeveloper = "ThreadID"
 )
 
 // PropertyNameForUser is Property name for user.
@@ -104,6 +107,13 @@ const (
 const (
 	ThreadValidIDForTest   uint32 = 1
 	ThreadInValidIDForTest uint32 = 2
+)
+
+// Comment
+const (
+	CommentValidIDForTest   uint32 = 1
+	CommentInValidIDForTest uint32 = 2
+	CommentContentForTest          = "ContentForTest"
 )
 
 // error message for test

@@ -51,7 +51,7 @@ func (a *threadService) ListThreads(ctx context.Context, limit int, cursor uint3
 func (a *threadService) GetThread(ctx context.Context, id uint32) (*model.Thread, error) {
 	thread, err := a.repo.GetThreadByID(ctx, a.m, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get thread by PropertyNameForDeveloper")
+		return nil, errors.Wrap(err, "failed to get thread by id")
 	}
 
 	return thread, nil
@@ -82,11 +82,11 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
 			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
 		}
-		return nil, errors.Wrap(err, "already exist title")
+		return nil, errors.Wrap(err, "already exist id")
 	}
 
 	if _, ok := errors.Cause(err).(*model.NoSuchDataError); !ok {
-		return nil, errors.Wrap(err, "failed is already exist title")
+		return nil, errors.Wrap(err, "failed is already exist id")
 	}
 
 	id, err := a.repo.InsertThread(ctx, tx, param)
@@ -157,10 +157,10 @@ func (a *threadService) DeleteThread(ctx context.Context, id uint32) (err error)
 			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
 			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
 		}
-		return errors.Wrap(err, "does not exists PropertyNameForDeveloper")
+		return errors.Wrap(err, "does not exists id")
 	}
 	if err != nil {
-		return errors.Wrap(err, "failed to is already exist PropertyNameForDeveloper")
+		return errors.Wrap(err, "failed to is already exist id")
 	}
 
 	if err := a.repo.DeleteThread(ctx, tx, id); err != nil {

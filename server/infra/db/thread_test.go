@@ -240,7 +240,7 @@ func Test_threadRepository_GetThreadByID(t *testing.T) {
 		wantErr *model.NoSuchDataError
 	}{
 		{
-			name: "When a user specified by id exists, returns a user",
+			name: "When a thread specified by id exists, returns a thread",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -259,7 +259,7 @@ func Test_threadRepository_GetThreadByID(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "When a user specified by id does not exist, returns NoSuchDataError",
+			name: "When a thread specified by id does not exist, returns NoSuchDataError",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -295,7 +295,7 @@ func Test_threadRepository_GetThreadByID(t *testing.T) {
 			got, err := repo.GetThreadByID(tt.args.ctx, tt.args.m, tt.args.id)
 
 			if tt.wantErr != nil {
-				if !reflect.DeepEqual(err, tt.wantErr) {
+				if err.Error() != tt.wantErr.Error() {
 					t.Errorf("threadRepository.GetThreadByID() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
@@ -333,7 +333,7 @@ func Test_threadRepository_GetThreadByTitle(t *testing.T) {
 		wantErr *model.NoSuchDataError
 	}{
 		{
-			name: "When a user specified by id exists, returns a user",
+			name: "When a thread specified by id exists, returns a thread",
 			args: args{
 				ctx:   context.Background(),
 				m:     db,
@@ -352,7 +352,7 @@ func Test_threadRepository_GetThreadByTitle(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "When a user specified by id does not exist, returns NoSuchDataError",
+			name: "When a thread specified by id does not exist, returns NoSuchDataError",
 			args: args{
 				ctx:   context.Background(),
 				m:     db,
@@ -562,7 +562,7 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name: "When a user which has Name, Session_ID, Password, UpdatedAt is given, returns nil",
+			name: "When a thread which has ID, Name, Title, User, CreatedAt, UpdatedAt is given, returns nil",
 			args: args{
 				ctx: context.Background(),
 				m:   db,
@@ -670,7 +670,7 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 			err := repo.UpdateThread(tt.args.ctx, tt.args.m, tt.args.id, tt.args.thread)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
-					t.Errorf("userRepository.UpdateThread() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("threadRepository.UpdateThread() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}
 			}
@@ -700,7 +700,7 @@ func Test_threadRepository_DeleteThread(t *testing.T) {
 		wantErr     *model.RepositoryError
 	}{
 		{
-			name:        "When a user specified by id exists, returns nil",
+			name:        "When a thread specified by id exists, returns nil",
 			rowAffected: 1,
 			args: args{
 				ctx: context.Background(),

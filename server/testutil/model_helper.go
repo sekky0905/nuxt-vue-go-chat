@@ -27,3 +27,26 @@ func GenerateThreadHelper(startNum, endNum int) []*model.Thread {
 
 	return threads
 }
+
+// GenerateCommentHelper generates and returns Comment slice.
+func GenerateCommentHelper(startNum, endNum int) []*model.Comment {
+	num := endNum - startNum + 1
+
+	comments := make([]*model.Comment, num, num)
+	i := 0
+	for j := startNum; j < endNum+1; j++ {
+		comment := &model.Comment{
+			ID:       uint32(j),
+			ThreadID: uint32(j),
+			User: &model.User{
+				ID:   model.UserValidIDForTest,
+				Name: model.UserNameForTest,
+			},
+			Content: model.CommentContentForTest,
+		}
+		comments[i] = comment
+		i++
+	}
+
+	return comments
+}

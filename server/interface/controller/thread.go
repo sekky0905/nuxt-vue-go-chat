@@ -58,7 +58,7 @@ func (c *threadController) ListThreads(g *gin.Context) {
 	ctx := g.Request.Context()
 	thread, err := c.tApp.ListThreads(ctx, limit, cursor)
 	if err != nil {
-		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		ResponseAndLogError(g, errors.Wrap(err, "failed to list threads"))
 		return
 	}
 
@@ -84,7 +84,7 @@ func (c *threadController) GetThread(g *gin.Context) {
 	ctx := g.Request.Context()
 	thread, err := c.tApp.GetThread(ctx, id)
 	if err != nil {
-		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		ResponseAndLogError(g, errors.Wrap(err, "failed to get thread"))
 		return
 	}
 
@@ -105,7 +105,7 @@ func (c *threadController) CreateThread(g *gin.Context) {
 	ctx := g.Request.Context()
 	thread, err := c.tApp.CreateThread(ctx, param)
 	if err != nil {
-		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		ResponseAndLogError(g, errors.Wrap(err, "failed created thread"))
 		return
 	}
 
@@ -140,7 +140,7 @@ func (c *threadController) UpdateThread(g *gin.Context) {
 	ctx := g.Request.Context()
 	thread, err := c.tApp.UpdateThread(ctx, id, param)
 	if err != nil {
-		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		ResponseAndLogError(g, errors.Wrap(err, "failed to update thread"))
 		return
 	}
 
@@ -165,7 +165,7 @@ func (c *threadController) DeleteThread(g *gin.Context) {
 
 	ctx := g.Request.Context()
 	if err := c.tApp.DeleteThread(ctx, id); err != nil {
-		ResponseAndLogError(g, errors.Wrap(err, "failed to sign up"))
+		ResponseAndLogError(g, errors.Wrap(err, "failed to delete thread"))
 		return
 	}
 

@@ -23,6 +23,9 @@ func main() {
 	tc := initializeThreadController(dbm)
 	tc.InitThreadAPI(apiV1)
 
+	cc := initializeCommentController(dbm)
+	cc.InitCommentAPI(apiV1)
+
 	if err := router.G.Run(":8080"); err != nil {
 		panic(err.Error())
 	}
@@ -54,4 +57,16 @@ func initializeThreadController(m repository.DBManager) controller.ThreadControl
 	tApp := application.NewThreadService(m, tService, tRepo, txCloser)
 
 	return controller.NewThreadController(tApp)
+}
+
+// initializeCommentController generates and returns CommentController.
+func initializeCommentController(m repository.DBManager) controller.CommentController {
+	txCloser := db.CloseTransaction
+
+	cRepo := db.NewCommentRepository()
+	cService := service.NewCommentService(m, cRepo)
+
+	cApp := application.NewCommentService(m, cService, cRepo, txCloser)
+
+	return controller.NewCommentController(cApp)
 }

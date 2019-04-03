@@ -578,3 +578,197 @@ func Test_commentController_CreateComment(t *testing.T) {
 		})
 	}
 }
+
+func Test_commentController_UpdateComment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type fields struct {
+		tApp application.CommentService
+	}
+
+	type parameter struct {
+		id string
+	}
+
+	type args struct {
+		id      uint32
+		comment *CommentDTO
+	}
+
+	type errBody struct {
+		errCode ErrCode
+	}
+
+	type want struct {
+		statusCode int
+		body       *model.Comment
+		errBody
+	}
+
+	type mockArg struct {
+		comment *model.Comment
+	}
+
+	type mockReturns struct {
+		comment *model.Comment
+		err     error
+	}
+
+	dto := &CommentDTO{
+		ID:       model.CommentValidIDForTest,
+		ThreadID: model.ThreadValidIDForTest,
+		UserDTO: &UserDTO{
+			ID:   model.UserValidIDForTest,
+			Name: model.UserNameForTest,
+		},
+		Content: model.CommentContentForTest,
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		parameter
+		args
+		mockArg
+		mockReturns
+		want
+	}{
+		{
+			name: "When appropriate id is given and data exists, returns comment and status code 200",
+			fields: fields{
+				tApp: mock_application.NewMockCommentService(ctrl),
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			args: args{
+				id:      model.CommentValidIDForTest,
+				comment: dto,
+			},
+			mockArg: mockArg{
+				comment: TranslateFromCommentDTOToComment(dto),
+			},
+			mockReturns: mockReturns{
+				comment: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				err: nil,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				body: &model.Comment{
+					ID:       model.CommentValidIDForTest,
+					ThreadID: model.ThreadValidIDForTest,
+					User: &model.User{
+						ID:   model.UserValidIDForTest,
+						Name: model.UserNameForTest,
+					},
+					Content: model.CommentContentForTest,
+				},
+				errBody: errBody{},
+			},
+		},
+		{
+			name: "When validation error occurs, CreateComment returns nil and status code 400",
+			fields: fields{
+				tApp: mock_application.NewMockCommentService(ctrl),
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			args: args{
+				id: model.CommentValidIDForTest,
+				comment: &CommentDTO{
+					UserDTO: &UserDTO{},
+				},
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParametersValueFailure,
+				},
+			},
+		},
+		{
+			name: "When inappropriate id is given returns nil and status code 400",
+			fields: fields{
+				tApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				id: model.CommentValidIDForTest,
+			},
+			parameter: parameter{
+				id: "a",
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParametersValueFailure,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			if !ok {
+				t.Fatal("failed to assert MockCommentService")
+			}
+
+			if tt.want.statusCode != http.StatusBadRequest {
+				at.EXPECT().UpdateComment(context.Background(), tt.args.id, tt.mockArg.comment).Return(tt.mockReturns.comment, tt.mockReturns.err)
+			}
+
+			tc := NewCommentController(tt.fields.tApp)
+			r := gin.New()
+
+			r.PUT("/threads/:threadId/comments/:id", tc.UpdateComment)
+
+			rec := httptest.NewRecorder()
+
+			b, err := json.Marshal(tt.args.comment)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("/threads/1/comments/%s", tt.parameter.id), bytes.NewBuffer(b))
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			if tt.want.errBody.errCode == "" {
+				bBody := rec.Body.Bytes()
+				comment := &model.Comment{}
+				if err := json.Unmarshal(bBody, comment); err != nil {
+					t.Fatal(err)
+					return
+				}
+
+				if !reflect.DeepEqual(comment, tt.want.body) {
+					t.Errorf("body = %#v, want %#v", comment, tt.want.body)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+			}
+		})
+	}
+}

@@ -137,6 +137,37 @@ func (c commentController) CreateComment(g *gin.Context) {
 
 // UpdateComment updates Comment.
 func (c commentController) UpdateComment(g *gin.Context) {
+	dto := &CommentDTO{}
+	if err := g.BindJSON(dto); err != nil {
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to bind json"))
+		return
+	}
+
+	idInt, err := strconv.Atoi(g.Param("id"))
+	if err != nil {
+		err = &model.InvalidParamError{
+			BaseErr:                  err,
+			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+			PropertyValue:            g.Param("id"),
+		}
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
+		return
+	}
+
+	id := uint32(idInt)
+
+	param := TranslateFromCommentDTOToComment(dto)
+
+	ctx := g.Request.Context()
+	thread, err := c.cApp.UpdateComment(ctx, id, param)
+	if err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to update comment"))
+		return
+	}
+
+	g.JSON(http.StatusOK, thread)
 
 }
 

@@ -173,4 +173,25 @@ func (c commentController) UpdateComment(g *gin.Context) {
 
 // DeleteComment deletes Comment.
 func (c commentController) DeleteComment(g *gin.Context) {
+	idInt, err := strconv.Atoi(g.Param("id"))
+	if err != nil {
+		err = &model.InvalidParamError{
+			BaseErr:                  err,
+			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+			PropertyValue:            g.Param("id"),
+		}
+		err = handleValidatorErr(err)
+		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
+		return
+	}
+
+	id := uint32(idInt)
+
+	ctx := g.Request.Context()
+	if err := c.cApp.DeleteComment(ctx, id); err != nil {
+		ResponseAndLogError(g, errors.Wrap(err, "failed to delete comment"))
+		return
+	}
+
+	g.JSON(http.StatusOK, nil)
 }

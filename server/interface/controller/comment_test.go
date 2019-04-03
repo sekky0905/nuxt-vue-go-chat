@@ -27,7 +27,7 @@ func Test_commentController_ListComments(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		tApp application.CommentService
+		cApp application.CommentService
 	}
 	type args struct {
 		threadID uint32
@@ -67,7 +67,7 @@ func Test_commentController_ListComments(t *testing.T) {
 		{
 			name: "When appropriate limit and commit are given and data exists, returns commentList and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				threadID: model.ThreadValidIDForTest,
@@ -100,7 +100,7 @@ func Test_commentController_ListComments(t *testing.T) {
 		{
 			name: "When inappropriate limit is given and data exists, returns commentList which has 20 data and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				threadID: model.ThreadValidIDForTest,
@@ -133,7 +133,7 @@ func Test_commentController_ListComments(t *testing.T) {
 		{
 			name: "When inappropriate cursor is given and data exists, returns commentList which has 1~21 data and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				threadID: model.ThreadValidIDForTest,
@@ -166,7 +166,7 @@ func Test_commentController_ListComments(t *testing.T) {
 		{
 			name: "When inappropriate cursor is given and data exists, returns error status code 404",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				threadID: model.ThreadValidIDForTest,
@@ -197,14 +197,14 @@ func Test_commentController_ListComments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			at, ok := tt.fields.cApp.(*mock_application.MockCommentService)
 			if !ok {
 				t.Fatal("failed to assert MockCommentService")
 			}
 
 			at.EXPECT().ListComments(context.Background(), tt.args.threadID, tt.args.limit, tt.args.cursor).Return(tt.mockReturns.list, tt.mockReturns.err)
 
-			tc := NewCommentController(tt.fields.tApp)
+			tc := NewCommentController(tt.fields.cApp)
 			r := gin.New()
 
 			r.GET("/threads/:threadId/comments", tc.ListComments)
@@ -249,7 +249,7 @@ func Test_commentController_GetComment(t *testing.T) {
 	defer ctrl.Finish()
 
 	type fields struct {
-		tApp application.CommentService
+		cApp application.CommentService
 	}
 	type args struct {
 		threadID uint32
@@ -287,7 +287,7 @@ func Test_commentController_GetComment(t *testing.T) {
 		{
 			name: "When appropriate id is given and data exists, returns comment and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				threadID: model.ThreadValidIDForTest,
@@ -326,7 +326,7 @@ func Test_commentController_GetComment(t *testing.T) {
 		{
 			name: "When inappropriate id is given returns nil and status code 400",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			parameter: parameter{
 				threadID: string(model.ThreadValidIDForTest),
@@ -342,7 +342,7 @@ func Test_commentController_GetComment(t *testing.T) {
 		{
 			name: "When some error occurs, GetComment returns nil and status code 404",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				id: model.CommentInValidIDForTest,
@@ -369,7 +369,7 @@ func Test_commentController_GetComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			at, ok := tt.fields.cApp.(*mock_application.MockCommentService)
 			if !ok {
 				t.Fatal("failed to assert MockCommentService")
 			}
@@ -378,7 +378,7 @@ func Test_commentController_GetComment(t *testing.T) {
 				at.EXPECT().GetComment(context.Background(), tt.args.id).Return(tt.mockReturns.comment, tt.mockReturns.err)
 			}
 
-			tc := NewCommentController(tt.fields.tApp)
+			tc := NewCommentController(tt.fields.cApp)
 			r := gin.New()
 
 			r.GET("/threads/:threadId/comments/:id", tc.GetComment)
@@ -423,7 +423,7 @@ func Test_commentController_CreateComment(t *testing.T) {
 	defer ctrl.Finish()
 
 	type fields struct {
-		tApp application.CommentService
+		cApp application.CommentService
 	}
 	type args struct {
 		comment *CommentDTO
@@ -469,7 +469,7 @@ func Test_commentController_CreateComment(t *testing.T) {
 		{
 			name: "When appropriate id is given and data exists, returns comment and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				comment: dto,
@@ -506,7 +506,7 @@ func Test_commentController_CreateComment(t *testing.T) {
 		{
 			name: "When validation error occurs, CreateComment returns nil and status code 400",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				comment: &CommentDTO{
@@ -524,7 +524,7 @@ func Test_commentController_CreateComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			at, ok := tt.fields.cApp.(*mock_application.MockCommentService)
 			if !ok {
 				t.Fatal("failed to assert MockCommentService")
 			}
@@ -533,7 +533,7 @@ func Test_commentController_CreateComment(t *testing.T) {
 				at.EXPECT().CreateComment(context.Background(), tt.mockArg.comment).Return(tt.mockReturns.comment, tt.mockReturns.err)
 			}
 
-			tc := NewCommentController(tt.fields.tApp)
+			tc := NewCommentController(tt.fields.cApp)
 			r := gin.New()
 
 			r.POST("/threads/:threadId/comments", tc.CreateComment)
@@ -584,7 +584,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 	defer ctrl.Finish()
 
 	type fields struct {
-		tApp application.CommentService
+		cApp application.CommentService
 	}
 
 	type parameter struct {
@@ -637,7 +637,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 		{
 			name: "When appropriate id is given and data exists, returns comment and status code 200",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			parameter: parameter{
 				id: "1",
@@ -678,7 +678,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 		{
 			name: "When validation error occurs, CreateComment returns nil and status code 400",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			parameter: parameter{
 				id: "1",
@@ -699,7 +699,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 		{
 			name: "When inappropriate id is given returns nil and status code 400",
 			fields: fields{
-				tApp: mock_application.NewMockCommentService(ctrl),
+				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			args: args{
 				id: model.CommentValidIDForTest,
@@ -718,7 +718,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, ok := tt.fields.tApp.(*mock_application.MockCommentService)
+			at, ok := tt.fields.cApp.(*mock_application.MockCommentService)
 			if !ok {
 				t.Fatal("failed to assert MockCommentService")
 			}
@@ -727,7 +727,7 @@ func Test_commentController_UpdateComment(t *testing.T) {
 				at.EXPECT().UpdateComment(context.Background(), tt.args.id, tt.mockArg.comment).Return(tt.mockReturns.comment, tt.mockReturns.err)
 			}
 
-			tc := NewCommentController(tt.fields.tApp)
+			tc := NewCommentController(tt.fields.cApp)
 			r := gin.New()
 
 			r.PUT("/threads/:threadId/comments/:id", tc.UpdateComment)
@@ -760,6 +760,151 @@ func Test_commentController_UpdateComment(t *testing.T) {
 
 				if !reflect.DeepEqual(comment, tt.want.body) {
 					t.Errorf("body = %#v, want %#v", comment, tt.want.body)
+					return
+				}
+			} else {
+				sBody := rec.Body.String()
+				if !strings.Contains(sBody, string(tt.want.errBody.errCode)) {
+					t.Errorf("body = %#v, want %#v", sBody, tt.want.errBody.errCode)
+					return
+				}
+			}
+		})
+	}
+}
+
+func Test_commentController_DeleteComment(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	type fields struct {
+		cApp application.CommentService
+	}
+	type args struct {
+		id uint32
+	}
+
+	type parameter struct {
+		id string
+	}
+
+	type errBody struct {
+		errCode ErrCode
+	}
+
+	type want struct {
+		statusCode int
+		errBody
+	}
+
+	type mockReturns struct {
+		err error
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		args
+		parameter
+		mockReturns
+		want
+	}{
+		{
+			name: "When appropriate id is given and data exists, returns thread and status code 200",
+			fields: fields{
+				cApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				id: model.CommentValidIDForTest,
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			mockReturns: mockReturns{
+				err: nil,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				errBody:    errBody{},
+			},
+		},
+		{
+			name: "When inappropriate id is given returns nil and status code 400",
+			fields: fields{
+				cApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				id: model.CommentValidIDForTest,
+			},
+			parameter: parameter{
+				id: "a",
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				errBody: errBody{
+					errCode: InvalidParametersValueFailure,
+				},
+			},
+		},
+		{
+			name: "When some error occurs, GetComment returns nil and status code 404",
+			fields: fields{
+				cApp: mock_application.NewMockCommentService(ctrl),
+			},
+			args: args{
+				id: model.CommentValidIDForTest,
+			},
+			parameter: parameter{
+				id: "1",
+			},
+			mockReturns: mockReturns{
+				err: &model.NoSuchDataError{
+					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
+					PropertyValue:            "",
+				},
+			},
+			want: want{
+				statusCode: http.StatusNotFound,
+				errBody: errBody{
+					errCode: NoSuchDataFailure,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			at, ok := tt.fields.cApp.(*mock_application.MockCommentService)
+			if !ok {
+				t.Fatal("failed to assert MockCommentService")
+			}
+
+			if tt.want.statusCode != http.StatusBadRequest {
+				at.EXPECT().DeleteComment(context.Background(), tt.args.id).Return(tt.mockReturns.err)
+			}
+
+			tc := NewCommentController(tt.fields.cApp)
+			r := gin.New()
+
+			r.DELETE("/threads/:threadId/comments/:id", tc.DeleteComment)
+
+			rec := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("/threads/1/comments/%s", tt.parameter.id), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ServeHTTP(rec, req)
+
+			if rec.Code != tt.want.statusCode {
+				t.Errorf("status code = %v, want %v", rec.Code, tt.want.statusCode)
+				return
+			}
+
+			if tt.want.errBody.errCode == "" {
+				bBody := rec.Body.Bytes()
+				thread := &model.Comment{}
+				if err := json.Unmarshal(bBody, thread); err != nil {
+					t.Fatal(err)
 					return
 				}
 			} else {

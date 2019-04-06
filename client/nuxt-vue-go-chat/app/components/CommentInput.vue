@@ -3,7 +3,7 @@
     <v-dialog v-model="dialogVisible" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Thread Title</span>
+          <span class="headline">Comment</span>
         </v-card-title>
         <v-card-text>
           <form>
@@ -12,9 +12,9 @@
               box
               label="Comment"
               auto-grow
-              :error-messages="titleErrors"
-              @input="$v.title.$touch()"
-              @blur="$v.title.$touch()"
+              :error-messages="contentError"
+              @input="$v.content.$touch()"
+              @blur="$v.content.$touch()"
             >
             </v-textarea>
           </form>

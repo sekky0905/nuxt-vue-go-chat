@@ -69,7 +69,7 @@ export default {
     async submitForm() {
       this.closeDialogState()
       const payload = {
-        title:  this.title,
+        title: this.title,
         user: this.user
       }
       try {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/sekky0905/go-vue-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"go.uber.org/zap"

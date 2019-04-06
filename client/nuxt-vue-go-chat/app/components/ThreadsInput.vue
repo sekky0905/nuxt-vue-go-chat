@@ -1,29 +1,31 @@
 <template>
   <div>
     <v-dialog v-model="dialogVisible" persistent max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Thread Title</span>
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="title"
-            type="text"
-            :error-messages="titleErrors"
-            :counter="10"
-            label="Name"
-            required
-            @input="$v.title.$touch()"
-            @blur="$v.title.$touch()"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="info" @click="submitForm('formData')">Create</v-btn>
-          <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
-          <v-btn color="warning" @click="resetForm('formData')">Reset</v-btn>
-        </v-card-actions>
-      </v-card>
+      <v-form>
+        <v-card>
+          <v-card-title>
+            <span class="headline">Thread Title</span>
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              v-model="title"
+              type="text"
+              :error-messages="titleErrors"
+              :counter="10"
+              label="Title"
+              required
+              @input="$v.title.$touch()"
+              @blur="$v.title.$touch()"
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="info" @click="submit()">Create</v-btn>
+            <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
+            <v-btn color="warning" @click="clear()">Clear</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
     </v-dialog>
   </div>
 </template>
@@ -35,16 +37,14 @@ import { mapGetters, mapActions } from 'vuex'
 import { SAVE_THREAD, CHANGE_IS_DIALOG_VISIBLE } from '../store/action-types'
 export default {
   mixins: [validationMixin],
-  data() {
-    return {
-      title: '',
-      snackbar: {
-        isOpen: false,
-        color: '',
-        text: ''
-      }
+  data: () => ({
+    title: '',
+    snackbar: {
+      isOpen: false,
+      color: '',
+      text: ''
     }
-  },
+  }),
   validations: {
     title: { required, minLength: minLength(1), maxLength: maxLength(20) }
   },
@@ -66,14 +66,13 @@ export default {
     ...mapGetters(['user'])
   },
   methods: {
-    async submitForm() {
-      this.closeDialogState()
+    async submit() {
       const payload = {
         title: this.title,
         user: this.user
       }
       try {
-        console.log(` payload: payload => ${payload}`)
+        console.log(` this.title => ${this.title}`)
         await this.SAVE_THREAD({ payload: payload })
         this.snackbar.color = 'success'
         this.snackbar.text = `success create 【${this.title}】thread`
@@ -83,12 +82,14 @@ export default {
         this.snackbar.text = 'fail sign up\nsystem error occur'
         this.snackbar.isOpen = true
       }
-      this.title = ''
+      this.closeDialogState()
     },
-    resetForm() {
+    clear() {
+      this.$v.$reset()
       this.title = ''
     },
     closeDialogState() {
+      this.clear()
       this.CHANGE_IS_DIALOG_VISIBLE({ dialogState: this.dialogVisible })
     },
     ...mapActions('threads', [SAVE_THREAD, CHANGE_IS_DIALOG_VISIBLE])

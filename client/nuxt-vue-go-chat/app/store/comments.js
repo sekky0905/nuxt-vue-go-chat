@@ -47,8 +47,8 @@ export const mutations = {
     state.commentList.comments.push(comment)
   },
   [UPDATE_COMMENT](state, { comment }) {
-    state.commentList.comments = state.commentList.comments.map(
-      t => (t.id === comment.id ? comment : t)
+    state.commentList.comments = state.commentList.comments.map(t =>
+      t.id === comment.id ? comment : t
     )
   },
   [REMOVE_COMMENT](state, { id }) {

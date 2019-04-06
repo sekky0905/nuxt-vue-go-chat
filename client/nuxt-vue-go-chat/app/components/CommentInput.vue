@@ -1,7 +1,7 @@
 <template>
   <div>
     <form>
-      <v-textarea name="content" box label="Comment" auto-grow></v-textarea>
+      <v-textarea v-model="content" box label="Comment" auto-grow></v-textarea>
       <v-btn @click="submit">Submit</v-btn>
       <v-btn @click="clear">Clear</v-btn>
     </form>
@@ -46,12 +46,12 @@ export default {
       this.$v.$touch()
 
       const payload = {
+        threadId: Number(this.$route.params.id),
+        content: this.content,
         user: {
           id: this.user.id,
           name: this.user.name
-        },
-        threadId: Number(this.$route.params.id),
-        ...this.content
+        }
       }
 
       try {
@@ -65,7 +65,7 @@ export default {
         this.snackbar.isOpen = true
       }
 
-      this.formData.content = ''
+      this.content = ''
     },
     clear() {
       this.$v.$reset()

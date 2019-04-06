@@ -3,6 +3,9 @@ package controller
 import (
 	"time"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+	"go.uber.org/zap"
+
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 )
 
@@ -63,6 +66,7 @@ type CommentDTO struct {
 
 // TranslateFromThreadDTOToThread translates from ThreadDTO to Thread.
 func TranslateFromCommentDTOToComment(dto *CommentDTO) *model.Comment {
+	logger.Logger.Info("CO", zap.String("content", dto.Content))
 	return &model.Comment{
 		ID:      dto.ID,
 		Content: dto.Content,

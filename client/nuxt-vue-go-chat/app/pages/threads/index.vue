@@ -22,7 +22,7 @@
           </v-tooltip>
         </template>
         <template v-slot:items="props">
-          <td class="text-xs-right" @click="redirectToComment">{{ props.item.title }}</td>
+          <td class="text-xs-right" @click="redirectToComment(props.item)">{{ props.item.title }}</td>
           <td class="text-xs-right">{{ props.item.user.name }}</td>
           <td class="text-xs-right">{{ props.item.createdAt }}</td>
         </template>
@@ -109,7 +109,7 @@ export default {
   },
   methods: {
     redirectToComment(thread) {
-      this.$router.push(`/threads/${thread.id}`)
+      this.$router.push(`/threads/${thread.id}/comments`)
     },
     async listMore(id) {
       try {

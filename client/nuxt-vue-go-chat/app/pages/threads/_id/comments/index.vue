@@ -49,7 +49,7 @@
     LIST_COMMENTS,
     LIST_COMMENTS_MORE,
     DELETE_COMMENT
-  } from '../../../store/action-types'
+  } from '../../../../store/action-types'
   export default {
     name: 'Index',
     components: {

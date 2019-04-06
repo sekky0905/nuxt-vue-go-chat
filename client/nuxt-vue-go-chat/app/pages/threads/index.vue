@@ -8,11 +8,15 @@
     </div>
 
     <div class="list">
-      <v-data-table :headers="headers" :items="showThreads"  :rows-per-page-items="[10, 20, 30, 40]">
+      <v-data-table
+        :headers="headers"
+        :items="showThreads"
+        :rows-per-page-items="[10, 20, 30, 40]"
+      >
         <template slot="headerCell" slot-scope="props">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <span v-on="on" style="color: #64B5F6">
+              <span style="color: #64B5F6" v-on="on">
                 {{ props.header.text }}
               </span>
             </template>
@@ -22,9 +26,9 @@
           </v-tooltip>
         </template>
         <template v-slot:items="props">
-          <td  @click="redirectToComment(props.item)">{{ props.item.title }}</td>
-          <td >{{ props.item.user.name }}</td>
-          <td >{{ props.item.createdAt }}</td>
+          <td @click="redirectToComment(props.item)">{{ props.item.title }}</td>
+          <td>{{ props.item.user.name }}</td>
+          <td>{{ props.item.createdAt }}</td>
         </template>
       </v-data-table>
     </div>
@@ -35,7 +39,6 @@
 import moment from '~/plugins/moment'
 import ThreadsInput from '~/components/ThreadsInput'
 import { mapGetters, mapActions } from 'vuex'
-import InfiniteLoading from 'vue-infinite-loading'
 import {
   LIST_THREADS,
   LIST_THREADS_MORE,
@@ -43,8 +46,7 @@ import {
 } from '../../store/action-types'
 export default {
   components: {
-    ThreadsInput,
-    InfiniteLoading
+    ThreadsInput
   },
 
   data() {

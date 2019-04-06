@@ -5,7 +5,8 @@ import {
   ADD_COMMENT,
   UPDATE_COMMENT,
   REMOVE_COMMENT,
-  CLEAR_COMMENTS
+  CLEAR_COMMENTS,
+  SET_IS_DIALOG_VISIBLE
 } from './mutation-types'
 
 import {
@@ -13,7 +14,8 @@ import {
   LIST_COMMENTS_MORE,
   SAVE_COMMENT,
   EDIT_COMMENT,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  CHANGE_IS_DIALOG_VISIBLE
 } from './action-types'
 
 export const state = () => ({
@@ -21,12 +23,14 @@ export const state = () => ({
     comments: [],
     hasNext: false,
     cursor: ''
-  }
+  },
+  isDialogVisible: false
 })
 
 export const getters = {
   commentList: state => state.commentList,
-  comments: state => state.commentList.comments
+  comments: state => state.commentList.comments,
+  isDialogVisible: state => state.isDialogVisible
 }
 
 export const mutations = {
@@ -62,6 +66,10 @@ export const mutations = {
       hasNext: false,
       cursor: ''
     }
+  },
+  [SET_IS_DIALOG_VISIBLE](state, { dialogState }) {
+    console.log(`[SET_IS_DIALOG_VISIBLE] =${dialogState}`)
+    state.isDialogVisible = !dialogState
   }
 }
 
@@ -102,5 +110,9 @@ export const actions = {
   async [DELETE_COMMENT]({ commit }, { threadId, id }) {
     await this.$axios.$delete(`threads/${threadId}/comments/${id}`)
     commit(REMOVE_COMMENT, { id: id })
+  },
+
+  [CHANGE_IS_DIALOG_VISIBLE]({ commit }, { dialogState }) {
+    commit(SET_IS_DIALOG_VISIBLE, { dialogState: dialogState })
   }
 }

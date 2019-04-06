@@ -4,7 +4,7 @@
       <ThreadsInput />
     </div>
     <div class="fixed">
-      <v-btn color="warning" @click="removeButton()">Create</v-btn>
+      <v-btn color="success" @click="removeButton()">Create</v-btn>
     </div>
 
     <div class="list">
@@ -131,8 +131,8 @@ export default {
 /* Fix button position */
 .fixed {
   position: fixed;
-  top: 40%;
-  right: 30px;
+  top: 90%;
+  right: 10%;
   z-index: 100;
 }
 .list {

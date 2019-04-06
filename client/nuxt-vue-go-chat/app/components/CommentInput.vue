@@ -1,10 +1,32 @@
 <template>
   <div>
-    <form>
-      <v-textarea v-model="content" box label="Comment" auto-grow></v-textarea>
-      <v-btn @click="submit">Submit</v-btn>
-      <v-btn @click="clear">Clear</v-btn>
-    </form>
+    <v-dialog v-model="dialogVisible" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Thread Title</span>
+        </v-card-title>
+        <v-card-text>
+          <form>
+            <v-textarea
+              v-model="content"
+              box
+              label="Comment"
+              auto-grow
+              :error-messages="titleErrors"
+              @input="$v.title.$touch()"
+              @blur="$v.title.$touch()"
+            >
+            </v-textarea>
+          </form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="info" @click="submit">Create</v-btn>
+          <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
+          <v-btn color="warning" @click="clear()">Clear</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -12,7 +34,7 @@
 import { validationMixin } from 'vuelidate'
 import { required, minLength, maxLength } from 'vuelidate/lib/validators'
 import { mapGetters, mapActions } from 'vuex'
-import { SAVE_COMMENT } from '../store/action-types'
+import { SAVE_COMMENT, CHANGE_IS_DIALOG_VISIBLE } from '../store/action-types'
 export default {
   name: 'CommentInput',
   mixins: [validationMixin],
@@ -29,6 +51,9 @@ export default {
     }
   }),
   computed: {
+    dialogVisible() {
+      return this.isDialogVisible
+    },
     contentError() {
       const errors = []
       if (!this.$v.content.$dirty) return errors
@@ -39,7 +64,8 @@ export default {
       !this.$v.content.required && errors.push('Content is required.')
       return errors
     },
-    ...mapGetters(['user'])
+    ...mapGetters(['user']),
+    ...mapGetters('comments', ['isDialogVisible'])
   },
   methods: {
     async submit(f) {
@@ -65,13 +91,17 @@ export default {
         this.snackbar.isOpen = true
       }
 
-      this.content = ''
+      this.clear()
     },
     clear() {
       this.$v.$reset()
       this.content = ''
     },
-    ...mapActions('comments', [SAVE_COMMENT])
+    closeDialogState() {
+      this.clear()
+      this.CHANGE_IS_DIALOG_VISIBLE({ dialogState: this.dialogVisible })
+    },
+    ...mapActions('comments', [SAVE_COMMENT, CHANGE_IS_DIALOG_VISIBLE])
   }
 }
 </script>

@@ -1,12 +1,12 @@
 <template>
   <div>
     <v-dialog v-model="dialogVisible" persistent max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Comment</span>
-        </v-card-title>
-        <v-card-text>
-          <form>
+      <v-form>
+        <v-card>
+          <v-card-title>
+            <span class="headline">Comment</span>
+          </v-card-title>
+          <v-card-text>
             <v-textarea
               v-model="content"
               box
@@ -17,15 +17,15 @@
               @blur="$v.content.$touch()"
             >
             </v-textarea>
-          </form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="info" @click="submit">Create</v-btn>
-          <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
-          <v-btn color="warning" @click="clear()">Clear</v-btn>
-        </v-card-actions>
-      </v-card>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="info" @click="submit">Create</v-btn>
+            <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
+            <v-btn color="warning" @click="clear()">Clear</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
     </v-dialog>
   </div>
 </template>
@@ -91,7 +91,7 @@ export default {
         this.snackbar.isOpen = true
       }
 
-      this.clear()
+      this.closeDialogState()
     },
     clear() {
       this.$v.$reset()

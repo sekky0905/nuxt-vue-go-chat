@@ -26,9 +26,11 @@
           </v-tooltip>
         </template>
         <template v-slot:items="props">
-          <td @click="redirectToComment(props.item)">{{ props.item.title }}</td>
-          <td>{{ props.item.user.name }}</td>
-          <td>{{ props.item.createdAt }}</td>
+          <tr @click="redirectToComment(props.item)">
+            <td>{{ props.item.title }}</td>
+            <td>{{ props.item.user.name }}</td>
+            <td>{{ props.item.createdAt }}</td>
+          </tr>
         </template>
       </v-data-table>
     </div>

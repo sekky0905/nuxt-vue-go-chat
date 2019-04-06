@@ -12,10 +12,14 @@
         <div v-if="isMyComment(comment.user.id)">
           <div class="my-comment">
             <div>
-              <span> {{ comment.user.name }}</span>
+              <span class="comment-info">
+                {{ comment.user.name }}: {{ comment.createdAt }}
+              </span>
             </div>
             <span>
-              <v-btn @click="removeComment(comment.id)">clear</v-btn>
+              <v-icon color="red darken-1" @click="removeComment(comment.id)"
+                >delete_forever</v-icon
+              >
             </span>
             <p>{{ comment.content }}</p>
           </div>
@@ -25,7 +29,9 @@
           <div class="other-comment">
             <div class="chatting">
               <div>
-                <span> {{ comment.user.name }}</span>
+                <span class="comment-info">
+                  {{ comment.user.name }}: {{ comment.createdAt }}
+                </span>
               </div>
               <div class="says">
                 <p>{{ comment.content }}</p>
@@ -60,14 +66,6 @@ export default {
     CommentInput,
     InfiniteLoading
   },
-  async asyncData({ store, params }) {
-    console.log(`asyncDataのrouterのparams => ${JSON.stringify(params)}`)
-    try {
-      await store.dispatch(`comments/${LIST_COMMENTS}`, { threadId: params.id })
-    } catch (e) {
-      console.log(`comments のe==> ${JSON.stringify(e)}`)
-    }
-  },
   computed: {
     existsData() {
       return this.commentList && this.commentList.length !== 0
@@ -91,6 +89,14 @@ export default {
     },
     ...mapGetters(['user']),
     ...mapGetters('comments', ['comments', 'commentList', 'isDialogVisible'])
+  },
+  async asyncData({ store, params }) {
+    console.log(`asyncDataのrouterのparams => ${JSON.stringify(params)}`)
+    try {
+      await store.dispatch(`comments/${LIST_COMMENTS}`, { threadId: params.id })
+    } catch (e) {
+      console.log(`comments のe==> ${JSON.stringify(e)}`)
+    }
   },
   methods: {
     async removeComment(id) {
@@ -158,11 +164,11 @@ export default {
 .says {
   display: inline-block;
   position: relative;
-  margin: 0 0 0 50px;
+  margin: 0 0 0 10px;
   padding: 10px;
   max-width: 250px;
   border-radius: 12px;
-  background: #edf1ee;
+  background: #37474f;
 }
 .says:after {
   content: '';
@@ -171,7 +177,7 @@ export default {
   top: 3px;
   left: -19px;
   border: 8px solid transparent;
-  border-right: 18px solid #edf1ee;
+  border-right: 18px solid #37474f;
   -ms-transform: rotate(35deg);
   -webkit-transform: rotate(35deg);
   transform: rotate(35deg);
@@ -222,5 +228,10 @@ export default {
 }
 .list {
   z-index: 50;
+}
+
+.comment-info {
+  color: #37474f;
+  border-bottom: solid 1px #37474f;
 }
 </style>

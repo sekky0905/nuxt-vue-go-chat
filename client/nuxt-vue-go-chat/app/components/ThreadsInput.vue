@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     async submit() {
-      this.closeDialogState()
       const payload = {
         title: this.title,
         user: this.user
@@ -83,7 +82,7 @@ export default {
         this.snackbar.text = 'fail sign up\nsystem error occur'
         this.snackbar.isOpen = true
       }
-      this.clear()
+      this.closeDialogState()
     },
     clear() {
       this.$v.$reset()

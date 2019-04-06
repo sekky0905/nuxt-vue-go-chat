@@ -114,7 +114,7 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m SQLManager,
 }
 
 // list gets and returns list of records.
-func (repo *commentRepository) list(ctx context.Context, m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
+func (repo *commentRepository) list(ctx context.Context, m repository.DBManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, errors.WithStack(repo.ErrorMsg(method, err))

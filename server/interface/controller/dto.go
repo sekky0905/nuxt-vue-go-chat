@@ -57,8 +57,8 @@ func TranslateFromThreadDTOToThread(dto *ThreadDTO) *model.Thread {
 // CommentDDTO is DTO of CommentD.
 type CommentDTO struct {
 	ID        uint32 `json:"id"`
-	Content   string `json:"content"`
-	ThreadID  uint32 `json:"threadId"`
+	Content   string `json:"content" binding:"required"`
+	ThreadID  uint32 `json:"threadId" binding:"required"`
 	*UserDTO  `json:"user"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

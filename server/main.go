@@ -20,11 +20,13 @@ func main() {
 	ac := initializeAuthenticationController(dbm)
 	ac.InitAuthenticationAPI(apiV1)
 
-	tc := initializeThreadController(dbm)
-	tc.InitThreadAPI(apiV1)
+	threadRouting := apiV1.Group("/threads")
 
 	cc := initializeCommentController(dbm)
-	cc.InitCommentAPI(apiV1)
+	cc.InitCommentAPI(threadRouting)
+
+	tc := initializeThreadController(dbm)
+	tc.InitThreadAPI(threadRouting)
 
 	if err := router.G.Run(":8080"); err != nil {
 		panic(err.Error())

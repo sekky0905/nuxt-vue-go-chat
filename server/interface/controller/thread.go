@@ -34,11 +34,11 @@ func NewThreadController(tApp application.ThreadService) ThreadController {
 
 // InitThreadAPI initialize Thread API.
 func (c *threadController) InitThreadAPI(g *gin.RouterGroup) {
-	g.GET("/threads", c.ListThreads)
-	g.GET("/threads/:id", c.GetThread)
-	g.POST("/threads", c.CreateThread)
-	g.PUT("/threads/:id", c.UpdateThread)
-	g.DELETE("/threads/:id", c.DeleteThread)
+	g.GET("", c.ListThreads)
+	g.GET("/:threadId", c.GetThread)
+	g.POST("", c.CreateThread)
+	g.PUT("/:threadId", c.UpdateThread)
+	g.DELETE("/:threadId", c.DeleteThread)
 }
 
 // ListThreads gets ThreadList.

@@ -29,11 +29,11 @@ type commentController struct {
 
 // InitCommentAPI initialize Comment API.
 func (c *commentController) InitCommentAPI(g *gin.RouterGroup) {
-	g.GET("/threads/:threadId/comments", c.ListComments)
-	g.GET("/threads/:threadId/comments/:id", c.GetComment)
-	g.POST("/threads/:threadId/comments", c.CreateComment)
-	g.PUT("/threads/:threadId/comments/:id", c.UpdateComment)
-	g.DELETE("/threads/:threadId/comments/:id", c.DeleteComment)
+	g.GET("/:threadId/comments", c.ListComments)
+	g.GET("/:threadId/comments/:id", c.GetComment)
+	g.POST("/:threadId/comments", c.CreateComment)
+	g.PUT("/:threadId/comments/:id", c.UpdateComment)
+	g.DELETE("/:threadId/comments/:id", c.DeleteComment)
 }
 
 // NewCommentController generates and returns CommentController.

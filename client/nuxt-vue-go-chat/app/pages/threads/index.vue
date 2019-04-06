@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%">
     <div>
       <ThreadsInput />
     </div>
@@ -8,30 +8,25 @@
     </div>
 
     <div class="list">
-      <v-data-table :headers="headers" :items="showThreads" class="elevation-1">
+      <v-data-table :headers="headers" :items="showThreads"  :rows-per-page-items="[10, 20, 30, 40]">
         <template slot="headerCell" slot-scope="props">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <span v-on="on">
+              <span v-on="on" style="color: #64B5F6">
                 {{ props.header.text }}
               </span>
             </template>
-            <span>
+            <span style="color: #64B5F6">
               {{ props.header.text }}
             </span>
           </v-tooltip>
         </template>
         <template v-slot:items="props">
-          <td class="text-xs-right" @click="redirectToComment(props.item)">{{ props.item.title }}</td>
-          <td class="text-xs-right">{{ props.item.user.name }}</td>
-          <td class="text-xs-right">{{ props.item.createdAt }}</td>
+          <td  @click="redirectToComment(props.item)">{{ props.item.title }}</td>
+          <td >{{ props.item.user.name }}</td>
+          <td >{{ props.item.createdAt }}</td>
         </template>
       </v-data-table>
-    </div>
-    <div v-if="existsMore">
-      <infinite-loading
-        @infinite="listMore(showThreads[showThreads.length - 1].id)"
-      />
     </div>
   </div>
 </template>

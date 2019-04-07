@@ -148,7 +148,7 @@ export default {
   text-align: right;
   font-size: 15px;
   /* 背景の色 */
-  background: #c0c4cc;
+  background: #424242;
   opacity: 0.7;
 }
 /* 他人のコメント */
@@ -168,7 +168,7 @@ export default {
   padding: 10px;
   max-width: 250px;
   border-radius: 12px;
-  background: #37474f;
+  background: #bdbdbd;
 }
 .says:after {
   content: '';
@@ -177,7 +177,7 @@ export default {
   top: 3px;
   left: -19px;
   border: 8px solid transparent;
-  border-right: 18px solid #37474f;
+  border-right: 18px solid #bdbdbd;
   -ms-transform: rotate(35deg);
   -webkit-transform: rotate(35deg);
   transform: rotate(35deg);
@@ -231,7 +231,7 @@ export default {
 }
 
 .comment-info {
-  color: #37474f;
-  border-bottom: solid 1px #37474f;
+  color: #76ff03;
+  border-bottom: solid 1px #76ff03;
 }
 </style>

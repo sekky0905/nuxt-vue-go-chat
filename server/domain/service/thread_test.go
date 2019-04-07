@@ -23,10 +23,10 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 
 	type fields struct {
 		repo repository.ThreadRepository
-		m    repository.DBManager
 	}
 	type args struct {
 		ctx context.Context
+		m   repository.SQLManager
 		id  uint32
 	}
 
@@ -47,10 +47,10 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified thread already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.ThreadValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -73,10 +73,10 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified thread doesn't already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.ThreadInValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -90,10 +90,10 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 			name: "When some error has occurred, return false and error.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.ThreadInValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -108,12 +108,11 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &threadService{
 				repo: mock,
-				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetThreadByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.returnArgs.thread, tt.returnArgs.err)
+			mock.EXPECT().GetThreadByID(tt.args.ctx, tt.args.m, tt.args.id).Return(tt.returnArgs.thread, tt.returnArgs.err)
 
-			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.id)
+			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.m, tt.args.id)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("threadService.IsAlreadyExistID() error = %v, wantErr %v", err, tt.wantErr)
@@ -136,10 +135,10 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 
 	type fields struct {
 		repo repository.ThreadRepository
-		m    repository.DBManager
 	}
 	type args struct {
 		ctx   context.Context
+		m     repository.SQLManager
 		title string
 	}
 
@@ -160,10 +159,10 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 			name: "When specified thread already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:   context.Background(),
+				m:     db.NewDBManager(),
 				title: model.TitleForTest,
 			},
 			returnArgs: returnArgs{
@@ -186,10 +185,10 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 			name: "When specified thread doesn't already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:   context.Background(),
+				m:     db.NewDBManager(),
 				title: model.TitleForTest,
 			},
 			returnArgs: returnArgs{
@@ -203,10 +202,10 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 			name: "When some error has occurred, return false and error.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:   context.Background(),
+				m:     db.NewDBManager(),
 				title: model.TitleForTest,
 			},
 			returnArgs: returnArgs{
@@ -221,12 +220,11 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &threadService{
 				repo: mock,
-				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetThreadByTitle(tt.args.ctx, tt.fields.m, tt.args.title).Return(tt.returnArgs.thread, tt.returnArgs.err)
+			mock.EXPECT().GetThreadByTitle(tt.args.ctx, tt.args.m, tt.args.title).Return(tt.returnArgs.thread, tt.returnArgs.err)
 
-			got, err := s.IsAlreadyExistTitle(tt.args.ctx, tt.args.title)
+			got, err := s.IsAlreadyExistTitle(tt.args.ctx, tt.args.m, tt.args.title)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("threadService.IsAlreadyExistTitle() error = %v, wantErr %v", err, tt.wantErr)

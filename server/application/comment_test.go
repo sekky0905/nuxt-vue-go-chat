@@ -614,7 +614,7 @@ func Test_commentService_UpdateComment(t *testing.T) {
 				t.Fatal("failed to assert MockCommentService")
 			}
 
-			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
+			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, gomock.Any(), tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
 
 			if tt.mockArgsUpdateComment.param != nil {
 
@@ -824,7 +824,7 @@ func Test_commentService_DeleteComment(t *testing.T) {
 				t.Fatal("failed to assert MockCommentService")
 			}
 
-			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
+			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, gomock.Any(), tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
 
 			if tt.mockReturnsIsAlreadyExistID.found {
 				tr, ok := tt.fields.repo.(*mock_repository.MockCommentRepository)

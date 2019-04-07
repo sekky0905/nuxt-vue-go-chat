@@ -134,7 +134,6 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &authenticationService{
-				m:    mockDBM,
 				repo: mockRepo,
 			}
 
@@ -143,9 +142,9 @@ func Test_authenticationService_Authenticate(t *testing.T) {
 				t.Fatal("failed to assert MockUserRepository")
 			}
 
-			ur.EXPECT().GetUserByName(tt.args.ctx, s.m, tt.args.userName).Return(tt.mockReturns.user, tt.mockReturns.err)
+			ur.EXPECT().GetUserByName(tt.args.ctx, mockDBM, tt.args.userName).Return(tt.mockReturns.user, tt.mockReturns.err)
 
-			gotOk, gotUser, err := s.Authenticate(tt.args.ctx, tt.args.userName, tt.args.password)
+			gotOk, gotUser, err := s.Authenticate(tt.args.ctx, mockDBM, tt.args.userName, tt.args.password)
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("authenticationService.Authenticate() error = %v, wantErr %v", err, tt.wantErr)
 				return

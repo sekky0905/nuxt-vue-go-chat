@@ -73,7 +73,7 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 	param.CreatedAt = time.Now()
 	param.UpdatedAt = time.Now()
 
-	yes, err := a.service.IsAlreadyExistTitle(ctx, param.Title)
+	yes, err := a.service.IsAlreadyExistTitle(ctx, tx, param.Title)
 	if yes {
 		err = &model.AlreadyExistError{
 			PropertyNameForDeveloper:    model.TitlePropertyForDeveloper,
@@ -110,7 +110,7 @@ func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *mode
 		}
 	}()
 
-	yes, err := a.service.IsAlreadyExistID(ctx, param.ID)
+	yes, err := a.service.IsAlreadyExistID(ctx, tx, param.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
@@ -148,7 +148,7 @@ func (a *threadService) DeleteThread(ctx context.Context, id uint32) (err error)
 		}
 	}()
 
-	yes, err := a.service.IsAlreadyExistID(ctx, id)
+	yes, err := a.service.IsAlreadyExistID(ctx, tx, id)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,

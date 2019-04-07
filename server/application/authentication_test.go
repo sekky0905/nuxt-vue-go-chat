@@ -189,20 +189,20 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			us.EXPECT().IsAlreadyExistName(tt.args.ctx, tt.mockUserServiceArgs.name).Return(tt.mockUserServiceReturns.found, tt.mockUserServiceReturns.err)
+			us.EXPECT().IsAlreadyExistName(tt.args.ctx, gomock.Any(), tt.mockUserServiceArgs.name).Return(tt.mockUserServiceReturns.found, tt.mockUserServiceReturns.err)
 			us.EXPECT().NewUser(tt.mockUserServiceArgs.name, tt.mockUserServiceArgs.password).Return(tt.mockUserServiceReturns.user, tt.mockUserServiceReturns.err)
 
 			ur, ok := tt.fields.userRepository.(*mock_repository.MockUserRepository)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().InsertUser(tt.args.ctx, tt.fields.m, gomock.Any()).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
+			ur.EXPECT().InsertUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(tt.mockUserRepoReturns.id, tt.mockUserRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ss.EXPECT().IsAlreadyExistID(tt.mockSessionServiceArgs.ctx, tt.mockSessionServiceArgs.id).Return(tt.mockSessionServiceReturns.found, tt.mockSessionServiceReturns.err)
+			ss.EXPECT().IsAlreadyExistID(tt.mockSessionServiceArgs.ctx, gomock.Any(), tt.mockSessionServiceArgs.id).Return(tt.mockSessionServiceReturns.found, tt.mockSessionServiceReturns.err)
 			ss.EXPECT().SessionID().Return(model.SessionValidIDForTest)
 			ss.EXPECT().NewSession(tt.mockSessionServiceArgs.userID).Return(tt.mockSessionServiceReturns.session)
 
@@ -210,7 +210,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.args.ctx, tt.fields.m, gomock.Any()).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.args.ctx, gomock.Any(), gomock.Any()).Return(tt.mockSessionRepoReturns.err)
 
 			a := &authenticationService{
 				m:                 tt.fields.m,
@@ -418,19 +418,19 @@ func Test_authenticationService_Login(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ur.EXPECT().UpdateUser(tt.args.ctx, tt.fields.m, tt.mockUserRepoArgs.user.ID, gomock.Any()).Return(tt.mockUserRepoReturns.err)
+			ur.EXPECT().UpdateUser(tt.args.ctx, gomock.Any(), tt.mockUserRepoArgs.user.ID, gomock.Any()).Return(tt.mockUserRepoReturns.err)
 
 			sr, ok := tt.fields.sessionRepository.(*mock_repository.MockSessionRepository)
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().InsertSession(tt.mockSessionRepoArgs.ctx, tt.mockSessionRepoArgs.m, gomock.Any()).Return(tt.mockSessionRepoReturns.err)
+			sr.EXPECT().InsertSession(tt.mockSessionRepoArgs.ctx, gomock.Any(), gomock.Any()).Return(tt.mockSessionRepoReturns.err)
 
 			ss, ok := tt.fields.sessionService.(*mock_service.MockSessionService)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			ss.EXPECT().IsAlreadyExistID(tt.mockSessionServiceArgs.ctx, tt.mockSessionServiceArgs.id).Return(tt.mockSessionServiceReturns.found, tt.mockSessionServiceReturns.err)
+			ss.EXPECT().IsAlreadyExistID(tt.mockSessionServiceArgs.ctx, gomock.Any(), tt.mockSessionServiceArgs.id).Return(tt.mockSessionServiceReturns.found, tt.mockSessionServiceReturns.err)
 			ss.EXPECT().SessionID().Return(model.SessionValidIDForTest)
 			ss.EXPECT().NewSession(tt.mockSessionServiceArgs.userID).Return(tt.mockSessionServiceReturns.session)
 
@@ -439,7 +439,7 @@ func Test_authenticationService_Login(t *testing.T) {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
 			as.EXPECT().
-				Authenticate(tt.mockAuthenticationServiceArgs.ctx, tt.mockAuthenticationServiceArgs.userName, tt.mockAuthenticationServiceArgs.password).
+				Authenticate(tt.mockAuthenticationServiceArgs.ctx, gomock.Any(), tt.mockAuthenticationServiceArgs.userName, tt.mockAuthenticationServiceArgs.password).
 				Return(tt.mockAuthenticationServiceReturns.ok, tt.mockAuthenticationServiceReturns.user, tt.mockAuthenticationServiceReturns.err)
 
 			a := &authenticationService{
@@ -540,7 +540,7 @@ func Test_authenticationService_Logout(t *testing.T) {
 			if !ok {
 				t.Fatal("failed to assert MockSessionRepository")
 			}
-			sr.EXPECT().DeleteSession(tt.mockArgs.ctx, tt.mockArgs.m, tt.mockArgs.sessionID).Return(tt.mockReturn.err)
+			sr.EXPECT().DeleteSession(tt.mockArgs.ctx, gomock.Any(), tt.mockArgs.sessionID).Return(tt.mockReturn.err)
 
 			a := &authenticationService{
 				m:                     tt.fields.m,

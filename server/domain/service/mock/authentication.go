@@ -8,6 +8,7 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	model "github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	reflect "reflect"
 )
 
@@ -35,9 +36,9 @@ func (m *MockAuthenticationService) EXPECT() *MockAuthenticationServiceMockRecor
 }
 
 // Authenticate mocks base method
-func (m *MockAuthenticationService) Authenticate(ctx context.Context, userName, password string) (bool, *model.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Authenticate", ctx, userName, password)
+func (m_2 *MockAuthenticationService) Authenticate(ctx context.Context, m repository.SQLManager, userName, password string) (bool, *model.User, error) {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "Authenticate", ctx, m, userName, password)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(*model.User)
 	ret2, _ := ret[2].(error)
@@ -45,7 +46,7 @@ func (m *MockAuthenticationService) Authenticate(ctx context.Context, userName, 
 }
 
 // Authenticate indicates an expected call of Authenticate
-func (mr *MockAuthenticationServiceMockRecorder) Authenticate(ctx, userName, password interface{}) *gomock.Call {
+func (mr *MockAuthenticationServiceMockRecorder) Authenticate(ctx, m, userName, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockAuthenticationService)(nil).Authenticate), ctx, userName, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockAuthenticationService)(nil).Authenticate), ctx, m, userName, password)
 }

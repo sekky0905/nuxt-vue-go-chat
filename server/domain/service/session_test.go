@@ -22,10 +22,10 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 
 	type fields struct {
 		repo repository.SessionRepository
-		m    repository.DBManager
 	}
 	type args struct {
 		ctx context.Context
+		m   repository.SQLManager
 		id  string
 	}
 
@@ -46,10 +46,10 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified session already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.SessionValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -67,7 +67,6 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified session doesn't already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -84,7 +83,6 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 			name: "When some error has occurred, return false and error.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -102,12 +100,11 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &sessionService{
 				repo: mock,
-				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetSessionByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.returnArgs.session, tt.returnArgs.err)
+			mock.EXPECT().GetSessionByID(tt.args.ctx, tt.args.m, tt.args.id).Return(tt.returnArgs.session, tt.returnArgs.err)
 
-			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.id)
+			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.m, tt.args.id)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("sessionService.IsAlreadyExistID() error = %v, wantErr %v", err, tt.wantErr)

@@ -10,20 +10,18 @@ import (
 
 // ThreadService is interface of ThreadService.
 type ThreadService interface {
-	IsAlreadyExistID(ctx context.Context, id uint32) (bool, error)
-	IsAlreadyExistTitle(ctx context.Context, title string) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error)
+	IsAlreadyExistTitle(ctx context.Context, m repository.SQLManager, title string) (bool, error)
 }
 
 // threadService is domain service of Thread.
 type threadService struct {
 	repo repository.ThreadRepository
-	m    repository.DBManager
 }
 
 // NewThreadService generates and returns ThreadService.
-func NewThreadService(m repository.DBManager, repo repository.ThreadRepository) ThreadService {
+func NewThreadService(repo repository.ThreadRepository) ThreadService {
 	return &threadService{
-		m:    m,
 		repo: repo,
 	}
 }
@@ -46,22 +44,22 @@ func (s threadService) NewThreadList(list []*model.Thread, hasNext bool, cursor 
 }
 
 // IsAlreadyExistID checks duplication of id.
-func (s threadService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
+func (s threadService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
 	var searched *model.Thread
 	var err error
 
-	if searched, err = s.repo.GetThreadByID(ctx, s.m, id); err != nil {
+	if searched, err = s.repo.GetThreadByID(ctx, m, id); err != nil {
 		return false, errors.Wrap(err, "failed to get thread by PropertyNameForDeveloper")
 	}
 	return searched != nil, nil
 }
 
 // IsAlreadyExistID checks duplication of name.
-func (s threadService) IsAlreadyExistTitle(ctx context.Context, title string) (bool, error) {
+func (s threadService) IsAlreadyExistTitle(ctx context.Context, m repository.SQLManager, title string) (bool, error) {
 	var searched *model.Thread
 	var err error
 
-	if searched, err = s.repo.GetThreadByTitle(ctx, s.m, title); err != nil {
+	if searched, err = s.repo.GetThreadByTitle(ctx, m, title); err != nil {
 		return false, errors.Wrap(err, "failed to get thread by title")
 	}
 	return searched != nil, nil

@@ -96,7 +96,7 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 		}
 	}()
 
-	yes, err := cs.service.IsAlreadyExistID(ctx, param.ID)
+	yes, err := cs.service.IsAlreadyExistID(ctx, tx, param.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
@@ -134,7 +134,7 @@ func (cs *commentService) DeleteComment(ctx context.Context, id uint32) (err err
 		}
 	}()
 
-	yes, err := cs.service.IsAlreadyExistID(ctx, id)
+	yes, err := cs.service.IsAlreadyExistID(ctx, tx, id)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,

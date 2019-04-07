@@ -8,6 +8,7 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	model "github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
+	repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	reflect "reflect"
 )
 
@@ -63,16 +64,16 @@ func (mr *MockSessionServiceMockRecorder) SessionID() *gomock.Call {
 }
 
 // IsAlreadyExistID mocks base method
-func (m *MockSessionService) IsAlreadyExistID(ctx context.Context, id string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsAlreadyExistID", ctx, id)
+func (m_2 *MockSessionService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id string) (bool, error) {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "IsAlreadyExistID", ctx, m, id)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IsAlreadyExistID indicates an expected call of IsAlreadyExistID
-func (mr *MockSessionServiceMockRecorder) IsAlreadyExistID(ctx, id interface{}) *gomock.Call {
+func (mr *MockSessionServiceMockRecorder) IsAlreadyExistID(ctx, m, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistID", reflect.TypeOf((*MockSessionService)(nil).IsAlreadyExistID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistID", reflect.TypeOf((*MockSessionService)(nil).IsAlreadyExistID), ctx, m, id)
 }

@@ -1,6 +1,7 @@
 // index.js
 export const LOGIN = 'LOGIN'
 export const SIGN_UP = 'SIGN_UP'
+export const LOGOUT = 'LOGOUT'
 
 // threads.js
 export const LIST_THREADS = 'LIST_THREADS'

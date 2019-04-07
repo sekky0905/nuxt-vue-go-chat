@@ -83,7 +83,7 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 	user.SessionID = sessionID
 
 	// create User
-	user, err = s.createUser(ctx, user)
+	user, err = s.createUser(ctx, tx, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create user")
 	}
@@ -92,7 +92,7 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 	session.ID = user.SessionID
 
 	// create Session
-	if _, err := s.createSession(ctx, session); err != nil {
+	if _, err := s.createSession(ctx, tx, session); err != nil {
 		return nil, errors.Wrap(err, "failed to create session")
 	}
 
@@ -100,9 +100,9 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 }
 
 // createUser creates the user.
-func (s *authenticationService) createUser(ctx context.Context, user *model.User) (*model.User, error) {
+func (s *authenticationService) createUser(ctx context.Context, m repository.SQLManager, user *model.User) (*model.User, error) {
 	// not allow duplicated name.
-	yes, err := s.userService.IsAlreadyExistName(ctx, user.Name)
+	yes, err := s.userService.IsAlreadyExistName(ctx, m, user.Name)
 	if yes {
 		err = &model.AlreadyExistError{
 			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
@@ -124,7 +124,7 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 
-	id, err := s.userRepository.InsertUser(ctx, s.m, user)
+	id, err := s.userRepository.InsertUser(ctx, m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
 	}
@@ -134,12 +134,12 @@ func (s *authenticationService) createUser(ctx context.Context, user *model.User
 }
 
 // createSession creates the session.
-func (s *authenticationService) createSession(ctx context.Context, session *model.Session) (*model.Session, error) {
+func (s *authenticationService) createSession(ctx context.Context, m repository.SQLManager, session *model.Session) (*model.Session, error) {
 	// ready for collision of UUID.
 	yes := true
 	var err error
 	for yes {
-		yes, err = s.sessionService.IsAlreadyExistID(ctx, session.ID)
+		yes, err = s.sessionService.IsAlreadyExistID(ctx, m, session.ID)
 		if err != nil {
 			if _, ok := errors.Cause(err).(*model.NoSuchDataError); !ok {
 				return nil, errors.Wrap(err, "failed to check whether already exists id or not")
@@ -149,7 +149,7 @@ func (s *authenticationService) createSession(ctx context.Context, session *mode
 
 	session.CreatedAt = time.Now()
 
-	if err := s.sessionRepository.InsertSession(ctx, s.m, session); err != nil {
+	if err := s.sessionRepository.InsertSession(ctx, m, session); err != nil {
 		return nil, errors.Wrap(err, "failed to insert session")
 	}
 	return session, nil
@@ -168,7 +168,7 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 		}
 	}()
 
-	ok, user, err := s.authenticationService.Authenticate(ctx, param.Name, param.Password)
+	ok, user, err := s.authenticationService.Authenticate(ctx, tx, param.Name, param.Password)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate")
 	} else if !ok {
@@ -180,7 +180,7 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 	session := s.sessionService.NewSession(user.ID)
 	session.ID = s.sessionService.SessionID()
 
-	session, err = s.createSession(ctx, session)
+	session, err = s.createSession(ctx, tx, session)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create session")
@@ -188,7 +188,7 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 
 	user.SessionID = session.ID
 
-	if err := s.userRepository.UpdateUser(ctx, s.m, user.ID, user); err != nil {
+	if err := s.userRepository.UpdateUser(ctx, tx, user.ID, user); err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
 	}
 
@@ -208,7 +208,7 @@ func (a *authenticationService) Logout(ctx context.Context, sessionID string) er
 		}
 	}()
 
-	if err := a.sessionRepository.DeleteSession(ctx, a.m, sessionID); err != nil {
+	if err := a.sessionRepository.DeleteSession(ctx, tx, sessionID); err != nil {
 		return errors.Wrap(err, "failed to delete session")
 	}
 

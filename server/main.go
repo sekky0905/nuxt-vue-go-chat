@@ -40,8 +40,8 @@ func initializeAuthenticationController(m repository.DBManager) controller.Authe
 	uRepo := db.NewUserRepository()
 	sRepo := db.NewSessionRepository()
 	uService := service.NewUserService(m, uRepo)
-	sService := service.NewSessionService(m, sRepo)
-	aService := service.NewAuthenticationService(m, uRepo)
+	sService := service.NewSessionService(sRepo)
+	aService := service.NewAuthenticationService(uRepo)
 
 	di := application.NewAuthenticationServiceDIInput(uRepo, sRepo, uService, sService, aService)
 	aApp := application.NewAuthenticationService(m, di, txCloser)
@@ -54,7 +54,7 @@ func initializeThreadController(m repository.DBManager) controller.ThreadControl
 	txCloser := db.CloseTransaction
 
 	tRepo := db.NewThreadRepository()
-	tService := service.NewThreadService(m, tRepo)
+	tService := service.NewThreadService(tRepo)
 
 	tApp := application.NewThreadService(m, tService, tRepo, txCloser)
 
@@ -66,7 +66,7 @@ func initializeCommentController(m repository.DBManager) controller.CommentContr
 	txCloser := db.CloseTransaction
 
 	cRepo := db.NewCommentRepository()
-	cService := service.NewCommentService(m, cRepo)
+	cService := service.NewCommentService(cRepo)
 
 	cApp := application.NewCommentService(m, cService, cRepo, txCloser)
 

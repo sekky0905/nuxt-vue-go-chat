@@ -10,19 +10,17 @@ import (
 
 // ThreadService is interface of ThreadService.
 type CommentService interface {
-	IsAlreadyExistID(ctx context.Context, id uint32) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error)
 }
 
 // threadService is domain service of Thread.
 type commentService struct {
 	repo repository.CommentRepository
-	m    repository.SQLManager
 }
 
 // NewThreadService generates and returns ThreadService.
-func NewCommentService(m repository.SQLManager, repo repository.CommentRepository) CommentService {
+func NewCommentService(repo repository.CommentRepository) CommentService {
 	return &commentService{
-		m:    m,
 		repo: repo,
 	}
 }
@@ -46,8 +44,8 @@ func NewCommentList(list []*model.Comment, hasNext bool, cursor uint32) *model.C
 }
 
 // IsAlreadyExistID checks duplication of id.
-func (s commentService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
-	searched, err := s.repo.GetCommentByID(ctx, s.m, id)
+func (s commentService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
+	searched, err := s.repo.GetCommentByID(ctx, m, id)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get comment by PropertyNameForDeveloper")
 	}

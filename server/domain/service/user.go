@@ -13,8 +13,8 @@ import (
 // UserService is interface of domain service of user.
 type UserService interface {
 	NewUser(name, password string) (*model.User, error)
-	IsAlreadyExistID(ctx context.Context, id uint32) (bool, error)
-	IsAlreadyExistName(ctx context.Context, name string) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error)
+	IsAlreadyExistName(ctx context.Context, m repository.SQLManager, name string) (bool, error)
 }
 
 // UserRepoFactory is factory of UserRepository.
@@ -22,14 +22,12 @@ type UserRepoFactory func(ctx context.Context) repository.UserRepository
 
 // userService is domain service of user.
 type userService struct {
-	m    repository.SQLManager
 	repo repository.UserRepository
 }
 
 // NewUserService generates and returns UserService.
 func NewUserService(m repository.SQLManager, repo repository.UserRepository) UserService {
 	return &userService{
-		m:    m,
 		repo: repo,
 	}
 }
@@ -50,8 +48,8 @@ func (s *userService) NewUser(name, password string) (*model.User, error) {
 }
 
 // IsAlreadyExistID checks whether the data specified by id already exists or not.
-func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
-	searched, err := s.repo.GetUserByID(ctx, s.m, id)
+func (s *userService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
+	searched, err := s.repo.GetUserByID(ctx, m, id)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by id")
 	}
@@ -59,8 +57,8 @@ func (s *userService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, er
 }
 
 // IsAlreadyExistName checks whether the data specified by name already exists or not.
-func (s *userService) IsAlreadyExistName(ctx context.Context, name string) (bool, error) {
-	searched, err := s.repo.GetUserByName(ctx, s.m, name)
+func (s *userService) IsAlreadyExistName(ctx context.Context, m repository.SQLManager, name string) (bool, error) {
+	searched, err := s.repo.GetUserByName(ctx, m, name)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by Name")
 	}

@@ -457,7 +457,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 				t.Fatal("failed to assert MockThreadService")
 			}
 
-			ts.EXPECT().IsAlreadyExistTitle(tt.mockArgsIsAlreadyExistTitle.ctx, tt.mockArgsIsAlreadyExistTitle.title).Return(tt.mockReturnsIsAlreadyExistTitle.found, tt.mockReturnsIsAlreadyExistTitle.err)
+			ts.EXPECT().IsAlreadyExistTitle(tt.mockArgsIsAlreadyExistTitle.ctx, gomock.Any(), tt.mockArgsIsAlreadyExistTitle.title).Return(tt.mockReturnsIsAlreadyExistTitle.found, tt.mockReturnsIsAlreadyExistTitle.err)
 
 			if tt.mockArgsInsertThread.param != nil {
 				tr, ok := tt.fields.repo.(*mock_repository.MockThreadRepository)
@@ -715,7 +715,7 @@ func Test_threadService_UpdateThread(t *testing.T) {
 				t.Fatal("failed to assert MockThreadService")
 			}
 
-			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
+			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, gomock.Any(), tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
 
 			if tt.mockArgsUpdateThread.param != nil {
 
@@ -727,7 +727,6 @@ func Test_threadService_UpdateThread(t *testing.T) {
 				txM := mock_repository.NewMockTxManager(ctrl)
 
 				tr.EXPECT().UpdateThread(tt.mockArgsUpdateThread.ctx, txM, tt.args.id, tt.args.param).Return(tt.mockReturnsUpdateThread.err)
-
 			}
 
 			a := &threadService{
@@ -937,7 +936,7 @@ func Test_threadService_DeleteThread(t *testing.T) {
 				t.Fatal("failed to assert MockThreadService")
 			}
 
-			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
+			ts.EXPECT().IsAlreadyExistID(tt.mockArgsIsAlreadyExistID.ctx, gomock.Any(), tt.mockArgsIsAlreadyExistID.id).Return(tt.mockReturnsIsAlreadyExistID.found, tt.mockReturnsIsAlreadyExistID.err)
 
 			if tt.mockReturnsIsAlreadyExistID.found {
 				tr, ok := tt.fields.repo.(*mock_repository.MockThreadRepository)

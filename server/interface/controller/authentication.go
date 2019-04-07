@@ -53,7 +53,7 @@ func (c *authenticationController) SignUp(g *gin.Context) {
 		return
 	}
 
-	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "/", "", true, true)
+	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "/", "", false, true)
 
 	uDTO := TranslateFromUserToUserDTO(user)
 	g.JSON(http.StatusOK, uDTO)

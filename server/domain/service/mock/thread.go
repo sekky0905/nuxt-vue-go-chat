@@ -7,6 +7,7 @@ package mock_service
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
+	repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	reflect "reflect"
 )
 
@@ -34,31 +35,31 @@ func (m *MockThreadService) EXPECT() *MockThreadServiceMockRecorder {
 }
 
 // IsAlreadyExistID mocks base method
-func (m *MockThreadService) IsAlreadyExistID(ctx context.Context, id uint32) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsAlreadyExistID", ctx, id)
+func (m_2 *MockThreadService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "IsAlreadyExistID", ctx, m, id)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IsAlreadyExistID indicates an expected call of IsAlreadyExistID
-func (mr *MockThreadServiceMockRecorder) IsAlreadyExistID(ctx, id interface{}) *gomock.Call {
+func (mr *MockThreadServiceMockRecorder) IsAlreadyExistID(ctx, m, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistID", reflect.TypeOf((*MockThreadService)(nil).IsAlreadyExistID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistID", reflect.TypeOf((*MockThreadService)(nil).IsAlreadyExistID), ctx, m, id)
 }
 
 // IsAlreadyExistTitle mocks base method
-func (m *MockThreadService) IsAlreadyExistTitle(ctx context.Context, title string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsAlreadyExistTitle", ctx, title)
+func (m_2 *MockThreadService) IsAlreadyExistTitle(ctx context.Context, m repository.SQLManager, title string) (bool, error) {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "IsAlreadyExistTitle", ctx, m, title)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IsAlreadyExistTitle indicates an expected call of IsAlreadyExistTitle
-func (mr *MockThreadServiceMockRecorder) IsAlreadyExistTitle(ctx, title interface{}) *gomock.Call {
+func (mr *MockThreadServiceMockRecorder) IsAlreadyExistTitle(ctx, m, title interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistTitle", reflect.TypeOf((*MockThreadService)(nil).IsAlreadyExistTitle), ctx, title)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAlreadyExistTitle", reflect.TypeOf((*MockThreadService)(nil).IsAlreadyExistTitle), ctx, m, title)
 }

@@ -76,7 +76,7 @@ func Test_authenticationController_SignUp(t *testing.T) {
 			},
 			want: want{
 				statusCode: http.StatusOK,
-				cookie:     "SESSION_ID=testValidSessionID12345678; Path=/; Max-Age=86400; HttpOnly; Secure",
+				cookie:     "SESSION_ID=testValidSessionID12345678; Path=/; Max-Age=86400; HttpOnly",
 				body: &UserDTO{
 					ID:        model.UserValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -308,7 +308,7 @@ func Test_authenticationController_Login(t *testing.T) {
 			},
 			want: want{
 				statusCode: http.StatusOK,
-				cookie:     "SESSION_ID=testValidSessionID12345678; Path=/; Max-Age=86400; HttpOnly; Secure",
+				cookie:     "SESSION_ID=testValidSessionID12345678; Path=/; Max-Age=86400; HttpOnly",
 				body: &UserDTO{
 					ID:        model.UserValidIDForTest,
 					Name:      model.UserNameForTest,
@@ -525,7 +525,7 @@ func Test_authenticationController_Logout(t *testing.T) {
 			},
 			want: want{
 				statusCode: 200,
-				cookie:     "SESSION_ID=; Path=/; HttpOnly; Secure",
+				cookie:     "SESSION_ID=; Path=/; HttpOnly",
 				errBody: errBody{
 					errCode: "",
 					filed:   "",

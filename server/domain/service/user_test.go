@@ -22,10 +22,10 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 
 	type fields struct {
 		repo repository.UserRepository
-		m    repository.DBManager
 	}
 	type args struct {
 		ctx context.Context
+		m   repository.DBManager
 		id  uint32
 	}
 
@@ -46,10 +46,10 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified user already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.UserValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -70,10 +70,10 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 			name: "When specified user doesn't already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.UserInValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -87,10 +87,10 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 			name: "When some error has occurred, return false and error.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx: context.Background(),
+				m:   db.NewDBManager(),
 				id:  model.UserInValidIDForTest,
 			},
 			returnArgs: returnArgs{
@@ -105,12 +105,11 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &userService{
 				repo: mock,
-				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetUserByID(tt.args.ctx, tt.fields.m, tt.args.id).Return(tt.returnArgs.user, tt.returnArgs.err)
+			mock.EXPECT().GetUserByID(tt.args.ctx, tt.args.m, tt.args.id).Return(tt.returnArgs.user, tt.returnArgs.err)
 
-			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.id)
+			got, err := s.IsAlreadyExistID(tt.args.ctx, tt.args.m, tt.args.id)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userService.IsAlreadyExistID() error = %v, wantErr %v", err, tt.wantErr)
@@ -133,10 +132,10 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 
 	type fields struct {
 		repo repository.UserRepository
-		m    repository.DBManager
 	}
 	type args struct {
 		ctx  context.Context
+		m    repository.DBManager
 		name string
 	}
 
@@ -157,7 +156,6 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 			name: "When specified user already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:  context.Background(),
@@ -181,10 +179,10 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 			name: "When specified user doesn't already exists, return true and nil.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:  context.Background(),
+				m:    db.NewDBManager(),
 				name: model.UserNameForTest,
 			},
 			returnArgs: returnArgs{
@@ -198,10 +196,10 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 			name: "When some error has occurred, return false and error.",
 			fields: fields{
 				repo: mock,
-				m:    db.NewDBManager(),
 			},
 			args: args{
 				ctx:  context.Background(),
+				m:    db.NewDBManager(),
 				name: model.UserNameForTest,
 			},
 			returnArgs: returnArgs{
@@ -216,12 +214,11 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &userService{
 				repo: mock,
-				m:    tt.fields.m,
 			}
 
-			mock.EXPECT().GetUserByName(tt.args.ctx, tt.fields.m, tt.args.name).Return(tt.returnArgs.user, tt.returnArgs.err)
+			mock.EXPECT().GetUserByName(tt.args.ctx, tt.args.m, tt.args.name).Return(tt.returnArgs.user, tt.returnArgs.err)
 
-			got, err := s.IsAlreadyExistName(tt.args.ctx, tt.args.name)
+			got, err := s.IsAlreadyExistName(tt.args.ctx, tt.args.m, tt.args.name)
 			if tt.wantErr != nil {
 				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("userService.IsAlreadyExistName() error = %v, wantErr %v", err, tt.wantErr)

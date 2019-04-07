@@ -34,7 +34,7 @@ func NewAuthenticationController(uAPP application.AuthenticationService) Authent
 func (c *authenticationController) InitAuthenticationAPI(g *gin.RouterGroup) {
 	g.POST("/signUp", c.SignUp)
 	g.POST("/login", c.Login)
-	g.POST("/logout", c.Logout)
+	g.DELETE("/logout", c.Logout)
 }
 
 // SignUp sign up an user.

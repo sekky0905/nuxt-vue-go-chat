@@ -35,7 +35,7 @@ export const actions = {
     const response = await this.$axios.$post('/signUp', payload)
     commit(SET_USER, { user: response, isLoggedIn: true })
   },
-  async logout({ commit }) {
+  async [LOGOUT]({ commit }) {
     await this.$axios.$delete('/logout')
     commit(SET_USER, { user: null, isLoggedIn: false })
   }

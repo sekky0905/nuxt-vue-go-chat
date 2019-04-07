@@ -53,7 +53,7 @@ func (c *authenticationController) SignUp(g *gin.Context) {
 		return
 	}
 
-	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "", "", true, true)
+	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "/", "", true, true)
 
 	uDTO := TranslateFromUserToUserDTO(user)
 	g.JSON(http.StatusOK, uDTO)
@@ -75,7 +75,7 @@ func (c *authenticationController) Login(g *gin.Context) {
 		return
 	}
 
-	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "", "", true, true)
+	g.SetCookie(model.SessionIDAtCookie, user.SessionID, 86400, "/", "", false, true)
 
 	uDTO := TranslateFromUserToUserDTO(user)
 	g.JSON(http.StatusOK, uDTO)
@@ -96,7 +96,7 @@ func (c *authenticationController) Logout(g *gin.Context) {
 	}
 
 	// empty cookie
-	g.SetCookie(model.SessionIDAtCookie, "", 0, "", "", true, true)
+	g.SetCookie(model.SessionIDAtCookie, "", 0, "", "", false, true)
 
 	g.JSON(http.StatusOK, nil)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/router"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/interface/controller"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/middleware"
 )
 
 func main() {
@@ -21,6 +22,9 @@ func main() {
 	ac.InitAuthenticationAPI(apiV1)
 
 	threadRouting := apiV1.Group("/threads")
+
+	// use middleware
+	threadRouting.Use(middleware.CheckAuthentication())
 
 	cc := initializeCommentController(dbm)
 	cc.InitCommentAPI(threadRouting)

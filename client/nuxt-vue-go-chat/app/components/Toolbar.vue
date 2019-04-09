@@ -56,8 +56,8 @@ export default {
     async logout() {
       try {
         await this.LOGOUT()
-        this.snackbar.color = 'success'
-        this.snackbar.text = 'success sign up'
+        this.snackbar.color = 'info'
+        this.snackbar.text = 'logout'
         this.snackbar.isOpen = true
         this.$router.push('/')
       } catch (error) {

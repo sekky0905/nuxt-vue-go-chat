@@ -91,11 +91,10 @@ export default {
     ...mapGetters('comments', ['comments', 'commentList', 'isDialogVisible'])
   },
   async asyncData({ store, params }) {
-    console.log(`asyncDataのrouterのparams => ${JSON.stringify(params)}`)
     try {
       await store.dispatch(`comments/${LIST_COMMENTS}`, { threadId: params.id })
-    } catch (e) {
-      console.log(`comments のe==> ${JSON.stringify(e)}`)
+    } catch (error) {
+      console.error(`failed to list comments: ${JSON.stringify(error)}`)
     }
   },
   methods: {
@@ -103,7 +102,7 @@ export default {
       try {
         await this.DELETE_COMMENT({ threadId: this.$route.params.id, id: id })
       } catch (error) {
-        console.log(`failed to DELETE_COMMENT error: ${JSON.stringify(error)}`)
+        console.error(`failed to delete comment: ${JSON.stringify(error)}`)
       }
     },
     isMyComment(userId) {
@@ -120,9 +119,7 @@ export default {
           cursor: comment.id
         })
       } catch (error) {
-        console.log(
-          `failed to LIST_COMMENTS_MORE error: ${JSON.stringify(error)}`
-        )
+        console.error(`failed to list comments more: ${JSON.stringify(error)}`)
       }
     },
     showDialog() {

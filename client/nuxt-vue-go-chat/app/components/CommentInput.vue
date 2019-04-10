@@ -86,8 +86,9 @@ export default {
         this.snackbar.text = 'success create comment'
         this.snackbar.isOpen = true
       } catch (error) {
+        console.error(`failed to save comment: ${JSON.stringify(error)}`)
         this.snackbar.color = 'error'
-        this.snackbar.text = 'fail sign up\nsystem error occur'
+        this.snackbar.text = 'fail to sign up\nsystem error occur'
         this.snackbar.isOpen = true
       }
 

@@ -1,19 +1,17 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/router"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/interface/controller"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/middleware"
 )
 
 func main() {
-
-	router.G.StaticFile("/", "./../client/nuxt-vue-go-chat/dist/index.html")
-	router.G.Static("/_nuxt", "./../client/nuxt-vue-go-chat/dist/_nuxt/")
-
 	apiV1 := router.G.Group("/v1")
 
 	dbm := db.NewDBManager()
@@ -22,11 +20,19 @@ func main() {
 
 	threadRouting := apiV1.Group("/threads")
 
+	// use middleware
+	threadRouting.Use(middleware.CheckAuthentication())
+
 	cc := initializeCommentController(dbm)
 	cc.InitCommentAPI(threadRouting)
 
 	tc := initializeThreadController(dbm)
 	tc.InitThreadAPI(threadRouting)
+
+	router.G.NoRoute(func(g *gin.Context) {
+		g.File("./../client/nuxt-vue-go-chat/dist/index.html")
+	})
+	router.G.Static("/_nuxt", "./../client/nuxt-vue-go-chat/dist/_nuxt/")
 
 	if err := router.G.Run(":8080"); err != nil {
 		panic(err.Error())

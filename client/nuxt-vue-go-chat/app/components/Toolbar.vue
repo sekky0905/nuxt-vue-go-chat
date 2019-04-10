@@ -8,7 +8,7 @@
               <v-icon>exit_to_app</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Dashboard</v-list-tile-title>
+              <v-list-tile-title>Exit</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -56,12 +56,12 @@ export default {
     async logout() {
       try {
         await this.LOGOUT()
-        this.snackbar.color = 'success'
-        this.snackbar.text = 'success sign up'
+        this.snackbar.color = 'info'
+        this.snackbar.text = 'logout'
         this.snackbar.isOpen = true
         this.$router.push('/')
       } catch (error) {
-        console.error(`failed to logout: ${error}`)
+        console.error(`failed to logout: ${JSON.stringify(error)}`)
       }
     },
     ...mapActions([LOGOUT])

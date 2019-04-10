@@ -90,7 +90,6 @@ export default {
         thread.createdAt = moment(thread.createdAt).format(
           'YYYY/MM/DD HH:mm:ss'
         )
-        console.log(`thread => ${JSON.stringify(thread)}`)
         return thread
       })
     },
@@ -102,8 +101,8 @@ export default {
   async asyncData({ store }) {
     try {
       await store.dispatch(`threads/${LIST_THREADS}`)
-    } catch (e) {
-      console.log(`threads のe==> ${JSON.stringify(e)}`)
+    } catch (error) {
+      console.error(`failed to list threads: ${JSON.stringify(error)}`)
     }
   },
   methods: {
@@ -114,7 +113,7 @@ export default {
       try {
         await this.LIST_THREADS_MORE({ limit: 20, cursor: id })
       } catch (error) {
-        console.error(`error has occurred => ${JSON.stringify(error)}`)
+        console.error(`failed to list threads more: ${JSON.stringify(error)}`)
       }
     },
     removeButton() {

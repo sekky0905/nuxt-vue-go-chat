@@ -105,13 +105,14 @@ export default {
         this.snackbar.isOpen = true
         this.$router.push('/threads/')
       } catch (error) {
+        console.error(`failed to login: ${JSON.stringify(error)}`)
         if (error.response.data.code === 'AuthenticationFailure') {
           this.snackbar.color = 'error'
-          this.snackbar.text = 'fail sign up\nName or Password is invalid'
+          this.snackbar.text = 'fail to sign up\nName or Password is invalid'
           this.snackbar.isOpen = true
         } else {
           this.snackbar.color = 'error'
-          this.snackbar.text = 'fail sign up\nsystem error occur'
+          this.snackbar.text = 'fail to sign up\nsystem error occur'
           this.snackbar.isOpen = true
         }
       }

@@ -61,7 +61,7 @@ export default {
         this.snackbar.isOpen = true
         this.$router.push('/')
       } catch (error) {
-        console.error(`failed to logout: ${error}`)
+        console.error(`failed to logout: ${JSON.stringify(error)}`)
       }
     },
     ...mapActions([LOGOUT])

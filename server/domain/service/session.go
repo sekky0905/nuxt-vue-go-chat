@@ -20,7 +20,7 @@ type SessionService interface {
 // SessionRepoFactory is factory of SessionRepository.
 type SessionRepoFactory func(ctx context.Context) repository.SessionRepository
 
-// sessionService is domain service of user.
+// sessionService is domain service of session.
 type sessionService struct {
 	repo repository.SessionRepository
 }

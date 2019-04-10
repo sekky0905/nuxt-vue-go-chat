@@ -45,7 +45,7 @@
         v-model="snackbar.isOpen"
         :color="snackbar.color"
         :multi-line="true"
-        :timeout="6000"
+        :timeout="500"
         :top="true"
       >
         {{ snackbar.text }}
@@ -136,7 +136,11 @@ export default {
         this.snackbar.color = 'success'
         this.snackbar.text = 'success sign up'
         this.snackbar.isOpen = true
-        this.$router.push('/threads/')
+        // for snackbar
+        const redirect = () => {
+          this.$router.push('/threads/')
+        }
+        setTimeout(redirect, 500)
       } catch (error) {
         console.error(`failed to sing up: ${JSON.stringify(error)}`)
         if (error.response.data.code === 'AuthenticationFailure') {

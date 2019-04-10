@@ -1,32 +1,48 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" persistent max-width="600px">
-      <v-form>
-        <v-card>
-          <v-card-title>
-            <span class="headline">Comment</span>
-          </v-card-title>
-          <v-card-text>
-            <v-textarea
-              v-model="content"
-              box
-              label="Comment"
-              auto-grow
-              :error-messages="contentError"
-              @input="$v.content.$touch()"
-              @blur="$v.content.$touch()"
-            >
-            </v-textarea>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="info" @click="submit">Create</v-btn>
-            <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
-            <v-btn color="warning" @click="clear()">Clear</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-form>
-    </v-dialog>
+    <div>
+      <v-dialog v-model="dialogVisible" persistent max-width="600px">
+        <v-form>
+          <v-card>
+            <v-card-title>
+              <span class="headline">Comment</span>
+            </v-card-title>
+            <v-card-text>
+              <v-textarea
+                v-model="content"
+                box
+                label="Comment"
+                auto-grow
+                :error-messages="contentError"
+                @input="$v.content.$touch()"
+                @blur="$v.content.$touch()"
+              >
+              </v-textarea>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="info" @click="submit">Create</v-btn>
+              <v-btn color="error" @click="closeDialogState()">Cancel</v-btn>
+              <v-btn color="warning" @click="clear()">Clear</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </v-dialog>
+    </div>
+    <div>
+      <v-snackbar
+        v-model="snackbar.isOpen"
+        :color="snackbar.color"
+        :multi-line="true"
+        :timeout="500"
+        :right="true"
+      >
+        {{ snackbar.text }}
+        <v-btn color="pink" flat @click="snackbar.isOpen = false">
+          Close
+        </v-btn>
+      </v-snackbar>
+    </div>
   </div>
 </template>
 
@@ -35,6 +51,7 @@ import { validationMixin } from 'vuelidate'
 import { required, minLength, maxLength } from 'vuelidate/lib/validators'
 import { mapGetters, mapActions } from 'vuex'
 import { SAVE_COMMENT, CHANGE_IS_DIALOG_VISIBLE } from '../store/action-types'
+
 export default {
   name: 'CommentInput',
   mixins: [validationMixin],

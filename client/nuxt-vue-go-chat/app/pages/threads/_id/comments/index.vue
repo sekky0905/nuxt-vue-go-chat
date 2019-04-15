@@ -135,20 +135,18 @@ export default {
 </script>
 
 <style scoped>
-/* 背景 */
+/** comments background **/
 .comment-background {
   padding: 20px 10px;
   margin: 20px auto;
-  /* 幅 */
   width: 95%;
-  /* 文字の設定 */
   text-align: right;
   font-size: 15px;
-  /* 背景の色 */
   background: #424242;
   opacity: 0.7;
 }
-/* 他人のコメント */
+
+/** other's comments **/
 .other-comment {
   width: 100%;
   margin: 10px 0;
@@ -183,12 +181,12 @@ export default {
   margin: 0;
   padding: 0;
 }
-/* 自分のコメント */
+
+/** my comments **/
 .my-comment {
   margin: 10px 0;
 }
 .my-comment p {
-  /* インラインボックスにする */
   display: inline-block;
   position: relative;
   margin: 0 10px 0 0;
@@ -222,9 +220,6 @@ export default {
   top: 90%;
   right: 10%;
   z-index: 100;
-}
-.list {
-  z-index: 50;
 }
 
 .comment-info {

@@ -36,7 +36,7 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m SQLManager, cur
 	FROM threads AS t
 	INNER JOIN users AS u
 	ON t.user_id = u.id
-	WHERE t.id > ?
+	WHERE t.id >= ?
 	ORDER BY t.id ASC
 	LIMIT ?;`
 

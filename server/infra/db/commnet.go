@@ -37,7 +37,7 @@ func (repo *commentRepository) ListComments(ctx context.Context, m SQLManager, t
 	FROM comments AS c
 	INNER JOIN users AS u
 	ON c.user_id = u.id
-	WHERE c.id > ?
+	WHERE c.id >= ?
 	AND c.thread_id = ?
 	ORDER BY c.id ASC
 	LIMIT ?;`

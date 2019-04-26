@@ -11,7 +11,9 @@
       <v-data-table
         :headers="headers"
         :items="showThreads"
-        :rows-per-page-items="[10, 20, 30, 40]"
+        :no-data-text="nodata"
+        :pagination.sync="pagination"
+        :loading="loading"
       >
         <template slot="headerCell" slot-scope="props">
           <v-tooltip bottom>
@@ -53,6 +55,13 @@ export default {
 
   data() {
     return {
+      nodata: 'There is no data',
+      loading: false,
+      pagination: {
+        rowsPerPage: 20,
+        totalItems: 0,
+        rowsPerPageItems: [20, 30, 40]
+      },
       headers: [
         {
           text: 'Title',
@@ -73,6 +82,16 @@ export default {
           value: 'createdAt'
         }
       ]
+    }
+  },
+  watch: {
+    pagination: {
+      rowsPerPage: 20,
+      handler() {
+        this.listMore()
+      },
+      rowsPerPageItems: [20, 30, 40],
+      deep: true
     }
   },
   computed: {
@@ -98,9 +117,9 @@ export default {
     },
     ...mapGetters('threads', ['threads', 'threadList', 'isDialogVisible'])
   },
-  async asyncData({ store }) {
+  asyncData({ store }) {
     try {
-      await store.dispatch(`threads/${LIST_THREADS}`)
+      store.dispatch(`threads/${LIST_THREADS}`)
     } catch (error) {
       console.error(`failed to list threads: ${JSON.stringify(error)}`)
     }
@@ -109,12 +128,28 @@ export default {
     redirectToComment(thread) {
       this.$router.push(`/threads/${thread.id}/comments`)
     },
-    async listMore(id) {
+    async listMore() {
+      if (!this.threadList.hasNext) {
+        console.log(
+          `this.threads.hasNext ========>>${JSON.stringify(
+            this.threadList.hasNext
+          )}`
+        )
+        return
+      }
+
+      this.loading = true
+      console.log('====X====')
+      const lastId = this.threads[this.threads.length - 1].id
+      console.log(`this.threads ========>>${JSON.stringify(this.threads)}`)
+
       try {
-        await this.LIST_THREADS_MORE({ limit: 20, cursor: id })
+        await this.LIST_THREADS_MORE({ limit: 20, cursor: lastId })
+        console.log(`this.threads = ${JSON.stringify(this.threads)}`)
       } catch (error) {
         console.error(`failed to list threads more: ${JSON.stringify(error)}`)
       }
+      this.loading = false
     },
     removeButton() {
       this.CHANGE_IS_DIALOG_VISIBLE({ dialogState: this.dialogVisible })

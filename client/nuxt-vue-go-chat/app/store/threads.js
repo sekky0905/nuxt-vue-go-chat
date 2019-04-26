@@ -40,6 +40,7 @@ export const mutations = {
     state.threadList = threadList
   },
   [ADD_THREAD_LIST](state, { threadList }) {
+    console.log(`threadList: ${JSON.stringify(threadList)}`)
     state.threadList.threads = state.threadList.threads.concat(
       threadList.threads
     )
@@ -68,24 +69,17 @@ export const mutations = {
 
 export const actions = {
   async [LIST_THREADS]({ commit }) {
-    const list = await this.$axios.$get('/threads')
-    commit(CLEAR_THREADS)
-    if (!list.threads) {
-      return
-    }
-    commit(SET_THREAD_LIST, { threadList: list })
+    const list = await this.$axios.$get('/threads?limit=20')
+    commit(ADD_THREAD_LIST, { threadList: list })
   },
   async [LIST_THREADS_MORE]({ commit }, { limit, cursor }) {
     const list = await this.$axios.$get(
       `/threads?limit=${limit}&cursor=${cursor}`
     )
-    if (!list.threads) {
-      return
-    }
+
     commit(ADD_THREAD_LIST, { threadList: list })
   },
   async [SAVE_THREAD]({ commit }, { payload }) {
-    console.log(`payload: ${JSON.stringify(payload)}`)
     const response = await this.$axios.$post(`/threads`, payload)
     commit(ADD_THREAD, { thread: response })
   },

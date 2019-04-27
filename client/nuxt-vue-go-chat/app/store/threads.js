@@ -40,7 +40,6 @@ export const mutations = {
     state.threadList = threadList
   },
   [ADD_THREAD_LIST](state, { threadList }) {
-    console.log(`threadList: ${JSON.stringify(threadList)}`)
     state.threadList.threads = state.threadList.threads.concat(
       threadList.threads
     )

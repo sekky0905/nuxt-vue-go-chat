@@ -57,11 +57,7 @@ export default {
     return {
       nodata: 'There is no data',
       loading: false,
-      pagination: {
-        rowsPerPage: 20,
-        totalItems: 0,
-        rowsPerPageItems: [20, 30, 40]
-      },
+      pagination: {},
       headers: [
         {
           text: 'Title',
@@ -86,11 +82,9 @@ export default {
   },
   watch: {
     pagination: {
-      rowsPerPage: 20,
       handler() {
         this.listMore()
       },
-      rowsPerPageItems: [20, 30, 40],
       deep: true
     }
   },

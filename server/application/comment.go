@@ -85,6 +85,8 @@ func (cs *commentService) CreateComment(ctx context.Context, param *model.Commen
 
 // UpdateComment updates Comment.
 func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *model.Comment) (comment *model.Comment, err error) {
+	copiedComment := *param
+
 	tx, err := cs.m.Begin()
 	if err != nil {
 		return nil, beginTxErrorMsg(err)
@@ -96,7 +98,7 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 		}
 	}()
 
-	yes, err := cs.service.IsAlreadyExistID(ctx, tx, param.ID)
+	yes, err := cs.service.IsAlreadyExistID(ctx, tx, copiedComment.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
@@ -112,13 +114,13 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 		return nil, errors.Wrap(err, "failed to is already exist ID")
 	}
 
-	param.UpdatedAt = time.Now()
+	copiedComment.UpdatedAt = time.Now()
 
-	if err := cs.repo.UpdateComment(ctx, tx, param.ID, param); err != nil {
+	if err := cs.repo.UpdateComment(ctx, tx, param.ID, &copiedComment); err != nil {
 		return nil, errors.Wrap(err, "failed to update comment")
 	}
 
-	return param, nil
+	return &copiedComment, nil
 }
 
 // DeleteComment deletes Comment.

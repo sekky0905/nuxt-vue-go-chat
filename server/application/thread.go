@@ -99,6 +99,7 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 
 // UpdateThread updates Thread.
 func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *model.Thread) (thread *model.Thread, err error) {
+	copiedThread := *param
 	tx, err := a.m.Begin()
 	if err != nil {
 		return nil, beginTxErrorMsg(err)
@@ -110,7 +111,7 @@ func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *mode
 		}
 	}()
 
-	yes, err := a.service.IsAlreadyExistID(ctx, tx, param.ID)
+	yes, err := a.service.IsAlreadyExistID(ctx, tx, copiedThread.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
 			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
@@ -126,13 +127,13 @@ func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *mode
 		return nil, errors.Wrap(err, "failed to is already exist ID")
 	}
 
-	param.UpdatedAt = time.Now()
+	copiedThread.UpdatedAt = time.Now()
 
-	if err := a.repo.UpdateThread(ctx, tx, param.ID, param); err != nil {
+	if err := a.repo.UpdateThread(ctx, tx, copiedThread.ID, &copiedThread); err != nil {
 		return nil, errors.Wrap(err, "failed to update thread")
 	}
 
-	return param, nil
+	return &copiedThread, nil
 }
 
 // DeleteThread deletes Thread.

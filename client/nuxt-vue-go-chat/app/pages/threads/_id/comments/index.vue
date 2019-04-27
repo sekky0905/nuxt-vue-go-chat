@@ -70,9 +70,6 @@ export default {
     existsData() {
       return this.commentList && this.commentList.length !== 0
     },
-    existsMore() {
-      return this.commentList.hasNext
-    },
     showComments() {
       if (!this.existsData) {
         return

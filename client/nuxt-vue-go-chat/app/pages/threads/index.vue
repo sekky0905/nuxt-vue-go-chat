@@ -11,7 +11,9 @@
       <v-data-table
         :headers="headers"
         :items="showThreads"
-        :rows-per-page-items="[10, 20, 30, 40]"
+        :no-data-text="nodata"
+        :pagination.sync="pagination"
+        :loading="loading"
       >
         <template slot="headerCell" slot-scope="props">
           <v-tooltip bottom>
@@ -53,6 +55,9 @@ export default {
 
   data() {
     return {
+      nodata: 'There is no data',
+      loading: false,
+      pagination: {},
       headers: [
         {
           text: 'Title',
@@ -73,6 +78,14 @@ export default {
           value: 'createdAt'
         }
       ]
+    }
+  },
+  watch: {
+    pagination: {
+      handler() {
+        this.listMore()
+      },
+      deep: true
     }
   },
   computed: {
@@ -98,9 +111,9 @@ export default {
     },
     ...mapGetters('threads', ['threads', 'threadList', 'isDialogVisible'])
   },
-  async asyncData({ store }) {
+  asyncData({ store }) {
     try {
-      await store.dispatch(`threads/${LIST_THREADS}`)
+      store.dispatch(`threads/${LIST_THREADS}`)
     } catch (error) {
       console.error(`failed to list threads: ${JSON.stringify(error)}`)
     }
@@ -109,12 +122,20 @@ export default {
     redirectToComment(thread) {
       this.$router.push(`/threads/${thread.id}/comments`)
     },
-    async listMore(id) {
+    async listMore() {
+      if (!this.threadList.hasNext) {
+        return
+      }
+
+      this.loading = true
+      const lastId = this.threads[this.threads.length - 1].id
+
       try {
-        await this.LIST_THREADS_MORE({ limit: 20, cursor: id })
+        await this.LIST_THREADS_MORE({ limit: 20, cursor: lastId })
       } catch (error) {
         console.error(`failed to list threads more: ${JSON.stringify(error)}`)
       }
+      this.loading = false
     },
     removeButton() {
       this.CHANGE_IS_DIALOG_VISIBLE({ dialogState: this.dialogVisible })

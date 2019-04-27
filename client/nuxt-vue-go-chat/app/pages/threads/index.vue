@@ -124,22 +124,14 @@ export default {
     },
     async listMore() {
       if (!this.threadList.hasNext) {
-        console.log(
-          `this.threads.hasNext ========>>${JSON.stringify(
-            this.threadList.hasNext
-          )}`
-        )
         return
       }
 
       this.loading = true
-      console.log('====X====')
       const lastId = this.threads[this.threads.length - 1].id
-      console.log(`this.threads ========>>${JSON.stringify(this.threads)}`)
 
       try {
         await this.LIST_THREADS_MORE({ limit: 20, cursor: lastId })
-        console.log(`this.threads = ${JSON.stringify(this.threads)}`)
       } catch (error) {
         console.error(`failed to list threads more: ${JSON.stringify(error)}`)
       }

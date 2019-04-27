@@ -59,7 +59,12 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+import {
+  required,
+  minLength,
+  maxLength,
+  sameAs
+} from 'vuelidate/lib/validators'
 import { mapActions, mapGetters } from 'vuex'
 import { SIGN_UP } from '../store/action-types'
 
@@ -73,7 +78,8 @@ export default {
     confirmPw: {
       required,
       minLength: minLength(10),
-      maxLength: maxLength(32)
+      maxLength: maxLength(32),
+      sameAsPassword: sameAs('pw')
     }
   },
 
@@ -119,9 +125,8 @@ export default {
       !this.$v.confirmPw.required &&
         errors.push('Confirm Password is required.')
 
-      if (this.$v.pw !== this.$v.confirmPw) {
+      !this.$v.confirmPw.sameAsPassword &&
         errors.push('Password and Confirm Password should be same.')
-      }
 
       return errors
     },

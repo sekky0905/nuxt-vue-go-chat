@@ -129,7 +129,7 @@ func (repo *userRepository) list(ctx context.Context, m SQLManager, method model
 
 // InsertUser insert a record.
 func (repo *userRepository) InsertUser(ctx context.Context, m SQLManager, user *model.User) (uint32, error) {
-	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
+	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
@@ -141,7 +141,7 @@ func (repo *userRepository) InsertUser(ctx context.Context, m SQLManager, user *
 		}
 	}()
 
-	result, err := stmt.ExecContext(ctx, user.Name, user.SessionID, user.Password, user.CreatedAt, user.UpdatedAt)
+	result, err := stmt.ExecContext(ctx, user.Name, user.SessionID, user.Password)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
@@ -162,7 +162,7 @@ func (repo *userRepository) InsertUser(ctx context.Context, m SQLManager, user *
 
 // UpdateUser updates a record.
 func (repo *userRepository) UpdateUser(ctx context.Context, m SQLManager, id uint32, user *model.User) error {
-	query := "UPDATE users SET session_id=?, password=?, updated_at=? WHERE id=?"
+	query := "UPDATE users SET session_id=?, password=?, updated_at=NOW() WHERE id=?"
 
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -176,7 +176,7 @@ func (repo *userRepository) UpdateUser(ctx context.Context, m SQLManager, id uin
 		}
 	}()
 
-	result, err := stmt.ExecContext(ctx, user.SessionID, user.Password, user.UpdatedAt, id)
+	result, err := stmt.ExecContext(ctx, user.SessionID, user.Password, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}

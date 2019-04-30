@@ -61,7 +61,6 @@ export const mutations = {
     state.threadList = null
   },
   [SET_IS_DIALOG_VISIBLE](state, { dialogState }) {
-    console.log(`[SET_IS_DIALOG_VISIBLE] =${dialogState}`)
     state.isDialogVisible = !dialogState
   }
 }
@@ -69,7 +68,7 @@ export const mutations = {
 export const actions = {
   async [LIST_THREADS]({ commit }) {
     const list = await this.$axios.$get('/threads?limit=20')
-    commit(ADD_THREAD_LIST, { threadList: list })
+    commit(SET_THREAD_LIST, { threadList: list })
   },
   async [LIST_THREADS_MORE]({ commit }, { limit, cursor }) {
     const list = await this.$axios.$get(

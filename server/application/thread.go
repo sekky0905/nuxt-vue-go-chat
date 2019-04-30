@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -70,9 +69,6 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 		}
 	}()
 
-	param.CreatedAt = time.Now()
-	param.UpdatedAt = time.Now()
-
 	yes, err := a.service.IsAlreadyExistTitle(ctx, tx, param.Title)
 	if yes {
 		err = &model.AlreadyExistError{
@@ -126,8 +122,6 @@ func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *mode
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to is already exist ID")
 	}
-
-	copiedThread.UpdatedAt = time.Now()
 
 	if err := a.repo.UpdateThread(ctx, tx, copiedThread.ID, &copiedThread); err != nil {
 		return nil, errors.Wrap(err, "failed to update thread")

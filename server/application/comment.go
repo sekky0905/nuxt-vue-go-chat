@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -71,9 +70,6 @@ func (cs *commentService) CreateComment(ctx context.Context, param *model.Commen
 		}
 	}()
 
-	param.CreatedAt = time.Now()
-	param.UpdatedAt = time.Now()
-
 	id, err := cs.repo.InsertComment(ctx, tx, param)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert comment")
@@ -113,8 +109,6 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to is already exist ID")
 	}
-
-	copiedComment.UpdatedAt = time.Now()
 
 	if err := cs.repo.UpdateComment(ctx, tx, param.ID, &copiedComment); err != nil {
 		return nil, errors.Wrap(err, "failed to update comment")

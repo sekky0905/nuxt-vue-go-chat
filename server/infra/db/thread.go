@@ -186,7 +186,7 @@ func (repo *threadRepository) list(ctx context.Context, m SQLManager, method mod
 
 // InsertThread insert a record.
 func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, thread *model.Thread) (uint32, error) {
-	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
@@ -198,7 +198,7 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, th
 		}
 	}()
 
-	result, err := stmt.ExecContext(ctx, thread.Title, thread.User.ID, thread.CreatedAt, thread.UpdatedAt)
+	result, err := stmt.ExecContext(ctx, thread.Title, thread.User.ID)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
@@ -219,8 +219,12 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, th
 
 // UpdateThread updates a record.
 func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id uint32, thread *model.Thread) error {
-	query := "UPDATE threads SET title=?, updated_at=? WHERE id=?"
+	query := "UPDATE threads SET title=?, updated_at=NOW() WHERE id=?"
 	stmt, err := m.PrepareContext(ctx, query)
+	if err != nil {
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+	}
+
 	defer func() {
 		err = stmt.Close()
 		if err != nil {
@@ -228,11 +232,7 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id
 		}
 	}()
 
-	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
-	}
-
-	result, err := stmt.ExecContext(ctx, thread.Title, thread.UpdatedAt, id)
+	result, err := stmt.ExecContext(ctx, thread.Title, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}

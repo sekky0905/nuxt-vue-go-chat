@@ -167,7 +167,7 @@ func (repo *commentRepository) list(ctx context.Context, m repository.SQLManager
 
 // InsertThread insert a record.
 func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, comment *model.Comment) (uint32, error) {
-	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?);"
+	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW());"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
@@ -179,7 +179,7 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, 
 		}
 	}()
 
-	result, err := stmt.ExecContext(ctx, comment.Content, comment.User.ID, comment.ThreadID, comment.CreatedAt, comment.UpdatedAt)
+	result, err := stmt.ExecContext(ctx, comment.Content, comment.User.ID, comment.ThreadID)
 	if err != nil {
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
 	}
@@ -200,7 +200,7 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, 
 
 // UpdateComment updates a record.
 func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, id uint32, comment *model.Comment) error {
-	query := "UPDATE comments SET content=?, updated_at=? WHERE id=?;"
+	query := "UPDATE comments SET content=?, updated_at= NOW() WHERE id=?;"
 
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -218,7 +218,7 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, 
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}
 
-	result, err := stmt.ExecContext(ctx, comment.Content, comment.UpdatedAt, id)
+	result, err := stmt.ExecContext(ctx, comment.Content, id)
 	if err != nil {
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
 	}

@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -121,9 +120,6 @@ func (s *authenticationService) createUser(ctx context.Context, m repository.SQL
 		}
 	}
 
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
-
 	id, err := s.userRepository.InsertUser(ctx, m, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert user")
@@ -146,8 +142,6 @@ func (s *authenticationService) createSession(ctx context.Context, m repository.
 			}
 		}
 	}
-
-	session.CreatedAt = time.Now()
 
 	if err := s.sessionRepository.InsertSession(ctx, m, session); err != nil {
 		return nil, errors.Wrap(err, "failed to insert session")

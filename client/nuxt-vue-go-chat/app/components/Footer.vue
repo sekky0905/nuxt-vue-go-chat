@@ -1,6 +1,6 @@
 <template>
   <v-footer app fixed>
-    <span>nuxt-go-vue-chat</span>
+    <span style="color: #64B5F6">Nuxt Go Vue Chat</span>
   </v-footer>
 </template>
 

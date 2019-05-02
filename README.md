@@ -1,4 +1,7 @@
 # nuxt-vue-go-chat
+
+[![Build Status](https://travis-ci.org/sekky0905/nuxt-vue-go-chat.svg?branch=master)](https://travis-ci.org/sekky0905/nuxt-vue-go-chat)
+
 Nuxt(Vue.js) + Goでの簡単なチャットアプリ。
 
 # サーバサイド

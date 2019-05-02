@@ -1,0 +1,19 @@
+language: go
+
+go:
+  - "1.11.x"
+
+cache:
+  directories:
+    - vendor
+
+before_install:
+  - go get -u github.com/golang/dep/cmd/dep
+
+install:
+  - cd server && make tools
+  - dep ensure
+
+script:
+  - make check
+  - make test

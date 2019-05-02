@@ -13,6 +13,8 @@ import (
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+	mock_query "github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
@@ -23,7 +25,7 @@ func Test_threadService_ListThreads(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		repo     repository.ThreadRepository
 		txCloser CloseTransaction
 	}
@@ -49,9 +51,9 @@ func Test_threadService_ListThreads(t *testing.T) {
 		{
 			name: "When appropriate args given, ListThreads returns ThreadList and nil",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -78,9 +80,9 @@ func Test_threadService_ListThreads(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, ListThreads returns nil and error",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -129,7 +131,7 @@ func Test_threadService_GetThread(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		repo     repository.ThreadRepository
 		txCloser CloseTransaction
 	}
@@ -154,9 +156,9 @@ func Test_threadService_GetThread(t *testing.T) {
 		{
 			name: "When appropriate args given, GetThread returns Thread and nil",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -192,9 +194,9 @@ func Test_threadService_GetThread(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, GetThread returns nil and error",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -242,7 +244,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.ThreadService
 		repo     repository.ThreadRepository
 		txCloser CloseTransaction
@@ -264,7 +266,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 
 	type mockArgsInsertThread struct {
 		ctx   context.Context
-		tx    repository.DBManager
+		tx    query.DBManager
 		param *model.Thread
 	}
 
@@ -287,10 +289,10 @@ func Test_threadService_CreateThread(t *testing.T) {
 		{
 			name: "When appropriate args given, CreateThread returns id and nil",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -351,10 +353,10 @@ func Test_threadService_CreateThread(t *testing.T) {
 		{
 			name: "When given id has already existed, CreateThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -390,10 +392,10 @@ func Test_threadService_CreateThread(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, CreateThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -422,7 +424,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 			},
 			mockArgsInsertThread: mockArgsInsertThread{
 				ctx: context.Background(),
-				tx:  mock_repository.NewMockDBManager(ctrl),
+				tx:  mock_query.NewMockDBManager(ctrl),
 				param: &model.Thread{
 					ID:    uint32(model.ThreadValidIDForTest),
 					Title: model.TitleForTest,
@@ -446,11 +448,11 @@ func Test_threadService_CreateThread(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ts, ok := tt.fields.service.(*mock_service.MockThreadService)
 			if !ok {
@@ -465,7 +467,7 @@ func Test_threadService_CreateThread(t *testing.T) {
 					t.Fatal("failed to assert MockThreadRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().InsertThread(tt.mockArgsInsertThread.ctx, txM, tt.args.param).Return(tt.mockReturnsInsertThread.id, tt.mockReturnsInsertThread.err)
 			}
@@ -499,7 +501,7 @@ func Test_threadService_UpdateThread(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.ThreadService
 		repo     repository.ThreadRepository
 		txCloser CloseTransaction
@@ -543,10 +545,10 @@ func Test_threadService_UpdateThread(t *testing.T) {
 		{
 			name: "When appropriate args given, UpdateThread returns Thread and err",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -609,10 +611,10 @@ func Test_threadService_UpdateThread(t *testing.T) {
 		{
 			name: "When given id has not existed, UpdateThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -649,10 +651,10 @@ func Test_threadService_UpdateThread(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, UpdateThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -704,11 +706,11 @@ func Test_threadService_UpdateThread(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ts, ok := tt.fields.service.(*mock_service.MockThreadService)
 			if !ok {
@@ -724,7 +726,7 @@ func Test_threadService_UpdateThread(t *testing.T) {
 					t.Fatal("failed to assert MockThreadRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().UpdateThread(tt.mockArgsUpdateThread.ctx, txM, tt.args.id, tt.args.param).Return(tt.mockReturnsUpdateThread.err)
 			}
@@ -759,7 +761,7 @@ func Test_threadService_DeleteThread(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.ThreadService
 		repo     repository.ThreadRepository
 		txCloser CloseTransaction
@@ -797,10 +799,10 @@ func Test_threadService_DeleteThread(t *testing.T) {
 		{
 			name: "When appropriate args given, DeleteThread returns Thread and err",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -848,10 +850,10 @@ func Test_threadService_DeleteThread(t *testing.T) {
 		{
 			name: "When given id has not existed, DeleteThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -885,10 +887,10 @@ func Test_threadService_DeleteThread(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, DeleteThread returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockThreadService(ctrl),
 				repo:    mock_repository.NewMockThreadRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -925,11 +927,11 @@ func Test_threadService_DeleteThread(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ts, ok := tt.fields.service.(*mock_service.MockThreadService)
 			if !ok {
@@ -944,7 +946,7 @@ func Test_threadService_DeleteThread(t *testing.T) {
 					t.Fatal("failed to assert MockThreadRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().DeleteThread(tt.args.ctx, txM, tt.args.id).Return(tt.mockReturnsDeleteThread.err)
 			}

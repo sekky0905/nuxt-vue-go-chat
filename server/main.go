@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/application"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/router"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/interface/controller"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/middleware"
@@ -40,7 +40,7 @@ func main() {
 }
 
 // initializeAuthenticationController generates and returns AuthenticationController.
-func initializeAuthenticationController(m repository.DBManager) controller.AuthenticationController {
+func initializeAuthenticationController(m query.DBManager) controller.AuthenticationController {
 	txCloser := db.CloseTransaction
 
 	uRepo := db.NewUserRepository()
@@ -56,7 +56,7 @@ func initializeAuthenticationController(m repository.DBManager) controller.Authe
 }
 
 // initializeThreadCController generates and returns ThreadCController.
-func initializeThreadController(m repository.DBManager) controller.ThreadController {
+func initializeThreadController(m query.DBManager) controller.ThreadController {
 	txCloser := db.CloseTransaction
 
 	tRepo := db.NewThreadRepository()
@@ -68,7 +68,7 @@ func initializeThreadController(m repository.DBManager) controller.ThreadControl
 }
 
 // initializeCommentController generates and returns CommentController.
-func initializeCommentController(m repository.DBManager) controller.CommentController {
+func initializeCommentController(m query.DBManager) controller.CommentController {
 	txCloser := db.CloseTransaction
 
 	cRepo := db.NewCommentRepository()

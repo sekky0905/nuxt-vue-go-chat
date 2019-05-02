@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/util"
 )
 
@@ -14,7 +15,7 @@ import (
 type SessionService interface {
 	NewSession(userID uint32) *model.Session
 	SessionID() string
-	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id string) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m query.SQLManager, id string) (bool, error)
 }
 
 // SessionRepoFactory is factory of SessionRepository.
@@ -47,7 +48,7 @@ func (s *sessionService) SessionID() string {
 }
 
 // IsAlreadyExistID checks whether the data specified by id already exists or not.
-func (s sessionService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id string) (bool, error) {
+func (s sessionService) IsAlreadyExistID(ctx context.Context, m query.SQLManager, id string) (bool, error) {
 	var searched *model.Session
 	var err error
 

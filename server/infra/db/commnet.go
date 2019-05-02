@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
-	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"go.uber.org/zap"
 )
@@ -17,7 +18,7 @@ type commentRepository struct {
 }
 
 // NewCommentRepository generates and returns CommentRepository.
-func NewCommentRepository() CommentRepository {
+func NewCommentRepository() repository.CommentRepository {
 	return &commentRepository{}
 }
 
@@ -32,7 +33,7 @@ func (repo *commentRepository) ErrorMsg(method model.RepositoryMethod, err error
 }
 
 // ListThreads lists ThreadList.
-func (repo *commentRepository) ListComments(ctx context.Context, m SQLManager, threadID uint32, limit int, cursor uint32) (*model.CommentList, error) {
+func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLManager, threadID uint32, limit int, cursor uint32) (*model.CommentList, error) {
 	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
 	FROM comments AS c
 	INNER JOIN users AS u
@@ -84,7 +85,7 @@ func (repo *commentRepository) ListComments(ctx context.Context, m SQLManager, t
 }
 
 // GetThreadByID gets and returns a record specified by id.
-func (repo *commentRepository) GetCommentByID(ctx context.Context, m SQLManager, id uint32) (*model.Comment, error) {
+func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLManager, id uint32) (*model.Comment, error) {
 	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
 	FROM comments AS c
 	INNER JOIN users AS u
@@ -114,7 +115,7 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m SQLManager,
 }
 
 // list gets and returns list of records.
-func (repo *commentRepository) list(ctx context.Context, m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
+func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, errors.WithStack(repo.ErrorMsg(method, err))
@@ -166,7 +167,7 @@ func (repo *commentRepository) list(ctx context.Context, m repository.SQLManager
 }
 
 // InsertThread insert a record.
-func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, comment *model.Comment) (uint32, error) {
+func (repo *commentRepository) InsertComment(ctx context.Context, m query.SQLManager, comment *model.Comment) (uint32, error) {
 	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW());"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -199,7 +200,7 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m SQLManager, 
 }
 
 // UpdateComment updates a record.
-func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, id uint32, comment *model.Comment) error {
+func (repo *commentRepository) UpdateComment(ctx context.Context, m query.SQLManager, id uint32, comment *model.Comment) error {
 	query := "UPDATE comments SET content=?, updated_at= NOW() WHERE id=?;"
 
 	stmt, err := m.PrepareContext(ctx, query)
@@ -233,7 +234,7 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m SQLManager, 
 }
 
 // DeleteComment delete a record.
-func (repo *commentRepository) DeleteComment(ctx context.Context, m SQLManager, id uint32) error {
+func (repo *commentRepository) DeleteComment(ctx context.Context, m query.SQLManager, id uint32) error {
 	query := "DELETE FROM comments WHERE id=?;"
 
 	stmt, err := m.PrepareContext(ctx, query)

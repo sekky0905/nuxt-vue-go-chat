@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"go.uber.org/zap"
 )
@@ -16,7 +18,7 @@ type threadRepository struct {
 }
 
 // NewThreadRepository generates and returns ThreadRepository.
-func NewThreadRepository() ThreadRepository {
+func NewThreadRepository() repository.ThreadRepository {
 	return &threadRepository{}
 }
 
@@ -31,7 +33,7 @@ func (repo *threadRepository) ErrorMsg(method model.RepositoryMethod, err error)
 }
 
 // ListThreads lists ThreadList.
-func (repo *threadRepository) ListThreads(ctx context.Context, m SQLManager, cursor uint32, limit int) (*model.ThreadList, error) {
+func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManager, cursor uint32, limit int) (*model.ThreadList, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
@@ -74,7 +76,7 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m SQLManager, cur
 }
 
 // GetThreadByID gets and returns a record specified by id.
-func (repo *threadRepository) GetThreadByID(ctx context.Context, m SQLManager, id uint32) (*model.Thread, error) {
+func (repo *threadRepository) GetThreadByID(ctx context.Context, m query.SQLManager, id uint32) (*model.Thread, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
@@ -104,7 +106,7 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m SQLManager, i
 }
 
 // GetThreadByTitle gets and returns a record specified by title.
-func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m SQLManager, name string) (*model.Thread, error) {
+func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLManager, name string) (*model.Thread, error) {
 	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
@@ -134,7 +136,7 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m SQLManager
 }
 
 // list gets and returns list of records.
-func (repo *threadRepository) list(ctx context.Context, m SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (threads []*model.Thread, err error) {
+func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (threads []*model.Thread, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, errors.WithStack(repo.ErrorMsg(method, err))
@@ -185,7 +187,7 @@ func (repo *threadRepository) list(ctx context.Context, m SQLManager, method mod
 }
 
 // InsertThread insert a record.
-func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, thread *model.Thread) (uint32, error) {
+func (repo *threadRepository) InsertThread(ctx context.Context, m query.SQLManager, thread *model.Thread) (uint32, error) {
 	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -218,7 +220,7 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m SQLManager, th
 }
 
 // UpdateThread updates a record.
-func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id uint32, thread *model.Thread) error {
+func (repo *threadRepository) UpdateThread(ctx context.Context, m query.SQLManager, id uint32, thread *model.Thread) error {
 	query := "UPDATE threads SET title=?, updated_at=NOW() WHERE id=?"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -247,7 +249,7 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m SQLManager, id
 }
 
 // DeleteThread delete a record.
-func (repo *threadRepository) DeleteThread(ctx context.Context, m SQLManager, id uint32) error {
+func (repo *threadRepository) DeleteThread(ctx context.Context, m query.SQLManager, id uint32) error {
 	query := "DELETE FROM threads WHERE id=?"
 
 	stmt, err := m.PrepareContext(ctx, query)

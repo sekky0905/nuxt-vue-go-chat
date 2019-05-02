@@ -7,6 +7,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 )
 
 // ThreadService is interface of ThreadService.
@@ -20,14 +21,14 @@ type ThreadService interface {
 
 // threadService is application service of thread.
 type threadService struct {
-	m        repository.DBManager
+	m        query.DBManager
 	service  service.ThreadService
 	repo     repository.ThreadRepository
 	txCloser CloseTransaction
 }
 
 // NewThreadService generates and returns ThreadService.
-func NewThreadService(m repository.DBManager, service service.ThreadService, repo repository.ThreadRepository, txCloser CloseTransaction) ThreadService {
+func NewThreadService(m query.DBManager, service service.ThreadService, repo repository.ThreadRepository, txCloser CloseTransaction) ThreadService {
 	return &threadService{
 		m:        m,
 		service:  service,

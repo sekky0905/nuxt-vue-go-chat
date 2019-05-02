@@ -30,7 +30,7 @@ func (c Comment) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-// CommentLList is list of comment.
+// CommentList is list of comment.
 type CommentList struct {
 	Comments []*Comment `json:"comments"`
 	HasNext  bool       `json:"hasNext"`

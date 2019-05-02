@@ -7,14 +7,15 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/util"
 )
 
 // UserService is interface of domain service of user.
 type UserService interface {
 	NewUser(name, password string) (*model.User, error)
-	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error)
-	IsAlreadyExistName(ctx context.Context, m repository.SQLManager, name string) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m query.SQLManager, id uint32) (bool, error)
+	IsAlreadyExistName(ctx context.Context, m query.SQLManager, name string) (bool, error)
 }
 
 // UserRepoFactory is factory of UserRepository.
@@ -26,7 +27,7 @@ type userService struct {
 }
 
 // NewUserService generates and returns UserService.
-func NewUserService(m repository.SQLManager, repo repository.UserRepository) UserService {
+func NewUserService(m query.SQLManager, repo repository.UserRepository) UserService {
 	return &userService{
 		repo: repo,
 	}
@@ -48,7 +49,7 @@ func (s *userService) NewUser(name, password string) (*model.User, error) {
 }
 
 // IsAlreadyExistID checks whether the data specified by id already exists or not.
-func (s *userService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
+func (s *userService) IsAlreadyExistID(ctx context.Context, m query.SQLManager, id uint32) (bool, error) {
 	searched, err := s.repo.GetUserByID(ctx, m, id)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by id")
@@ -57,7 +58,7 @@ func (s *userService) IsAlreadyExistID(ctx context.Context, m repository.SQLMana
 }
 
 // IsAlreadyExistName checks whether the data specified by name already exists or not.
-func (s *userService) IsAlreadyExistName(ctx context.Context, m repository.SQLManager, name string) (bool, error) {
+func (s *userService) IsAlreadyExistName(ctx context.Context, m query.SQLManager, name string) (bool, error) {
 	searched, err := s.repo.GetUserByName(ctx, m, name)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to get user by Name")

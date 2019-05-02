@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -25,7 +27,7 @@ func Test_userService_IsAlreadyExistID(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		m   repository.DBManager
+		m   query.DBManager
 		id  uint32
 	}
 
@@ -135,7 +137,7 @@ func Test_userService_IsAlreadyExistName(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		m    repository.DBManager
+		m    query.DBManager
 		name string
 	}
 

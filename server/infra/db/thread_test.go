@@ -6,12 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
-	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
-	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 func TestNewThreadRepository(t *testing.T) {
@@ -98,7 +99,7 @@ func Test_threadRepository_ListThreads(t *testing.T) {
 
 	type args struct {
 		ctx    context.Context
-		m      SQLManager
+		m      query.SQLManager
 		limit  int
 		cursor uint32
 	}
@@ -229,7 +230,7 @@ func Test_threadRepository_GetThreadByID(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 	}
 
@@ -322,7 +323,7 @@ func Test_threadRepository_GetThreadByTitle(t *testing.T) {
 
 	type args struct {
 		ctx   context.Context
-		m     repository.SQLManager
+		m     query.SQLManager
 		title string
 	}
 
@@ -414,7 +415,7 @@ func Test_threadRepository_InsertThread(t *testing.T) {
 
 	type args struct {
 		ctx    context.Context
-		m      repository.SQLManager
+		m      query.SQLManager
 		thread *model.Thread
 		err    error
 	}
@@ -549,7 +550,7 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 
 	type args struct {
 		ctx    context.Context
-		m      repository.SQLManager
+		m      query.SQLManager
 		id     uint32
 		thread *model.Thread
 		err    error
@@ -688,7 +689,7 @@ func Test_threadRepository_DeleteThread(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 		err error
 	}

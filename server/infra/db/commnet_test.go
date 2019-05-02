@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
-	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
-	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 func TestNewCommentRepository(t *testing.T) {
@@ -98,7 +98,7 @@ func Test_commentRepository_ListComments(t *testing.T) {
 
 	type args struct {
 		ctx       context.Context
-		m         SQLManager
+		m         query.SQLManager
 		commentID uint32
 		limit     int
 		cursor    uint32
@@ -234,7 +234,7 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   SQLManager
+		m   query.SQLManager
 		id  uint32
 	}
 
@@ -325,7 +325,7 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
-		m       SQLManager
+		m       query.SQLManager
 		comment *model.Comment
 		err     error
 	}
@@ -458,7 +458,7 @@ func Test_commentRepository_UpdateComment(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
-		m       SQLManager
+		m       query.SQLManager
 		id      uint32
 		comment *model.Comment
 		err     error
@@ -595,7 +595,7 @@ func Test_commentRepository_DeleteComment(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   SQLManager
+		m   query.SQLManager
 		id  uint32
 		err error
 	}

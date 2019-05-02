@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-	. "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 )
 
 // CommentService is interface of CommentService.
@@ -21,14 +21,14 @@ type CommentService interface {
 
 // commentService is application service of comment.
 type commentService struct {
-	m        DBManager
+	m        query.DBManager
 	service  service.CommentService
-	repo     CommentRepository
+	repo     repository.CommentRepository
 	txCloser CloseTransaction
 }
 
 // NewCommentService generates and returns CommentService.
-func NewCommentService(m DBManager, service service.CommentService, repo CommentRepository, txCloser CloseTransaction) CommentService {
+func NewCommentService(m query.DBManager, service service.CommentService, repo repository.CommentRepository, txCloser CloseTransaction) CommentService {
 	return &commentService{
 		m:        m,
 		service:  service,

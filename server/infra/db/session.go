@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
 	"go.uber.org/zap"
 )
@@ -33,7 +34,7 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 }
 
 // GetSessionByID gets and returns a record specified by id.
-func (repo *sessionRepository) GetSessionByID(ctx context.Context, m repository.SQLManager, id string) (*model.Session, error) {
+func (repo *sessionRepository) GetSessionByID(ctx context.Context, m query.SQLManager, id string) (*model.Session, error) {
 	query := "SELECT id, user_id, created_at FROM sessions WHERE id=?"
 
 	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
@@ -58,7 +59,7 @@ func (repo *sessionRepository) GetSessionByID(ctx context.Context, m repository.
 }
 
 // list gets and returns list of records.
-func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
+func (repo *sessionRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, errors.WithStack(err))
@@ -103,7 +104,7 @@ func (repo *sessionRepository) list(ctx context.Context, m repository.SQLManager
 }
 
 // InsertSession insert a record.
-func (repo *sessionRepository) InsertSession(ctx context.Context, m repository.SQLManager, session *model.Session) error {
+func (repo *sessionRepository) InsertSession(ctx context.Context, m query.SQLManager, session *model.Session) error {
 	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, NOW())"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
@@ -131,7 +132,7 @@ func (repo *sessionRepository) InsertSession(ctx context.Context, m repository.S
 }
 
 // DeleteSession delete a record.
-func (repo *sessionRepository) DeleteSession(ctx context.Context, m repository.SQLManager, id string) error {
+func (repo *sessionRepository) DeleteSession(ctx context.Context, m query.SQLManager, id string) error {
 	query := "DELETE FROM sessions WHERE id=?"
 
 	stmt, err := m.PrepareContext(ctx, query)

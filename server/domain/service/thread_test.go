@@ -6,12 +6,12 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
-
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
 func Test_threadService_IsAlreadyExistID(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_threadService_IsAlreadyExistID(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 	}
 
@@ -138,7 +138,7 @@ func Test_threadService_IsAlreadyExistTitle(t *testing.T) {
 	}
 	type args struct {
 		ctx   context.Context
-		m     repository.SQLManager
+		m     query.SQLManager
 		title string
 	}
 

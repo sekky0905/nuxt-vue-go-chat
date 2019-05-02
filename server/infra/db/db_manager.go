@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 
 	// SQL Driver.
 	_ "github.com/go-sql-driver/mysql"
@@ -17,7 +17,7 @@ type dbManager struct {
 }
 
 // NewDBManager generates and returns DBManager.
-func NewDBManager() repository.DBManager {
+func NewDBManager() query.DBManager {
 	conn, err := sql.Open("mysql", "root:@tcp(nvgdb:3306)/nuxt_vue_go_chat?charset=utf8mb4&parseTime=True")
 	if err != nil {
 		panic(err.Error())
@@ -76,6 +76,6 @@ func (s *dbManager) PrepareContext(ctx context.Context, query string) (*sql.Stmt
 }
 
 // Begin begins tx.
-func (s *dbManager) Begin() (repository.TxManager, error) {
+func (s *dbManager) Begin() (query.TxManager, error) {
 	return s.Conn.Begin()
 }

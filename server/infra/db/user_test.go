@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
@@ -97,7 +99,7 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 	}
 
@@ -183,7 +185,7 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 
 	type args struct {
 		ctx  context.Context
-		m    repository.SQLManager
+		m    query.SQLManager
 		name string
 	}
 
@@ -268,7 +270,7 @@ func Test_userRepository_InsertUser(t *testing.T) {
 
 	type args struct {
 		ctx  context.Context
-		m    repository.SQLManager
+		m    query.SQLManager
 		user *model.User
 		err  error
 	}
@@ -395,7 +397,7 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 
 	type args struct {
 		ctx  context.Context
-		m    repository.SQLManager
+		m    query.SQLManager
 		id   uint32
 		user *model.User
 		err  error
@@ -526,7 +528,7 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 		err error
 	}

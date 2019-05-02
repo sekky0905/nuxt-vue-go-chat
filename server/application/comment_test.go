@@ -13,6 +13,8 @@ import (
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+	mock_query "github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
@@ -23,7 +25,7 @@ func Test_commentService_ListComments(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		repo     repository.CommentRepository
 		service  service.CommentService
 		txCloser CloseTransaction
@@ -51,10 +53,10 @@ func Test_commentService_ListComments(t *testing.T) {
 		{
 			name: "When appropriate args given, ListComments returns CommentList and nil",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -82,9 +84,9 @@ func Test_commentService_ListComments(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, ListComments returns nil and error",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -135,7 +137,7 @@ func Test_commentService_GetComment(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		repo     repository.CommentRepository
 		txCloser CloseTransaction
 	}
@@ -160,9 +162,9 @@ func Test_commentService_GetComment(t *testing.T) {
 		{
 			name: "When appropriate args given, GetComment returns Comment and nil",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -196,9 +198,9 @@ func Test_commentService_GetComment(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, GetComment returns nil and error",
 			fields: fields{
-				m:    mock_repository.NewMockDBManager(ctrl),
+				m:    mock_query.NewMockDBManager(ctrl),
 				repo: mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -246,7 +248,7 @@ func Test_commentService_CreateComment(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.CommentService
 		repo     repository.CommentRepository
 		txCloser CloseTransaction
@@ -258,7 +260,7 @@ func Test_commentService_CreateComment(t *testing.T) {
 
 	type mockArgsInsertComment struct {
 		ctx   context.Context
-		tx    repository.DBManager
+		tx    query.DBManager
 		param *model.Comment
 	}
 
@@ -279,10 +281,10 @@ func Test_commentService_CreateComment(t *testing.T) {
 		{
 			name: "When appropriate args given, CreateComment returns id and nil",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -328,10 +330,10 @@ func Test_commentService_CreateComment(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, CreateComment returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -349,7 +351,7 @@ func Test_commentService_CreateComment(t *testing.T) {
 			},
 			mockArgsInsertComment: mockArgsInsertComment{
 				ctx: context.Background(),
-				tx:  mock_repository.NewMockDBManager(ctrl),
+				tx:  mock_query.NewMockDBManager(ctrl),
 				param: &model.Comment{
 					ID:       model.CommentValidIDForTest,
 					ThreadID: model.ThreadValidIDForTest,
@@ -370,11 +372,11 @@ func Test_commentService_CreateComment(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			if tt.mockArgsInsertComment.param != nil {
 				tr, ok := tt.fields.repo.(*mock_repository.MockCommentRepository)
@@ -382,7 +384,7 @@ func Test_commentService_CreateComment(t *testing.T) {
 					t.Fatal("failed to assert MockCommentRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().InsertComment(tt.mockArgsInsertComment.ctx, txM, tt.args.param).Return(tt.mockReturnsInsertComment.id, tt.mockReturnsInsertComment.err)
 			}
@@ -416,7 +418,7 @@ func Test_commentService_UpdateComment(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.CommentService
 		repo     repository.CommentRepository
 		txCloser CloseTransaction
@@ -460,10 +462,10 @@ func Test_commentService_UpdateComment(t *testing.T) {
 		{
 			name: "When appropriate args given, UpdateComment returns Comment and err",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -517,10 +519,10 @@ func Test_commentService_UpdateComment(t *testing.T) {
 		{
 			name: "When given id has not existed, UpdateComment returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -554,10 +556,10 @@ func Test_commentService_UpdateComment(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, UpdateComment returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -603,11 +605,11 @@ func Test_commentService_UpdateComment(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ts, ok := tt.fields.service.(*mock_service.MockCommentService)
 			if !ok {
@@ -623,7 +625,7 @@ func Test_commentService_UpdateComment(t *testing.T) {
 					t.Fatal("failed to assert MockCommentRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().UpdateComment(tt.mockArgsUpdateComment.ctx, txM, tt.args.id, tt.args.param).Return(tt.mockReturnsUpdateComment.err)
 
@@ -659,7 +661,7 @@ func Test_commentService_DeleteComment(t *testing.T) {
 	testutil.SetFakeTime(time.Now())
 
 	type fields struct {
-		m        repository.DBManager
+		m        query.DBManager
 		service  service.CommentService
 		repo     repository.CommentRepository
 		txCloser CloseTransaction
@@ -697,10 +699,10 @@ func Test_commentService_DeleteComment(t *testing.T) {
 		{
 			name: "When appropriate args given, DeleteComment returns Comment and err",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -742,10 +744,10 @@ func Test_commentService_DeleteComment(t *testing.T) {
 		{
 			name: "When given id has not existed, DeleteComment returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -776,10 +778,10 @@ func Test_commentService_DeleteComment(t *testing.T) {
 		{
 			name: "When some error occurs at repository layer, DeleteComment returns nil and error",
 			fields: fields{
-				m:       mock_repository.NewMockDBManager(ctrl),
+				m:       mock_query.NewMockDBManager(ctrl),
 				service: mock_service.NewMockCommentService(ctrl),
 				repo:    mock_repository.NewMockCommentRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -813,11 +815,11 @@ func Test_commentService_DeleteComment(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockDBManager")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ts, ok := tt.fields.service.(*mock_service.MockCommentService)
 			if !ok {
@@ -832,7 +834,7 @@ func Test_commentService_DeleteComment(t *testing.T) {
 					t.Fatal("failed to assert MockCommentRepository")
 				}
 
-				txM := mock_repository.NewMockTxManager(ctrl)
+				txM := mock_query.NewMockTxManager(ctrl)
 
 				tr.EXPECT().DeleteComment(tt.args.ctx, txM, tt.args.id).Return(tt.mockReturnsDeleteComment.err)
 			}

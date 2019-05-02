@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	mock_query "github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query/mock"
+
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
@@ -13,6 +15,7 @@ import (
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
 	mock_service "github.com/sekky0905/nuxt-vue-go-chat/server/domain/service/mock"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
@@ -21,7 +24,7 @@ func Test_authenticationService_SignUp(t *testing.T) {
 	defer ctrl.Finish()
 
 	type fields struct {
-		m                 repository.DBManager
+		m                 query.DBManager
 		userRepository    repository.UserRepository
 		sessionRepository repository.SessionRepository
 		userService       service.UserService
@@ -93,12 +96,12 @@ func Test_authenticationService_SignUp(t *testing.T) {
 		{
 			name: "When appropriate name and password are given and the user which name is same as given name does'nt exist, returns user and nil",
 			fields: fields{
-				m:                 mock_repository.NewMockDBManager(ctrl),
+				m:                 mock_query.NewMockDBManager(ctrl),
 				userRepository:    mock_repository.NewMockUserRepository(ctrl),
 				sessionRepository: mock_repository.NewMockSessionRepository(ctrl),
 				userService:       mock_service.NewMockUserService(ctrl),
 				sessionService:    mock_service.NewMockSessionService(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -179,11 +182,11 @@ func Test_authenticationService_SignUp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			us, ok := tt.fields.userService.(*mock_service.MockUserService)
 			if !ok {
@@ -246,7 +249,7 @@ func Test_authenticationService_Login(t *testing.T) {
 	defer ctrl.Finish()
 
 	type fields struct {
-		m                     repository.DBManager
+		m                     query.DBManager
 		userRepository        repository.UserRepository
 		sessionRepository     repository.SessionRepository
 		userService           service.UserService
@@ -288,7 +291,7 @@ func Test_authenticationService_Login(t *testing.T) {
 
 	type mockSessionRepoArgs struct {
 		ctx     context.Context
-		m       repository.DBManager
+		m       query.DBManager
 		session *model.Session
 	}
 
@@ -322,12 +325,12 @@ func Test_authenticationService_Login(t *testing.T) {
 		{
 			name: "When appropriate name and password are given and the user which name is same as given name does'nt exist, returns user and nil",
 			fields: fields{
-				m:                     mock_repository.NewMockDBManager(ctrl),
+				m:                     mock_query.NewMockDBManager(ctrl),
 				userRepository:        mock_repository.NewMockUserRepository(ctrl),
 				sessionService:        mock_service.NewMockSessionService(ctrl),
 				authenticationService: mock_service.NewMockAuthenticationService(ctrl),
 				sessionRepository:     mock_repository.NewMockSessionRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -354,7 +357,7 @@ func Test_authenticationService_Login(t *testing.T) {
 			},
 			mockSessionRepoArgs: mockSessionRepoArgs{
 				ctx: context.Background(),
-				m:   mock_repository.NewMockDBManager(ctrl),
+				m:   mock_query.NewMockDBManager(ctrl),
 				session: &model.Session{
 					ID:        model.SessionValidIDForTest,
 					UserID:    model.UserValidIDForTest,
@@ -408,11 +411,11 @@ func Test_authenticationService_Login(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			ur, ok := tt.fields.userRepository.(*mock_repository.MockUserRepository)
 			if !ok {
@@ -472,7 +475,7 @@ func Test_authenticationService_Logout(t *testing.T) {
 
 	type mockArgs struct {
 		ctx       context.Context
-		m         repository.DBManager
+		m         query.DBManager
 		sessionID string
 	}
 
@@ -481,7 +484,7 @@ func Test_authenticationService_Logout(t *testing.T) {
 	}
 
 	type fields struct {
-		m                     repository.DBManager
+		m                     query.DBManager
 		userRepository        repository.UserRepository
 		sessionRepository     repository.SessionRepository
 		userService           service.UserService
@@ -504,12 +507,12 @@ func Test_authenticationService_Logout(t *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				m:                     mock_repository.NewMockDBManager(ctrl),
+				m:                     mock_query.NewMockDBManager(ctrl),
 				userRepository:        mock_repository.NewMockUserRepository(ctrl),
 				sessionService:        mock_service.NewMockSessionService(ctrl),
 				authenticationService: mock_service.NewMockAuthenticationService(ctrl),
 				sessionRepository:     mock_repository.NewMockSessionRepository(ctrl),
-				txCloser: func(tx repository.TxManager, err error) error {
+				txCloser: func(tx query.TxManager, err error) error {
 					return nil
 				},
 			},
@@ -519,7 +522,7 @@ func Test_authenticationService_Logout(t *testing.T) {
 			},
 			mockArgs: mockArgs{
 				ctx:       context.Background(),
-				m:         mock_repository.NewMockDBManager(ctrl),
+				m:         mock_query.NewMockDBManager(ctrl),
 				sessionID: model.SessionValidIDForTest,
 			},
 			mockReturn: mockReturn{
@@ -530,11 +533,11 @@ func Test_authenticationService_Logout(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m, ok := tt.fields.m.(*mock_repository.MockDBManager)
+			m, ok := tt.fields.m.(*mock_query.MockDBManager)
 			if !ok {
 				t.Fatal("failed to assert MockUserRepository")
 			}
-			m.EXPECT().Begin().Return(mock_repository.NewMockTxManager(ctrl), nil)
+			m.EXPECT().Begin().Return(mock_query.NewMockTxManager(ctrl), nil)
 
 			sr, ok := tt.fields.sessionRepository.(*mock_repository.MockSessionRepository)
 			if !ok {

@@ -16,7 +16,7 @@ check:
 	find . -name '*.go' | grep -v 'vendor' | xargs goimports -l
 	go list ./... | grep -v 'vendor' | xargs golint
 	go list ./... | grep -v 'vendor' | xargs go vet
-	go list ./... | grep -v 'vendor' | xargs errcheck -asserts
+	go list ./... | grep -v 'vendor' | grep -v 'mock' | xargs errcheck -asserts -blank -exclude errcheck_excludes.txt
 
 .PHONY:run
 run:

@@ -10,6 +10,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 )
 
@@ -25,7 +26,7 @@ func Test_sessionService_IsAlreadyExistID(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  string
 	}
 

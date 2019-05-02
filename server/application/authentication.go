@@ -7,6 +7,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/service"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 )
 
 // AuthenticationService is the interface of AuthenticationService.
@@ -38,7 +39,7 @@ func NewAuthenticationServiceDIInput(uRepo repository.UserRepository, sRepo repo
 
 // authenticationService is the service of authentication.
 type authenticationService struct {
-	m                     repository.DBManager
+	m                     query.DBManager
 	userRepository        repository.UserRepository
 	sessionRepository     repository.SessionRepository
 	userService           service.UserService
@@ -48,7 +49,7 @@ type authenticationService struct {
 }
 
 // NewAuthenticationService generates and returns AuthenticationService.
-func NewAuthenticationService(m repository.DBManager, diInput *AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
+func NewAuthenticationService(m query.DBManager, diInput *AuthenticationServiceDIInput, txCloser CloseTransaction) AuthenticationService {
 	return &authenticationService{
 		m:                     m,
 		userRepository:        diInput.userRepository,
@@ -99,7 +100,7 @@ func (s *authenticationService) SignUp(ctx context.Context, param *model.User) (
 }
 
 // createUser creates the user.
-func (s *authenticationService) createUser(ctx context.Context, m repository.SQLManager, user *model.User) (*model.User, error) {
+func (s *authenticationService) createUser(ctx context.Context, m query.SQLManager, user *model.User) (*model.User, error) {
 	// not allow duplicated name.
 	yes, err := s.userService.IsAlreadyExistName(ctx, m, user.Name)
 	if yes {
@@ -130,7 +131,7 @@ func (s *authenticationService) createUser(ctx context.Context, m repository.SQL
 }
 
 // createSession creates the session.
-func (s *authenticationService) createSession(ctx context.Context, m repository.SQLManager, session *model.Session) (*model.Session, error) {
+func (s *authenticationService) createSession(ctx context.Context, m query.SQLManager, session *model.Session) (*model.Session, error) {
 	// ready for collision of UUID.
 	yes := true
 	var err error
@@ -190,19 +191,19 @@ func (s *authenticationService) Login(ctx context.Context, param *model.User) (u
 }
 
 // Logout logout a user.
-func (a *authenticationService) Logout(ctx context.Context, sessionID string) error {
-	tx, err := a.m.Begin()
+func (s *authenticationService) Logout(ctx context.Context, sessionID string) error {
+	tx, err := s.m.Begin()
 	if err != nil {
 		return beginTxErrorMsg(err)
 	}
 
 	defer func() {
-		if err := a.txCloser(tx, err); err != nil {
+		if err := s.txCloser(tx, err); err != nil {
 			err = errors.Wrap(err, "failed to close tx")
 		}
 	}()
 
-	if err := a.sessionRepository.DeleteSession(ctx, tx, sessionID); err != nil {
+	if err := s.sessionRepository.DeleteSession(ctx, tx, sessionID); err != nil {
 		return errors.Wrap(err, "failed to delete session")
 	}
 

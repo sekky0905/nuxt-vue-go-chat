@@ -10,6 +10,7 @@ import (
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	mock_repository "github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository/mock"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 )
 
 func Test_commentService_IsAlreadyExistID(t *testing.T) {
@@ -24,7 +25,7 @@ func Test_commentService_IsAlreadyExistID(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 	}
 

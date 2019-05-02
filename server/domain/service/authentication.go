@@ -7,12 +7,13 @@ import (
 
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/util"
 )
 
 // AuthenticationService is interface of domain service of authentication.
 type AuthenticationService interface {
-	Authenticate(ctx context.Context, m repository.SQLManager, userName, password string) (ok bool, user *model.User, err error)
+	Authenticate(ctx context.Context, m query.SQLManager, userName, password string) (ok bool, user *model.User, err error)
 }
 
 // authenticationService is domain service of authentication.
@@ -28,7 +29,7 @@ func NewAuthenticationService(repo repository.UserRepository) AuthenticationServ
 }
 
 // Authenticate authenticate user.
-func (s *authenticationService) Authenticate(ctx context.Context, m repository.SQLManager, userName, password string) (ok bool, user *model.User, err error) {
+func (s *authenticationService) Authenticate(ctx context.Context, m query.SQLManager, userName, password string) (ok bool, user *model.User, err error) {
 	gotUser, err := s.repo.GetUserByName(ctx, m, userName)
 	if err != nil {
 		if _, ok := errors.Cause(err).(*model.NoSuchDataError); ok {

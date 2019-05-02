@@ -6,12 +6,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 )
 
 // ThreadService is interface of ThreadService.
 type ThreadService interface {
-	IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error)
-	IsAlreadyExistTitle(ctx context.Context, m repository.SQLManager, title string) (bool, error)
+	IsAlreadyExistID(ctx context.Context, m query.SQLManager, id uint32) (bool, error)
+	IsAlreadyExistTitle(ctx context.Context, m query.SQLManager, title string) (bool, error)
 }
 
 // threadService is domain service of Thread.
@@ -44,7 +45,7 @@ func (s threadService) NewThreadList(list []*model.Thread, hasNext bool, cursor 
 }
 
 // IsAlreadyExistID checks duplication of id.
-func (s threadService) IsAlreadyExistID(ctx context.Context, m repository.SQLManager, id uint32) (bool, error) {
+func (s threadService) IsAlreadyExistID(ctx context.Context, m query.SQLManager, id uint32) (bool, error) {
 	var searched *model.Thread
 	var err error
 
@@ -55,7 +56,7 @@ func (s threadService) IsAlreadyExistID(ctx context.Context, m repository.SQLMan
 }
 
 // IsAlreadyExistID checks duplication of name.
-func (s threadService) IsAlreadyExistTitle(ctx context.Context, m repository.SQLManager, title string) (bool, error) {
+func (s threadService) IsAlreadyExistTitle(ctx context.Context, m query.SQLManager, title string) (bool, error) {
 	var searched *model.Thread
 	var err error
 

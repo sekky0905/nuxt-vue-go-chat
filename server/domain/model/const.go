@@ -1,8 +1,10 @@
 package model
 
-const InvalidID = 0
-
-const SessionIDAtCookie = "SESSION_ID"
+// const
+const (
+	InvalidID         = 0
+	SessionIDAtCookie = "SESSION_ID"
+)
 
 // InvalidReasonForDeveloper is InvalidReason message for developer.
 type InvalidReasonForDeveloper string
@@ -85,9 +87,9 @@ var PropertyNameKV = map[PropertyNameForDeveloper]PropertyNameForUser{
 	PassWordPropertyForDeveloper: PassWordPropertyForUser,
 }
 
+// FailedToBeginTx is error of tx begin.
 const FailedToBeginTx InvalidReasonForDeveloper = "failed to begin tx"
 
-// == for test ==
 // User
 const (
 	UserNameForTest             = "testUserName"

@@ -54,7 +54,7 @@ func TranslateFromThreadDTOToThread(dto *ThreadDTO) *model.Thread {
 	}
 }
 
-// CommentDDTO is DTO of CommentD.
+// CommentDTO is DTO of CommentD.
 type CommentDTO struct {
 	ID        uint32 `json:"id"`
 	Content   string `json:"content" binding:"required"`
@@ -64,7 +64,7 @@ type CommentDTO struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// TranslateFromThreadDTOToThread translates from ThreadDTO to Thread.
+// TranslateFromCommentDTOToComment translates from CommentDTO to Comment.
 func TranslateFromCommentDTOToComment(dto *CommentDTO) *model.Comment {
 	logger.Logger.Info("CO", zap.String("content", dto.Content))
 	return &model.Comment{

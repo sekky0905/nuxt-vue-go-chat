@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
-	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/repository"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/testutil"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -63,7 +64,7 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  string
 	}
 
@@ -147,7 +148,7 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
-		m       repository.SQLManager
+		m       query.SQLManager
 		session *model.Session
 		err     error
 	}
@@ -263,7 +264,7 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		m   repository.SQLManager
+		m   query.SQLManager
 		id  uint32
 		err error
 	}

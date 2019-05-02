@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/logger"
+
 	"github.com/pkg/errors"
 	"github.com/sekky0905/nuxt-vue-go-chat/server/domain/model"
 )
@@ -26,7 +28,12 @@ const systemErrorForUser = "システムエラー"
 func handleError(err error) *handledError {
 	switch errors.Cause(err).(type) {
 	case *model.NoSuchDataError:
-		realErr := errors.Cause(err).(*model.NoSuchDataError)
+		realErr, ok := errors.Cause(err).(*model.NoSuchDataError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusNotFound,
@@ -36,7 +43,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   fmt.Sprintf("ご指定された%sのデータが存在しません", realErr.DomainModelNameForUser),
 		}
 	case *model.RequiredError:
-		realErr := errors.Cause(err).(*model.RequiredError)
+		realErr, ok := errors.Cause(err).(*model.RequiredError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusBadRequest,
@@ -46,7 +58,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   fmt.Sprintf("%sの入力が必要です", realErr.PropertyNameForUser),
 		}
 	case *model.InvalidParamError:
-		realErr := errors.Cause(err).(*model.InvalidParamError)
+		realErr, ok := errors.Cause(err).(*model.InvalidParamError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusBadRequest,
@@ -64,7 +81,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   "不正な入力です",
 		}
 	case *model.AlreadyExistError:
-		realErr := errors.Cause(err).(*model.AlreadyExistError)
+		realErr, ok := errors.Cause(err).(*model.AlreadyExistError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusConflict,
@@ -82,7 +104,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   "認証に失敗しました、IDもしくはパスワードが不正か既に利用されています",
 		}
 	case *model.RepositoryError:
-		realErr := errors.Cause(err).(*model.RepositoryError)
+		realErr, ok := errors.Cause(err).(*model.RepositoryError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusInternalServerError,
@@ -92,7 +119,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   fmt.Sprintf("[エラーコード: %s]システムエラーが発生しました。", InternalDBFailure),
 		}
 	case *model.SQLError:
-		realErr := errors.Cause(err).(*model.SQLError)
+		realErr, ok := errors.Cause(err).(*model.SQLError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusInternalServerError,
@@ -102,7 +134,12 @@ func handleError(err error) *handledError {
 			ErrorUserMsg:   fmt.Sprintf("[エラーコード: %s]システムエラーが発生しました。", InternalSQLFailure),
 		}
 	case *model.OtherServerError:
-		realErr := errors.Cause(err).(*model.OtherServerError)
+		realErr, ok := errors.Cause(err).(*model.OtherServerError)
+		if !ok {
+			logger.Logger.Error(fmt.Sprintf("failed to assert. err = %+v", err))
+			return nil
+		}
+
 		return &handledError{
 			BaseError:      realErr.BaseErr,
 			Status:         http.StatusInternalServerError,

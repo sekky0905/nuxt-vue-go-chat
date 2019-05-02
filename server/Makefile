@@ -1,10 +1,13 @@
 .PHONY: deps
-deps:
+deps: tools
+	go get github.com/golang/dep/cmd/dep
+	dep ensure
+
+.PHONY: tools
+tools:
 	go get golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
-	go get github.com/golang/dep/cmd/dep
 	go get github.com/kisielk/errcheck
-	dep ensure
 
 .PHONY: test
 test:

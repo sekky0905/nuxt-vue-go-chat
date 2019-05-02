@@ -329,7 +329,7 @@ func Test_commentController_GetComment(t *testing.T) {
 				cApp: mock_application.NewMockCommentService(ctrl),
 			},
 			parameter: parameter{
-				threadID: string(model.ThreadValidIDForTest),
+				threadID: "1",
 				id:       "a",
 			},
 			want: want{

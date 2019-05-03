@@ -41,9 +41,7 @@
         </div>
       </div>
       <div v-if="existsMore">
-        <infinite-loading
-          @infinite="listMore(showComments[showComments.length - 1])"
-        />
+        <infinite-loading @infinite="listMore" />
       </div>
     </div>
   </div>
@@ -69,6 +67,9 @@ export default {
   computed: {
     existsData() {
       return this.commentList && this.commentList.length !== 0
+    },
+    existsMore() {
+      return this.commentList.hasNext
     },
     showComments() {
       if (!this.existsData) {
@@ -108,7 +109,8 @@ export default {
     isOtherComment(userId) {
       return this.user.id !== userId
     },
-    async listMore(comment) {
+    async listMore() {
+      const comment = this.showComments[this.showComments.length - 1]
       try {
         await this.LIST_COMMENTS_MORE({
           threadId: comment.threadId,

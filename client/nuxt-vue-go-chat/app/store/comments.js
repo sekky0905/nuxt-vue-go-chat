@@ -68,14 +68,12 @@ export const mutations = {
     }
   },
   [SET_IS_DIALOG_VISIBLE](state, { dialogState }) {
-    console.log(`[SET_IS_DIALOG_VISIBLE] =${dialogState}`)
     state.isDialogVisible = !dialogState
   }
 }
 
 export const actions = {
   async [LIST_COMMENTS]({ commit }, { threadId }) {
-    console.log(`threads/${threadId}/comments`)
     commit(CLEAR_COMMENTS)
     const list = await this.$axios.$get(`threads/${threadId}/comments`)
     if (!list.comments) {

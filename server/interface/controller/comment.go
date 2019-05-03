@@ -93,15 +93,11 @@ func (c commentController) GetComment(g *gin.Context) {
 			InvalidReasonForDeveloper: "id should be number and over 0",
 		}
 
-		logger.Logger.Info("DEBUG", zap.String("ERR", err.Error()))
-
 		ResponseAndLogError(g, err)
 		return
 	}
 
 	id := uint32(idInt)
-
-	logger.Logger.Info("DEBUG", zap.Int("ID", idInt))
 
 	ctx := g.Request.Context()
 	comment, err := c.cApp.GetComment(ctx, id)

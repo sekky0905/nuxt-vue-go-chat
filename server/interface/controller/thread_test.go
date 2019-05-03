@@ -171,8 +171,7 @@ func Test_threadController_ListThreads(t *testing.T) {
 			mockReturns: mockReturns{
 				list: nil,
 				err: &model.NoSuchDataError{
-					DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-					DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+					DomainModelName: model.DomainModelNameThread,
 				},
 			},
 			want: want{
@@ -339,8 +338,8 @@ func Test_threadController_GetThread(t *testing.T) {
 			mockReturns: mockReturns{
 				thread: nil,
 				err: &model.NoSuchDataError{
-					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-					PropertyValue:            "",
+					PropertyName:  model.IDProperty,
+					PropertyValue: "",
 				},
 			},
 			want: want{
@@ -842,8 +841,8 @@ func Test_threadController_DeleteThread(t *testing.T) {
 			},
 			mockReturns: mockReturns{
 				err: &model.NoSuchDataError{
-					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-					PropertyValue:            "",
+					PropertyName:  model.IDProperty,
+					PropertyValue: "",
 				},
 			},
 			want: want{

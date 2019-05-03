@@ -90,7 +90,6 @@ export default {
         user: this.user
       }
       try {
-        console.log(` this.title => ${this.title}`)
         await this.SAVE_THREAD({ payload: payload })
         this.snackbar.color = 'success'
         this.snackbar.text = `success create 【${this.title}】thread`

@@ -181,8 +181,7 @@ func Test_commentController_ListComments(t *testing.T) {
 			mockReturns: mockReturns{
 				list: nil,
 				err: &model.NoSuchDataError{
-					DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-					DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+					DomainModelName: model.DomainModelNameComment,
 				},
 			},
 			want: want{
@@ -354,8 +353,8 @@ func Test_commentController_GetComment(t *testing.T) {
 			mockReturns: mockReturns{
 				comment: nil,
 				err: &model.NoSuchDataError{
-					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-					PropertyValue:            "",
+					PropertyName:  model.IDProperty,
+					PropertyValue: "",
 				},
 			},
 			want: want{
@@ -859,8 +858,8 @@ func Test_commentController_DeleteComment(t *testing.T) {
 			},
 			mockReturns: mockReturns{
 				err: &model.NoSuchDataError{
-					PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-					PropertyValue:            "",
+					PropertyName:  model.IDProperty,
+					PropertyValue: "",
 				},
 			},
 			want: want{

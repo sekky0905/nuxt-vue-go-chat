@@ -67,10 +67,9 @@ func Test_userRepository_ErrorMsg(t *testing.T) {
 				err:    errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				BaseErr:                     errors.New(model.ErrorMessageForTest),
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				BaseErr:          errors.New(model.ErrorMessageForTest),
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 	}
@@ -135,11 +134,9 @@ func Test_userRepository_GetUserByID(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               model.UserInValidIDForTest,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				PropertyName:    model.IDProperty,
+				PropertyValue:   model.UserInValidIDForTest,
+				DomainModelName: model.DomainModelNameUser,
 			},
 		},
 	}
@@ -221,11 +218,9 @@ func Test_userRepository_GetUserByName(t *testing.T) {
 			want: nil,
 
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
-				PropertyNameForUser:         model.NamePropertyForUser,
-				PropertyValue:               "test2",
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				PropertyName:    model.NameProperty,
+				PropertyValue:   "test2",
+				DomainModelName: model.DomainModelNameUser,
 			},
 		},
 	}
@@ -314,9 +309,8 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -335,9 +329,8 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -357,9 +350,8 @@ func Test_userRepository_InsertUser(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 	}
@@ -444,9 +436,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -466,9 +457,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -489,9 +479,8 @@ func Test_userRepository_UpdateUser(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 	}
@@ -558,9 +547,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -572,9 +560,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -587,9 +574,8 @@ func Test_userRepository_DeleteUser(t *testing.T) {
 				err: errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 	}

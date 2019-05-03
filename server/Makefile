@@ -23,4 +23,4 @@ check:
 
 .PHONY:run
 run:
-	cd .. && rm -r client/nuxt-vue-go-chat/dist && cd client/nuxt-vue-go-chat && yarn lint && yarn build && cd ../.. && docker-compose up
+	cd ../client/nuxt-vue-go-chat && yarn lint && yarn build && cd ../.. && docker-compose up

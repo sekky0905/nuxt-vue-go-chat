@@ -67,10 +67,9 @@ func Test_threadRepository_ErrorMsg(t *testing.T) {
 				err:    errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				BaseErr:                     errors.New(model.ErrorMessageForTest),
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				BaseErr:          errors.New(model.ErrorMessageForTest),
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 	}
@@ -174,9 +173,8 @@ func Test_threadRepository_ListThreads(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				BaseErr:                     err,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				BaseErr:         err,
+				DomainModelName: model.DomainModelNameThread,
 			},
 		},
 	}
@@ -268,11 +266,9 @@ func Test_threadRepository_GetThreadByID(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               model.UserInValidIDForTest,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				PropertyName:    model.IDProperty,
+				PropertyValue:   model.UserInValidIDForTest,
+				DomainModelName: model.DomainModelNameThread,
 			},
 		},
 	}
@@ -361,11 +357,9 @@ func Test_threadRepository_GetThreadByTitle(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
-				PropertyNameForUser:         model.NamePropertyForUser,
-				PropertyValue:               model.TitleForTest,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				PropertyName:    model.NameProperty,
+				PropertyValue:   model.TitleForTest,
+				DomainModelName: model.DomainModelNameThread,
 			},
 		},
 	}
@@ -463,9 +457,8 @@ func Test_threadRepository_InsertThread(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -486,9 +479,8 @@ func Test_threadRepository_InsertThread(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -510,9 +502,8 @@ func Test_threadRepository_InsertThread(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 	}
@@ -601,9 +592,8 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -625,9 +615,8 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -650,9 +639,8 @@ func Test_threadRepository_UpdateThread(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 	}
@@ -719,9 +707,8 @@ func Test_threadRepository_DeleteThread(t *testing.T) {
 				id:  model.ThreadInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -733,9 +720,8 @@ func Test_threadRepository_DeleteThread(t *testing.T) {
 				id:  model.ThreadInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 		{
@@ -748,9 +734,8 @@ func Test_threadRepository_DeleteThread(t *testing.T) {
 				err: errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameThread,
 			},
 		},
 	}

@@ -122,7 +122,7 @@ func Test_authenticationController_SignUp(t *testing.T) {
 				body:       nil,
 				errBody: errBody{
 					errCode: InvalidParameterValueFailure,
-					filed:   model.NamePropertyForDeveloper.String(),
+					filed:   model.NameProperty.String(),
 				},
 			},
 			mockArgs: mockArgs{
@@ -161,7 +161,7 @@ func Test_authenticationController_SignUp(t *testing.T) {
 				body:       nil,
 				errBody: errBody{
 					errCode: InvalidParameterValueFailure,
-					filed:   model.PassWordPropertyForDeveloper.String(),
+					filed:   model.PassWordProperty.String(),
 				},
 			},
 			mockArgs: mockArgs{
@@ -354,7 +354,7 @@ func Test_authenticationController_Login(t *testing.T) {
 				body:       nil,
 				errBody: errBody{
 					errCode: InvalidParameterValueFailure,
-					filed:   model.NamePropertyForDeveloper.String(),
+					filed:   model.NameProperty.String(),
 				},
 			},
 			mockArgs: mockArgs{
@@ -393,7 +393,7 @@ func Test_authenticationController_Login(t *testing.T) {
 				body:       nil,
 				errBody: errBody{
 					errCode: InvalidParameterValueFailure,
-					filed:   model.PassWordPropertyForDeveloper.String(),
+					filed:   model.PassWordProperty.String(),
 				},
 			},
 			mockArgs: mockArgs{

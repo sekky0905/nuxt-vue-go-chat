@@ -97,11 +97,9 @@ func (cs *commentService) UpdateComment(ctx context.Context, id uint32, param *m
 	yes, err := cs.service.IsAlreadyExistID(ctx, tx, copiedComment.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               param.ID,
-			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   param.ID,
+			DomainModelName: model.DomainModelNameComment,
 		}
 		return nil, errors.Wrap(err, "does not exists ID")
 	}
@@ -133,11 +131,9 @@ func (cs *commentService) DeleteComment(ctx context.Context, id uint32) (err err
 	yes, err := cs.service.IsAlreadyExistID(ctx, tx, id)
 	if !yes {
 		err = &model.NoSuchDataError{
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameComment,
 		}
 		return errors.Wrap(err, "does not exists id")
 	}

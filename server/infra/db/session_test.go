@@ -32,10 +32,9 @@ func Test_sessionRepository_ErrorMsg(t *testing.T) {
 				err:    errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				BaseErr:                     errors.New(model.ErrorMessageForTest),
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+				BaseErr:          errors.New(model.ErrorMessageForTest),
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameSession,
 			},
 		},
 	}
@@ -97,11 +96,9 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               model.SessionInValidIDForTest,
-				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+				PropertyName:    model.IDProperty,
+				PropertyValue:   model.SessionInValidIDForTest,
+				DomainModelName: model.DomainModelNameSession,
 			},
 		},
 	}
@@ -187,9 +184,8 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameSession,
 			},
 		},
 		{
@@ -205,9 +201,8 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameSession,
 			},
 		},
 		{
@@ -224,9 +219,8 @@ func Test_sessionRepository_InsertSession(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameSession,
 			},
 		},
 	}
@@ -294,9 +288,8 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -308,9 +301,8 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 				id:  model.UserInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 		{
@@ -323,9 +315,8 @@ func Test_sessionRepository_DeleteSession(t *testing.T) {
 				err: errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameUserForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameUser,
 			},
 		},
 	}

@@ -19,10 +19,9 @@ func handleValidatorErr(err error) error {
 
 	for _, v := range errors {
 		e := &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.PropertyNameForDeveloper(v.Field),
-			PropertyNameForUser:      model.PropertyNameKV[model.PropertyNameForDeveloper(v.Field)],
-			PropertyValue:            v.Value,
+			BaseErr:       err,
+			PropertyName:  model.PropertyName(v.Field),
+			PropertyValue: v.Value,
 		}
 
 		errs.Errors = append(errs.Errors, e)

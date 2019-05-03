@@ -60,9 +60,9 @@ func (c commentController) ListComments(g *gin.Context) {
 	threadIInt, err := strconv.Atoi(g.Param("threadId"))
 	if err != nil || threadIInt < 1 {
 		err = &model.InvalidParamError{
-			BaseErr:                   err,
-			PropertyNameForDeveloper:  model.ThreadIDPropertyForDeveloper,
-			InvalidReasonForDeveloper: "threadId should be number and over 0",
+			BaseErr:       err,
+			PropertyName:  model.ThreadIDProperty,
+			InvalidReason: "threadId should be number and over 0",
 		}
 
 		ResponseAndLogError(g, errors.Wrap(err, "failed to list comments"))
@@ -88,20 +88,16 @@ func (c commentController) GetComment(g *gin.Context) {
 	if err != nil || idInt < 1 {
 		logger.Logger.Info("DEBUG>>>", zap.String("ERR", err.Error()))
 		err = &model.InvalidParamError{
-			BaseErr:                   err,
-			PropertyNameForDeveloper:  model.IDPropertyForDeveloper,
-			InvalidReasonForDeveloper: "id should be number and over 0",
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			InvalidReason: "id should be number and over 0",
 		}
-
-		logger.Logger.Info("DEBUG", zap.String("ERR", err.Error()))
 
 		ResponseAndLogError(g, err)
 		return
 	}
 
 	id := uint32(idInt)
-
-	logger.Logger.Info("DEBUG", zap.Int("ID", idInt))
 
 	ctx := g.Request.Context()
 	comment, err := c.cApp.GetComment(ctx, id)
@@ -145,9 +141,9 @@ func (c commentController) UpdateComment(g *gin.Context) {
 	idInt, err := strconv.Atoi(g.Param("id"))
 	if err != nil {
 		err = &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-			PropertyValue:            g.Param("id"),
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			PropertyValue: g.Param("id"),
 		}
 		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
@@ -174,9 +170,9 @@ func (c commentController) DeleteComment(g *gin.Context) {
 	idInt, err := strconv.Atoi(g.Param("id"))
 	if err != nil {
 		err = &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-			PropertyValue:            g.Param("id"),
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			PropertyValue: g.Param("id"),
 		}
 		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))

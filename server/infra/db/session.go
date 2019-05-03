@@ -24,10 +24,9 @@ func NewSessionRepository() repository.SessionRepository {
 // ErrorMsg generates and returns error message.
 func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
 	ex := &model.RepositoryError{
-		BaseErr:                     err,
-		RepositoryMethod:            method,
-		DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-		DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+		BaseErr:          err,
+		RepositoryMethod: method,
+		DomainModelName:  model.DomainModelNameSession,
 	}
 
 	return ex
@@ -41,12 +40,10 @@ func (repo *sessionRepository) GetSessionByID(ctx context.Context, m query.SQLMa
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameSessionForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameSessionForUser,
+			BaseErr:         err,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameSession,
 		}
 		return nil, errors.WithStack(err)
 	}

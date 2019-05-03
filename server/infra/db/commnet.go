@@ -32,7 +32,7 @@ func (repo *commentRepository) ErrorMsg(method model.RepositoryMethod, err error
 
 // ListThreads lists ThreadList.
 func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLManager, threadID uint32, limit int, cursor uint32) (*model.CommentList, error) {
-	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
+	q := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
 	FROM comments AS c
 	INNER JOIN users AS u
 	ON c.user_id = u.id
@@ -42,7 +42,7 @@ func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLMana
 	LIMIT ?;`
 
 	limitForCheckHasNext := readyLimitForHasNext(limit)
-	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, cursor, threadID, limitForCheckHasNext)
+	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, cursor, threadID, limitForCheckHasNext)
 
 	length := len(comments)
 
@@ -84,14 +84,14 @@ func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLMana
 
 // GetThreadByID gets and returns a record specified by id.
 func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLManager, id uint32) (*model.Comment, error) {
-	query := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
+	q := `SELECT c.id, c.content, u.id, u.name, c.thread_id, c.created_at, c.updated_at
 	FROM comments AS c
 	INNER JOIN users AS u
 	ON c.user_id = u.id
 	WHERE c.id=?
 	LIMIT 1;`
 
-	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
+	comments, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, id)
 
 	if len(comments) == 0 {
 		err = &model.NoSuchDataError{
@@ -112,8 +112,8 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLMa
 }
 
 // list gets and returns list of records.
-func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
-	stmt, err := m.PrepareContext(ctx, query)
+func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, q string, args ...interface{}) (comments []*model.Comment, err error) {
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, err)
 	}
@@ -167,8 +167,8 @@ func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, met
 
 // InsertThread insert a record.
 func (repo *commentRepository) InsertComment(ctx context.Context, m query.SQLManager, comment *model.Comment) (uint32, error) {
-	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW());"
-	stmt, err := m.PrepareContext(ctx, query)
+	q := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW());"
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to list prepare context")
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
@@ -203,9 +203,9 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m query.SQLMan
 
 // UpdateComment updates a record.
 func (repo *commentRepository) UpdateComment(ctx context.Context, m query.SQLManager, id uint32, comment *model.Comment) error {
-	query := "UPDATE comments SET content=?, updated_at= NOW() WHERE id=?;"
+	q := "UPDATE comments SET content=?, updated_at= NOW() WHERE id=?;"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
@@ -235,9 +235,9 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m query.SQLMan
 
 // DeleteComment delete a record.
 func (repo *commentRepository) DeleteComment(ctx context.Context, m query.SQLManager, id uint32) error {
-	query := "DELETE FROM comments WHERE id=?;"
+	q := "DELETE FROM comments WHERE id=?;"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)

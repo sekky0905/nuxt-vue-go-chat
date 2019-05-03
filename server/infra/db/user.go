@@ -33,9 +33,9 @@ func (repo *userRepository) ErrorMsg(method model.RepositoryMethod, err error) e
 
 // GetUserByID gets and returns a record specified by id.
 func (repo *userRepository) GetUserByID(ctx context.Context, m query.SQLManager, id uint32) (*model.User, error) {
-	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE id=?"
+	q := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE id=?"
 
-	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -57,8 +57,8 @@ func (repo *userRepository) GetUserByID(ctx context.Context, m query.SQLManager,
 
 // GetUserByName gets and returns a record specified by name.
 func (repo *userRepository) GetUserByName(ctx context.Context, m query.SQLManager, name string) (*model.User, error) {
-	query := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
-	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, name)
+	q := "SELECT id, name, session_id, password, created_at, updated_at FROM users WHERE name=?"
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, name)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -79,8 +79,8 @@ func (repo *userRepository) GetUserByName(ctx context.Context, m query.SQLManage
 }
 
 // list gets and returns list of records.
-func (repo *userRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (users []*model.User, err error) {
-	stmt, err := m.PrepareContext(ctx, query)
+func (repo *userRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, q string, args ...interface{}) (users []*model.User, err error) {
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return nil, repo.ErrorMsg(method, err)
@@ -130,8 +130,8 @@ func (repo *userRepository) list(ctx context.Context, m query.SQLManager, method
 
 // InsertUser insert a record.
 func (repo *userRepository) InsertUser(ctx context.Context, m query.SQLManager, user *model.User) (uint32, error) {
-	query := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
-	stmt, err := m.PrepareContext(ctx, query)
+	q := "INSERT INTO users (name, session_id, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
@@ -170,9 +170,9 @@ func (repo *userRepository) InsertUser(ctx context.Context, m query.SQLManager, 
 
 // UpdateUser updates a record.
 func (repo *userRepository) UpdateUser(ctx context.Context, m query.SQLManager, id uint32, user *model.User) error {
-	query := "UPDATE users SET session_id=?, password=?, updated_at=NOW() WHERE id=?"
+	q := "UPDATE users SET session_id=?, password=?, updated_at=NOW() WHERE id=?"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
@@ -206,9 +206,9 @@ func (repo *userRepository) UpdateUser(ctx context.Context, m query.SQLManager, 
 
 // DeleteUser delete a record.
 func (repo *userRepository) DeleteUser(ctx context.Context, m query.SQLManager, id uint32) error {
-	query := "DELETE FROM users WHERE id=?"
+	q := "DELETE FROM users WHERE id=?"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)

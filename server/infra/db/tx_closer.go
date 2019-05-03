@@ -9,11 +9,14 @@ import (
 func CloseTransaction(tx query.TxManager, err error) error {
 	if p := recover(); p != nil { // rewrite panic
 		err = tx.Rollback()
+		err = errors.Wrap(err, "failed to roll back")
 		panic(p)
 	} else if err != nil {
 		err = tx.Rollback()
+		err = errors.Wrap(err, "failed to roll back")
 	} else {
 		err = tx.Commit()
+		err = errors.Wrap(err, "failed to commit")
 	}
-	return errors.WithStack(err)
+	return err
 }

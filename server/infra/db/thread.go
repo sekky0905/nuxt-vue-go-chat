@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 
@@ -55,7 +54,8 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManage
 	}
 
 	if err != nil {
-		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list threads")
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, err)
 	}
 
 	hasNext := checkHasNext(length, limit)
@@ -95,7 +95,8 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m query.SQLMana
 	}
 
 	if err != nil {
-		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list threads")
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, err)
 	}
 
 	return list[0], nil
@@ -123,7 +124,8 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLM
 	}
 
 	if err != nil {
-		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list threads")
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, err)
 	}
 
 	return list[0], nil
@@ -133,7 +135,7 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLM
 func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (threads []*model.Thread, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(method, err))
+		return nil, repo.ErrorMsg(method, err)
 	}
 
 	defer func() {
@@ -145,7 +147,8 @@ func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, meth
 
 	rows, err := stmt.QueryContext(ctx, args...)
 	if err != nil {
-		return nil, repo.ErrorMsg(method, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to query context")
+		return nil, repo.ErrorMsg(method, err)
 	}
 
 	defer func() {
@@ -171,7 +174,8 @@ func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, meth
 		)
 
 		if err != nil {
-			return nil, repo.ErrorMsg(method, errors.WithStack(err))
+			err = errors.Wrap(err, "failed to scan rows")
+			return nil, repo.ErrorMsg(method, err)
 		}
 
 		list = append(list, thread)
@@ -185,7 +189,8 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m query.SQLManag
 	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		err = errors.Wrap(err, "failed to prepare context")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -196,18 +201,20 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m query.SQLManag
 
 	result, err := stmt.ExecContext(ctx, thread.Title, thread.User.ID)
 	if err != nil {
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to execute context")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	affect, err := result.RowsAffected()
 	if affect != 1 {
-		err = fmt.Errorf("total affected is: %d", affect)
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Errorf("total affected is: %d", affect)
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to get last insert id")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	return uint32(id), nil
@@ -218,7 +225,8 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m query.SQLManag
 	query := "UPDATE threads SET title=?, updated_at=NOW() WHERE id=?"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to prepare context")
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	defer func() {
@@ -230,13 +238,19 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m query.SQLManag
 
 	result, err := stmt.ExecContext(ctx, thread.Title, id)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to execute context")
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	affect, err := result.RowsAffected()
+	if err != nil {
+		err = errors.Wrap(err, "failed to get rows affected")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
+	}
+
 	if affect != 1 {
-		err = fmt.Errorf("total affected is: %d", affect)
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+		err = errors.Errorf("total affected is: %d", affect)
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	return nil
@@ -248,7 +262,8 @@ func (repo *threadRepository) DeleteThread(ctx context.Context, m query.SQLManag
 
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to prepare context")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -259,16 +274,18 @@ func (repo *threadRepository) DeleteThread(ctx context.Context, m query.SQLManag
 
 	result, err := stmt.ExecContext(ctx, id)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to execute context")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 
 	affect, err := result.RowsAffected()
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to get rows affected")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 	if affect != 1 {
-		err = fmt.Errorf("total affected is: %d", affect)
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Errorf("total affected is: %d", affect)
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 
 	return nil

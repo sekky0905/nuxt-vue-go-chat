@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/sekky0905/nuxt-vue-go-chat/server/infra/db/query"
 
@@ -56,7 +55,8 @@ func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLMana
 	}
 
 	if err != nil {
-		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list comments")
+		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, err)
 	}
 
 	hasNext := checkHasNext(length, limit)
@@ -104,7 +104,8 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLMa
 	}
 
 	if err != nil {
-		return nil, repo.ErrorMsg(model.RepositoryMethodLIST, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list comments")
+		return nil, repo.ErrorMsg(model.RepositoryMethodREAD, err)
 	}
 
 	return comments[0], nil
@@ -114,7 +115,7 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLMa
 func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (comments []*model.Comment, err error) {
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return nil, errors.WithStack(repo.ErrorMsg(method, err))
+		return nil, repo.ErrorMsg(method, err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -126,7 +127,8 @@ func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, met
 	rows, err := stmt.QueryContext(ctx, args...)
 
 	if err != nil {
-		return nil, repo.ErrorMsg(method, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to query context")
+		return nil, repo.ErrorMsg(method, err)
 	}
 
 	defer func() {
@@ -153,7 +155,8 @@ func (repo *commentRepository) list(ctx context.Context, m query.SQLManager, met
 		)
 
 		if err != nil {
-			return nil, repo.ErrorMsg(method, errors.WithStack(err))
+			err = errors.Wrap(err, "failed to scan rows")
+			return nil, repo.ErrorMsg(method, err)
 		}
 
 		list = append(list, comment)
@@ -167,7 +170,8 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m query.SQLMan
 	query := "INSERT INTO comments (content, user_id, thread_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW());"
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return model.InvalidID, errors.WithStack(repo.ErrorMsg(model.RepositoryMethodInsert, err))
+		err = errors.Wrap(err, "failed to list prepare context")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -178,18 +182,20 @@ func (repo *commentRepository) InsertComment(ctx context.Context, m query.SQLMan
 
 	result, err := stmt.ExecContext(ctx, comment.Content, comment.User.ID, comment.ThreadID)
 	if err != nil {
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to list execute context")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	affect, err := result.RowsAffected()
 	if affect != 1 {
-		err = fmt.Errorf("total affected id: %d ", affect)
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Errorf("total affected id: %d ", affect)
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to get last insert id")
+		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
 	}
 
 	return uint32(id), nil
@@ -201,7 +207,8 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m query.SQLMan
 
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return errors.WithStack(repo.ErrorMsg(model.RepositoryMethodUPDATE, err))
+		err = errors.Wrap(err, "failed to prepare context")
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	defer func() {
@@ -211,19 +218,16 @@ func (repo *commentRepository) UpdateComment(ctx context.Context, m query.SQLMan
 		}
 	}()
 
-	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
-	}
-
 	result, err := stmt.ExecContext(ctx, comment.Content, id)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to execute context")
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	affect, err := result.RowsAffected()
 	if affect != 1 {
-		err = fmt.Errorf("total affected id: %d ", affect)
-		return repo.ErrorMsg(model.RepositoryMethodUPDATE, errors.WithStack(err))
+		err = errors.Errorf("total affected id: %d ", affect)
+		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
 	}
 
 	return nil
@@ -235,7 +239,8 @@ func (repo *commentRepository) DeleteComment(ctx context.Context, m query.SQLMan
 
 	stmt, err := m.PrepareContext(ctx, query)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to prepare context")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -246,16 +251,18 @@ func (repo *commentRepository) DeleteComment(ctx context.Context, m query.SQLMan
 
 	result, err := stmt.ExecContext(ctx, id)
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed to execute context")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 
 	affect, err := result.RowsAffected()
 	if err != nil {
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Wrap(err, "failed get rows affected")
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 	if affect != 1 {
-		err = fmt.Errorf("total affected id: %d ", affect)
-		return repo.ErrorMsg(model.RepositoryMethodDELETE, errors.WithStack(err))
+		err = errors.Errorf("total affected id: %d ", affect)
+		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)
 	}
 
 	return nil

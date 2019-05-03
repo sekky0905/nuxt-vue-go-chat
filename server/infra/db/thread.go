@@ -32,7 +32,7 @@ func (repo *threadRepository) ErrorMsg(method model.RepositoryMethod, err error)
 
 // ListThreads lists ThreadList.
 func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManager, cursor uint32, limit int) (*model.ThreadList, error) {
-	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
+	q := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
 	ON t.user_id = u.id
@@ -41,7 +41,7 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManage
 	LIMIT ?;`
 
 	limitForCheckHasNext := readyLimitForHasNext(limit)
-	threads, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, cursor, limitForCheckHasNext)
+	threads, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, cursor, limitForCheckHasNext)
 
 	length := len(threads)
 
@@ -75,14 +75,14 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManage
 
 // GetThreadByID gets and returns a record specified by id.
 func (repo *threadRepository) GetThreadByID(ctx context.Context, m query.SQLManager, id uint32) (*model.Thread, error) {
-	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
+	q := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
 	ON t.user_id = u.id
 	WHERE t.id=?
 	LIMIT 1;`
 
-	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -104,14 +104,14 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m query.SQLMana
 
 // GetThreadByTitle gets and returns a record specified by title.
 func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLManager, name string) (*model.Thread, error) {
-	query := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
+	q := `SELECT t.id, t.title, u.id, u.name, t.created_at, t.updated_at
 	FROM threads AS t
 	INNER JOIN users AS u
 	ON t.user_id = u.id
 	WHERE t.title=?
 	LIMIT 1;`
 
-	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, name)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, name)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -132,8 +132,8 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLM
 }
 
 // list gets and returns list of records.
-func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (threads []*model.Thread, err error) {
-	stmt, err := m.PrepareContext(ctx, query)
+func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, q string, args ...interface{}) (threads []*model.Thread, err error) {
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		return nil, repo.ErrorMsg(method, err)
 	}
@@ -186,8 +186,8 @@ func (repo *threadRepository) list(ctx context.Context, m query.SQLManager, meth
 
 // InsertThread insert a record.
 func (repo *threadRepository) InsertThread(ctx context.Context, m query.SQLManager, thread *model.Thread) (uint32, error) {
-	query := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())"
-	stmt, err := m.PrepareContext(ctx, query)
+	q := "INSERT INTO threads (title, user_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())"
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return model.InvalidID, repo.ErrorMsg(model.RepositoryMethodInsert, err)
@@ -222,8 +222,8 @@ func (repo *threadRepository) InsertThread(ctx context.Context, m query.SQLManag
 
 // UpdateThread updates a record.
 func (repo *threadRepository) UpdateThread(ctx context.Context, m query.SQLManager, id uint32, thread *model.Thread) error {
-	query := "UPDATE threads SET title=?, updated_at=NOW() WHERE id=?"
-	stmt, err := m.PrepareContext(ctx, query)
+	q := "UPDATE threads SET title=?, updated_at=NOW() WHERE id=?"
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodUPDATE, err)
@@ -258,9 +258,9 @@ func (repo *threadRepository) UpdateThread(ctx context.Context, m query.SQLManag
 
 // DeleteThread delete a record.
 func (repo *threadRepository) DeleteThread(ctx context.Context, m query.SQLManager, id uint32) error {
-	query := "DELETE FROM threads WHERE id=?"
+	q := "DELETE FROM threads WHERE id=?"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)

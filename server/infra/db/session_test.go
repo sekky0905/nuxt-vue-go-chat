@@ -119,7 +119,7 @@ func Test_sessionRepository_GetSessionByID(t *testing.T) {
 			got, err := repo.GetSessionByID(tt.args.ctx, tt.args.m, tt.args.id)
 
 			if tt.wantErr != nil {
-				if err.Error() != tt.wantErr.Error() {
+				if errors.Cause(err).Error() != tt.wantErr.Error() {
 					t.Errorf("sessionRepository.GetSessionByID() error = %v, wantErr %v", err, tt.wantErr)
 					return
 				}

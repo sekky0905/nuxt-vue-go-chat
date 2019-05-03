@@ -33,9 +33,9 @@ func (repo *sessionRepository) ErrorMsg(method model.RepositoryMethod, err error
 
 // GetSessionByID gets and returns a record specified by id.
 func (repo *sessionRepository) GetSessionByID(ctx context.Context, m query.SQLManager, id string) (*model.Session, error) {
-	query := "SELECT id, user_id, created_at FROM sessions WHERE id=?"
+	q := "SELECT id, user_id, created_at FROM sessions WHERE id=?"
 
-	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, query, id)
+	list, err := repo.list(ctx, m, model.RepositoryMethodREAD, q, id)
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
@@ -56,8 +56,8 @@ func (repo *sessionRepository) GetSessionByID(ctx context.Context, m query.SQLMa
 }
 
 // list gets and returns list of records.
-func (repo *sessionRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, query string, args ...interface{}) (sessions []*model.Session, err error) {
-	stmt, err := m.PrepareContext(ctx, query)
+func (repo *sessionRepository) list(ctx context.Context, m query.SQLManager, method model.RepositoryMethod, q string, args ...interface{}) (sessions []*model.Session, err error) {
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return nil, repo.ErrorMsg(method, err)
@@ -104,8 +104,8 @@ func (repo *sessionRepository) list(ctx context.Context, m query.SQLManager, met
 
 // InsertSession insert a record.
 func (repo *sessionRepository) InsertSession(ctx context.Context, m query.SQLManager, session *model.Session) error {
-	query := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, NOW())"
-	stmt, err := m.PrepareContext(ctx, query)
+	q := "INSERT INTO sessions (id, user_id, created_at) VALUES (?, ?, NOW())"
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodInsert, err)
@@ -134,9 +134,9 @@ func (repo *sessionRepository) InsertSession(ctx context.Context, m query.SQLMan
 
 // DeleteSession delete a record.
 func (repo *sessionRepository) DeleteSession(ctx context.Context, m query.SQLManager, id string) error {
-	query := "DELETE FROM sessions WHERE id=?"
+	q := "DELETE FROM sessions WHERE id=?"
 
-	stmt, err := m.PrepareContext(ctx, query)
+	stmt, err := m.PrepareContext(ctx, q)
 	if err != nil {
 		err = errors.Wrap(err, "failed to prepare context")
 		return repo.ErrorMsg(model.RepositoryMethodDELETE, err)

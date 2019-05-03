@@ -26,10 +26,9 @@ func NewUserRepository() repository.UserRepository {
 // ErrorMsg generates and returns error message.
 func (repo *userRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
 	return &model.RepositoryError{
-		BaseErr:                     err,
-		RepositoryMethod:            method,
-		DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-		DomainModelNameForUser:      model.DomainModelNameUserForUser,
+		BaseErr:          err,
+		RepositoryMethod: method,
+		DomainModelName:  model.DomainModelNameUser,
 	}
 }
 
@@ -41,12 +40,10 @@ func (repo *userRepository) GetUserByID(ctx context.Context, m query.SQLManager,
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			BaseErr:         err,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameUser,
 		}
 		return nil, err
 	}
@@ -65,12 +62,10 @@ func (repo *userRepository) GetUserByName(ctx context.Context, m query.SQLManage
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
-			PropertyNameForUser:         model.NamePropertyForUser,
-			PropertyValue:               name,
-			DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			BaseErr:         err,
+			PropertyName:    model.NameProperty,
+			PropertyValue:   name,
+			DomainModelName: model.DomainModelNameUser,
 		}
 		return nil, err
 	}

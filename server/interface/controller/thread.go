@@ -70,9 +70,9 @@ func (c *threadController) GetThread(g *gin.Context) {
 	idInt, err := strconv.Atoi(g.Param("id"))
 	if err != nil {
 		err = &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-			PropertyValue:            g.Param("id"),
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			PropertyValue: g.Param("id"),
 		}
 		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
@@ -124,9 +124,9 @@ func (c *threadController) UpdateThread(g *gin.Context) {
 	idInt, err := strconv.Atoi(g.Param("id"))
 	if err != nil {
 		err = &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-			PropertyValue:            g.Param("id"),
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			PropertyValue: g.Param("id"),
 		}
 		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))
@@ -152,9 +152,9 @@ func (c *threadController) DeleteThread(g *gin.Context) {
 	idInt, err := strconv.Atoi(g.Param("id"))
 	if err != nil {
 		err = &model.InvalidParamError{
-			BaseErr:                  err,
-			PropertyNameForDeveloper: model.IDPropertyForDeveloper,
-			PropertyValue:            g.Param("id"),
+			BaseErr:       err,
+			PropertyName:  model.IDProperty,
+			PropertyValue: g.Param("id"),
 		}
 		err = handleValidatorErr(err)
 		ResponseAndLogError(g, errors.Wrap(err, "failed to change id from string to int"))

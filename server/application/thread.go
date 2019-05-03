@@ -73,11 +73,9 @@ func (a *threadService) CreateThread(ctx context.Context, param *model.Thread) (
 	yes, err := a.service.IsAlreadyExistTitle(ctx, tx, param.Title)
 	if yes {
 		err = &model.AlreadyExistError{
-			PropertyNameForDeveloper:    model.TitlePropertyForDeveloper,
-			PropertyNameForUser:         model.TitlePropertyForUser,
-			PropertyValue:               param.Title,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			PropertyName:    model.TitleProperty,
+			PropertyValue:   param.Title,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return nil, errors.Wrap(err, "already exist id")
 	}
@@ -111,11 +109,9 @@ func (a *threadService) UpdateThread(ctx context.Context, id uint32, param *mode
 	yes, err := a.service.IsAlreadyExistID(ctx, tx, copiedThread.ID)
 	if !yes {
 		err = &model.NoSuchDataError{
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               param.ID,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   param.ID,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return nil, errors.Wrap(err, "does not exists ID")
 	}
@@ -147,11 +143,9 @@ func (a *threadService) DeleteThread(ctx context.Context, id uint32) (err error)
 	yes, err := a.service.IsAlreadyExistID(ctx, tx, id)
 	if !yes {
 		err = &model.NoSuchDataError{
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return errors.Wrap(err, "does not exists id")
 	}

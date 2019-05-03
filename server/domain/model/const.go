@@ -6,89 +6,49 @@ const (
 	SessionIDAtCookie = "SESSION_ID"
 )
 
-// InvalidReasonForDeveloper is InvalidReason message for developer.
-type InvalidReasonForDeveloper string
+// InvalidReason is InvalidReason message for developer.
+type InvalidReason string
 
 // String return as string.
-func (p InvalidReasonForDeveloper) String() string {
+func (p InvalidReason) String() string {
 	return string(p)
 }
 
-// DomainModelNameForDeveloper is Model name for developer.
-type DomainModelNameForDeveloper string
+// DomainModelName is Model name for developer.
+type DomainModelName string
 
 // String return as string.
-func (p DomainModelNameForDeveloper) String() string {
+func (p DomainModelName) String() string {
 	return string(p)
 }
 
-// Model name for developer.
+// Model name.
 const (
-	DomainModelNameUserForDeveloper    DomainModelNameForDeveloper = "User"
-	DomainModelNameSessionForDeveloper DomainModelNameForDeveloper = "Session"
-	DomainModelNameThreadForDeveloper  DomainModelNameForDeveloper = "Thread"
-	DomainModelNameCommentForDeveloper DomainModelNameForDeveloper = "Comment"
+	DomainModelNameUser    DomainModelName = "User"
+	DomainModelNameSession DomainModelName = "Session"
+	DomainModelNameThread  DomainModelName = "Thread"
+	DomainModelNameComment DomainModelName = "Comment"
 )
 
-// DomainModelNameForUser is Model name for user.
-type DomainModelNameForUser string
+// PropertyName is property name for developer.
+type PropertyName string
 
 // String return as string.
-func (p DomainModelNameForUser) String() string {
-	return string(p)
-}
-
-// Model name for user.
-const (
-	DomainModelNameUserForUser    DomainModelNameForUser = "ユーザー"
-	DomainModelNameSessionForUser DomainModelNameForUser = "セッション"
-	DomainModelNameThreadForUser  DomainModelNameForUser = "スレッド"
-	DomainModelNameCommentForUser DomainModelNameForUser = "コメント"
-)
-
-// PropertyNameForDeveloper is property name for developer.
-type PropertyNameForDeveloper string
-
-// String return as string.
-func (p PropertyNameForDeveloper) String() string {
+func (p PropertyName) String() string {
 	return string(p)
 }
 
 // Property name for developer.
 const (
-	IDPropertyForDeveloper       PropertyNameForDeveloper = "ID"
-	NamePropertyForDeveloper     PropertyNameForDeveloper = "Name"
-	TitlePropertyForDeveloper    PropertyNameForDeveloper = "Title"
-	PassWordPropertyForDeveloper PropertyNameForDeveloper = "Password"
-	ThreadIDPropertyForDeveloper PropertyNameForDeveloper = "ThreadID"
+	IDProperty       PropertyName = "ID"
+	NameProperty     PropertyName = "Name"
+	TitleProperty    PropertyName = "Title"
+	PassWordProperty PropertyName = "Password"
+	ThreadIDProperty PropertyName = "ThreadID"
 )
-
-// PropertyNameForUser is Property name for user.
-type PropertyNameForUser string
-
-// String return as string.
-func (p PropertyNameForUser) String() string {
-	return string(p)
-}
-
-// Property name for user.
-const (
-	IDPropertyForUser       PropertyNameForUser = "ID"
-	NamePropertyForUser     PropertyNameForUser = "名前"
-	TitlePropertyForUser    PropertyNameForUser = "タイトル"
-	PassWordPropertyForUser PropertyNameForUser = "パスワード"
-)
-
-// PropertyNameKV is the Key/Value of PropertyNameForDeveloper and PropertyNameForUser,
-var PropertyNameKV = map[PropertyNameForDeveloper]PropertyNameForUser{
-	IDPropertyForDeveloper:       IDPropertyForUser,
-	NamePropertyForDeveloper:     NamePropertyForUser,
-	TitlePropertyForDeveloper:    TitlePropertyForUser,
-	PassWordPropertyForDeveloper: PassWordPropertyForUser,
-}
 
 // FailedToBeginTx is error of tx begin.
-const FailedToBeginTx InvalidReasonForDeveloper = "failed to begin tx"
+const FailedToBeginTx InvalidReason = "failed to begin tx"
 
 // User
 const (

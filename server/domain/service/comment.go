@@ -48,7 +48,7 @@ func NewCommentList(list []*model.Comment, hasNext bool, cursor uint32) *model.C
 func (s commentService) IsAlreadyExistID(ctx context.Context, m query.SQLManager, id uint32) (bool, error) {
 	searched, err := s.repo.GetCommentByID(ctx, m, id)
 	if err != nil {
-		return false, errors.Wrap(err, "failed to get comment by PropertyNameForDeveloper")
+		return false, errors.Wrap(err, "failed to get comment by PropertyName")
 	}
 	return searched != nil, nil
 }

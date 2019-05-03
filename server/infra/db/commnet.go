@@ -25,10 +25,9 @@ func NewCommentRepository() repository.CommentRepository {
 // ErrorMsg generates and returns error message.
 func (repo *commentRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
 	return &model.RepositoryError{
-		BaseErr:                     err,
-		RepositoryMethod:            method,
-		DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-		DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+		BaseErr:          err,
+		RepositoryMethod: method,
+		DomainModelName:  model.DomainModelNameComment,
 	}
 }
 
@@ -50,9 +49,8 @@ func (repo *commentRepository) ListComments(ctx context.Context, m query.SQLMana
 
 	if length == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			BaseErr:         err,
+			DomainModelName: model.DomainModelNameComment,
 		}
 		return nil, err
 	}
@@ -97,12 +95,10 @@ func (repo *commentRepository) GetCommentByID(ctx context.Context, m query.SQLMa
 
 	if len(comments) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+			BaseErr:         err,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameComment,
 		}
 		return nil, err
 	}

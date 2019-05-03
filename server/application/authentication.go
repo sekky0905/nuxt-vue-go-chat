@@ -105,11 +105,9 @@ func (s *authenticationService) createUser(ctx context.Context, m query.SQLManag
 	yes, err := s.userService.IsAlreadyExistName(ctx, m, user.Name)
 	if yes {
 		err = &model.AlreadyExistError{
-			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
-			PropertyNameForUser:         model.NamePropertyForUser,
-			PropertyValue:               user.Name,
-			DomainModelNameForDeveloper: model.DomainModelNameUserForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameUserForUser,
+			PropertyName:    model.NameProperty,
+			PropertyValue:   user.Name,
+			DomainModelName: model.DomainModelNameUser,
 		}
 
 		return nil, errors.WithStack(err)

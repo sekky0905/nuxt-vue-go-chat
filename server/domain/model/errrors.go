@@ -19,57 +19,52 @@ const (
 
 // InvalidDataError expresses that given data is invalid.
 type InvalidDataError struct {
-	BaseErr                   error
-	DataNameForDeveloper      string
-	DataValueForDeveloper     interface{}
-	InvalidReasonForDeveloper string
+	BaseErr       error
+	DataName      string
+	DataValue     interface{}
+	InvalidReason string
 }
 
 // Error returns error message.
 func (e *InvalidDataError) Error() string {
-	return fmt.Sprintf("%s, %s", e.DataNameForDeveloper, e.InvalidReasonForDeveloper)
+	return fmt.Sprintf("%s, %s", e.DataName, e.InvalidReason)
 }
 
 // AlreadyExistError expresses already specified data has existed.
 type AlreadyExistError struct {
 	BaseErr error
-	PropertyNameForDeveloper
-	PropertyNameForUser
+	PropertyName
 	PropertyValue interface{}
-	DomainModelNameForDeveloper
-	DomainModelNameForUser
+	DomainModelName
 }
 
 // Error returns error message.
 func (e *AlreadyExistError) Error() string {
-	return fmt.Sprintf("%s, %s, is already exists", e.PropertyNameForDeveloper, e.DomainModelNameForDeveloper)
+	return fmt.Sprintf("%s, %s, is already exists", e.PropertyName, e.DomainModelName)
 }
 
 // RequiredError is not existing necessary value error.
 type RequiredError struct {
 	BaseErr error
-	PropertyNameForDeveloper
-	PropertyNameForUser
+	PropertyName
 }
 
 // Error returns error message.
 func (e *RequiredError) Error() string {
-	return fmt.Sprintf("%s is required", e.PropertyNameForDeveloper)
+	return fmt.Sprintf("%s is required", e.PropertyName)
 }
 
 // InvalidParamError is inappropriate parameter error。
 type InvalidParamError struct {
 	BaseErr error
-	PropertyNameForDeveloper
-	PropertyNameForUser
-	PropertyValue             interface{}
-	InvalidReasonForDeveloper string
-	InvalidReasonForUser      string
+	PropertyName
+	PropertyValue interface{}
+	InvalidReason string
 }
 
 // Error returns error message.
 func (e *InvalidParamError) Error() string {
-	return fmt.Sprintf("%s, %v, is invalid, %s", e.PropertyNameForDeveloper, e.PropertyValue, e.InvalidReasonForDeveloper)
+	return fmt.Sprintf("%s, %v, is invalid, %s", e.PropertyName, e.PropertyValue, e.InvalidReason)
 }
 
 // InvalidParamsError is inappropriate parameters error。
@@ -90,35 +85,32 @@ func (e *InvalidParamsError) Error() string {
 // NoSuchDataError is not existing specified data error.
 type NoSuchDataError struct {
 	BaseErr error
-	PropertyNameForDeveloper
-	PropertyNameForUser
+	PropertyName
 	PropertyValue interface{}
-	DomainModelNameForDeveloper
-	DomainModelNameForUser
+	DomainModelName
 }
 
 // Error returns error message.
 func (e *NoSuchDataError) Error() string {
-	return fmt.Sprintf("no such data, %s: %v, %s", e.PropertyNameForDeveloper, e.PropertyValue, e.DomainModelNameForDeveloper)
+	return fmt.Sprintf("no such data, %s: %v, %s", e.PropertyName, e.PropertyValue, e.DomainModelName)
 }
 
 // RepositoryError is Repository error.
 type RepositoryError struct {
 	BaseErr          error
 	RepositoryMethod RepositoryMethod
-	DomainModelNameForDeveloper
-	DomainModelNameForUser
+	DomainModelName
 }
 
 // Error returns error message.
 func (e *RepositoryError) Error() string {
-	return fmt.Sprintf("failed Repository operation, %s, %s", e.RepositoryMethod, e.DomainModelNameForDeveloper)
+	return fmt.Sprintf("failed Repository operation, %s, %s", e.RepositoryMethod, e.DomainModelName)
 }
 
 // SQLError is SQL error.
 type SQLError struct {
 	BaseErr                   error
-	InvalidReasonForDeveloper InvalidReasonForDeveloper
+	InvalidReasonForDeveloper InvalidReason
 }
 
 // Error returns error message.
@@ -138,11 +130,11 @@ func (e *AuthenticationErr) Error() string {
 
 // OtherServerError is other server error.
 type OtherServerError struct {
-	BaseErr                   error
-	InvalidReasonForDeveloper string
+	BaseErr       error
+	InvalidReason string
 }
 
 // Error returns error message.
 func (e *OtherServerError) Error() string {
-	return e.InvalidReasonForDeveloper
+	return e.InvalidReason
 }

@@ -66,10 +66,9 @@ func Test_commentRepository_ErrorMsg(t *testing.T) {
 				err:    errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				BaseErr:                     errors.New(model.ErrorMessageForTest),
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				BaseErr:          errors.New(model.ErrorMessageForTest),
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 	}
@@ -178,9 +177,8 @@ func Test_commentRepository_ListComments(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				BaseErr:                     err,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				BaseErr:         err,
+				DomainModelName: model.DomainModelNameComment,
 			},
 		},
 	}
@@ -271,11 +269,9 @@ func Test_commentRepository_GetCommentByID(t *testing.T) {
 			},
 			want: nil,
 			wantErr: &model.NoSuchDataError{
-				PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-				PropertyNameForUser:         model.IDPropertyForUser,
-				PropertyValue:               model.UserInValidIDForTest,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				PropertyName:    model.IDProperty,
+				PropertyValue:   model.UserInValidIDForTest,
+				DomainModelName: model.DomainModelNameComment,
 			},
 		},
 	}
@@ -371,9 +367,8 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -393,9 +388,8 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -416,9 +410,8 @@ func Test_commentRepository_InsertComment(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodInsert,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodInsert,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 	}
@@ -507,9 +500,8 @@ func Test_commentRepository_UpdateComment(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -530,9 +522,8 @@ func Test_commentRepository_UpdateComment(t *testing.T) {
 			},
 			rowAffected: 2,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -554,9 +545,8 @@ func Test_commentRepository_UpdateComment(t *testing.T) {
 			},
 			rowAffected: 0,
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodUPDATE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodUPDATE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 	}
@@ -625,9 +615,8 @@ func Test_commentRepository_DeleteComment(t *testing.T) {
 				id:  model.CommentInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -639,9 +628,8 @@ func Test_commentRepository_DeleteComment(t *testing.T) {
 				id:  model.CommentInValidIDForTest,
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 		{
@@ -654,9 +642,8 @@ func Test_commentRepository_DeleteComment(t *testing.T) {
 				err: errors.New(model.ErrorMessageForTest),
 			},
 			wantErr: &model.RepositoryError{
-				RepositoryMethod:            model.RepositoryMethodDELETE,
-				DomainModelNameForDeveloper: model.DomainModelNameCommentForDeveloper,
-				DomainModelNameForUser:      model.DomainModelNameCommentForUser,
+				RepositoryMethod: model.RepositoryMethodDELETE,
+				DomainModelName:  model.DomainModelNameComment,
 			},
 		},
 	}

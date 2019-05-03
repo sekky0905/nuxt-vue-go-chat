@@ -25,10 +25,9 @@ func NewThreadRepository() repository.ThreadRepository {
 // ErrorMsg generates and returns error message.
 func (repo *threadRepository) ErrorMsg(method model.RepositoryMethod, err error) error {
 	return &model.RepositoryError{
-		BaseErr:                     err,
-		RepositoryMethod:            method,
-		DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-		DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+		BaseErr:          err,
+		RepositoryMethod: method,
+		DomainModelName:  model.DomainModelNameThread,
 	}
 }
 
@@ -49,9 +48,8 @@ func (repo *threadRepository) ListThreads(ctx context.Context, m query.SQLManage
 
 	if length == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			BaseErr:         err,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return nil, err
 	}
@@ -88,12 +86,10 @@ func (repo *threadRepository) GetThreadByID(ctx context.Context, m query.SQLMana
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.IDPropertyForDeveloper,
-			PropertyNameForUser:         model.IDPropertyForUser,
-			PropertyValue:               id,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			BaseErr:         err,
+			PropertyName:    model.IDProperty,
+			PropertyValue:   id,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return nil, err
 	}
@@ -118,12 +114,10 @@ func (repo *threadRepository) GetThreadByTitle(ctx context.Context, m query.SQLM
 
 	if len(list) == 0 {
 		err = &model.NoSuchDataError{
-			BaseErr:                     err,
-			PropertyNameForDeveloper:    model.NamePropertyForDeveloper,
-			PropertyNameForUser:         model.NamePropertyForUser,
-			PropertyValue:               name,
-			DomainModelNameForDeveloper: model.DomainModelNameThreadForDeveloper,
-			DomainModelNameForUser:      model.DomainModelNameThreadForUser,
+			BaseErr:         err,
+			PropertyName:    model.NameProperty,
+			PropertyValue:   name,
+			DomainModelName: model.DomainModelNameThread,
 		}
 		return nil, err
 	}

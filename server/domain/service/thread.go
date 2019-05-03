@@ -50,7 +50,7 @@ func (s threadService) IsAlreadyExistID(ctx context.Context, m query.SQLManager,
 	var err error
 
 	if searched, err = s.repo.GetThreadByID(ctx, m, id); err != nil {
-		return false, errors.Wrap(err, "failed to get thread by PropertyNameForDeveloper")
+		return false, errors.Wrap(err, "failed to get thread by PropertyName")
 	}
 	return searched != nil, nil
 }

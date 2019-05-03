@@ -80,14 +80,6 @@ export default {
       ]
     }
   },
-  watch: {
-    pagination: {
-      handler() {
-        this.listMore()
-      },
-      deep: true
-    }
-  },
   computed: {
     existsData() {
       return this.threadList && this.threadList.length !== 0
@@ -110,6 +102,14 @@ export default {
       return this.isDialogVisible
     },
     ...mapGetters('threads', ['threads', 'threadList', 'isDialogVisible'])
+  },
+  watch: {
+    pagination: {
+      handler() {
+        this.listMore()
+      },
+      deep: true
+    }
   },
   asyncData({ store }) {
     try {

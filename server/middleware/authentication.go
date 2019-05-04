@@ -13,6 +13,7 @@ func CheckAuthentication() gin.HandlerFunc {
 		id, err := g.Cookie(model.SessionIDAtCookie)
 		if err != nil {
 			controller.ResponseAndLogError(g, &model.AuthenticationErr{})
+			g.Abort()
 			return
 		}
 
@@ -22,6 +23,7 @@ func CheckAuthentication() gin.HandlerFunc {
 		session, err := repo.GetSessionByID(ctx, m, id)
 		if err != nil || session == nil {
 			controller.ResponseAndLogError(g, &model.AuthenticationErr{})
+			g.Abort()
 			return
 		}
 		g.Next()

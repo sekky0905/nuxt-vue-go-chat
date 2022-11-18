@@ -18,7 +18,7 @@
     "@nuxtjs/pwa": "^2.6.0",
     "cross-env": "^5.2.0",
     "moment": "^2.24.0",
-    "nuxt": "^2.4.0",
+    "nuxt": "^2.15.8",
     "vue-infinite-loading": "^2.4.3",
     "vuelidate": "^0.7.4",
     "vuetify": "^1.5.5",
